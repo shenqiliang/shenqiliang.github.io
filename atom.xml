@@ -4,7 +4,7 @@
   <title><![CDATA[My Octopress Blog]]></title>
   <link href="http://shenqiliang.github.io/atom.xml" rel="self"/>
   <link href="http://shenqiliang.github.io/"/>
-  <updated>2013-10-14T02:51:27+08:00</updated>
+  <updated>2013-10-14T03:30:05+08:00</updated>
   <id>http://shenqiliang.github.io/</id>
   <author>
     <name><![CDATA[Your Name]]></name>
@@ -19,6 +19,19 @@
     <updated>2013-10-14T02:25:00+08:00</updated>
     <id>http://shenqiliang.github.io/blog/2013/10/14/title</id>
     <content type="html"><![CDATA[
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[博客开通第一天]]></title>
+    <link href="http://shenqiliang.github.io/blog/2011/03/01/my-first-blog/"/>
+    <updated>2011-03-01T07:48:00+08:00</updated>
+    <id>http://shenqiliang.github.io/blog/2011/03/01/my-first-blog</id>
+    <content type="html"><![CDATA[<p>本博客今日起开通！</p>
+
+<p>我做过接近3年的iPhone开发，从已经被人们遗忘的toolchain到今天的iOS4.2。对iOS开发充满的浓厚的兴趣，希望和大家一起分享iOS开发经验，提供开发技术，并讨论移动互联网业界动态。</p>
+
+<p>不积跬步，无以至千里；不积小流，无以成江海。学习永无止境！</p>
 ]]></content>
   </entry>
   
