@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: iOS开发 | My Octopress Blog]]></title>
+  <link href="http://shenqiliang.github.io/blog/categories/ioskai-fa/atom.xml" rel="self"/>
+  <link href="http://shenqiliang.github.io/"/>
+  <updated>2013-10-14T20:15:36+08:00</updated>
+  <id>http://shenqiliang.github.io/</id>
+  <author>
+    <name><![CDATA[Your Name]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[iOS5网页视图（UIWebView）中的输入框不能弹出键盘的问题]]></title>
+    <link href="http://shenqiliang.github.io/blog/2013/07/30/no-keyboard-in-webview-of-ios5/"/>
+    <updated>2013-07-30T10:32:00+08:00</updated>
+    <id>http://shenqiliang.github.io/blog/2013/07/30/no-keyboard-in-webview-of-ios5</id>
+    <content type="html"><![CDATA[<p>项目开发时，发现有时候在网页视图中的输入框获得焦点后，却不能弹出键盘。而且全部都是在iOS5的系统中出现了这个问题，iOS6中运行完全是正常的，而且即使是在iOS5中，其他的UITextView和UITextField仍然可以正常地弹出键盘。我仔细了看了一下代码，发现对UIWebView的一些操作和键盘弹出并没有什么关系。我看了一些UIWebView的一些资料，然后发现了这个问题：UIWebView要能弹出键盘，那么它所在的window必须是key window。</p>
+
+<h2>什么是key window？</h2>
+
+<p>key window就是接收键盘消息的window。键盘消息都会发送到key window上。而这个key window往往是系统自动设置的，但web view获得焦点并没有自动设置（也许是Apple开发偷了个懒），然而我们也可以用一个方法手动设置。</p>
+
+<pre><code>[window makeKeyAndVisiable]
+</code></pre>
+
+<h2>一个演示例子</h2>
+
+<p>为了验证这个问题我也写了一段简短的代码：</p>
+
+<pre><code>UIWebView *webView = [[UIWebView alloc] initWithFrame:self.window.bounds];
+[webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"http://www.google.com"]]];
+[self.window addSubview:webView];
+
+UIWindow *anotherWindow = [UIWindow new];
+[anotherWindow makeKeyAndVisible];
+</code></pre>
+
+<p>这段代码在iOS5中运行的话，即使输入框获得了焦点也不能弹出键盘。
+<img src="/images/post/no-keyboard-in-webview.jpg" alt="image" /></p>
+
+<h2>解决方案</h2>
+
+<p>如果在UIWebView被添加的window上时，将window设置为key window就好了。</p>
+
+<pre><code>[self.window makeKeyAndVisiable]
+[self.window addSubview:webView];
+</code></pre>
+
+<h2>小结</h2>
+
+<p>UIWebView要能弹出键盘，那么它所在的window必须是key window。如果你的App可能存在多个Window（如弹出自定义的Alert，状态条等），而且这些window有可能被设置为key window，一定要在web view显示时将它所在的window设置为key window。</p>
+]]></content>
+  </entry>
+  
+</feed>

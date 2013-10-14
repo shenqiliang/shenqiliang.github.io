@@ -4,7 +4,7 @@
   <title><![CDATA[My Octopress Blog]]></title>
   <link href="http://shenqiliang.github.io/atom.xml" rel="self"/>
   <link href="http://shenqiliang.github.io/"/>
-  <updated>2013-10-14T14:07:51+08:00</updated>
+  <updated>2013-10-14T20:15:36+08:00</updated>
   <id>http://shenqiliang.github.io/</id>
   <author>
     <name><![CDATA[Your Name]]></name>
@@ -18,17 +18,165 @@
     <link href="http://shenqiliang.github.io/blog/2013/08/15/auto-key-press-using-appscript/"/>
     <updated>2013-08-15T01:11:00+08:00</updated>
     <id>http://shenqiliang.github.io/blog/2013/08/15/auto-key-press-using-appscript</id>
-    <content type="html"><![CDATA[<h1>什么是AppleScript</h1>
+    <content type="html"><![CDATA[<h2>什么是AppleScript</h2>
 
 <p>AppleScript是Mac系统提供的一个脚本语言，这个脚本语言简单易读，稍微懂一点脚本语言就可以快速学会了。AppleScript可以让我们的日常工作流程化，简化繁琐的固定输入，自动化完成一般的日常工作。
 AppleScript提供了很多很多强大的功能，本文就只简单的介绍一下如何用它来实现类似Windows下按键精灵的功能。</p>
 
-<h1>前提工作</h1>
+<h2>前提工作</h2>
 
 <p>如果想要让AppleScript自动帮我们按键，点击鼠标。首先还是要在设置里“启用辅助设备的控制”，否则AppleScript就没有权限控制我们的键盘、鼠标这些辅助设备。
 打开“系统偏好设置”->“辅助功能”页面，然后勾选“启用辅助设备的控制”。</p>
 
-<p><img src="./images/post/enable-assist-device-control.png" alt="image" /></p>
+<p><img src="http://shenqiliang.github.io/images/post/enable-assist-device-control.png" alt="image" /></p>
+
+<h2>如何按键</h2>
+
+<p>在Mac系统中有个叫“System Events”的App，AppleScript可以让它做按键或者点击鼠标的动作。</p>
+
+<pre><code>tell application "TextEdit"
+    activate
+end tell
+
+tell application "System Events"
+    tell process "TextEdit"
+        set frontmost to true
+    end tell
+
+    key down shift
+    keystroke "e"
+    delay 1
+    key up shift
+    keystroke "e"
+    keystroke return
+end tell
+</code></pre>
+
+<p>1-3行脚本用来运行系统自带App“文本编辑器”，第6-8行是将文本编辑器设置为前台App，这样我们的键盘鼠标消息才可以发到“文本编辑器”的进程上去。key down是按下某个按键不放，key up是松开某个按键，keystroke是点按一下某个按键。第10-13行相当与按shift+e，这样在文本编辑器中就输入的大写的“E”，然后14行就是又按了一下“e”，就紧接着输入了一个小写的“e”。15行按了一下回车，那么“文本编辑器”会换行。</p>
+
+<h2>如何点击鼠标</h2>
+
+<p>点击鼠标脚本和按键脚本类似，不同的是用了click at命令。如：</p>
+
+<p>tell application &ldquo;System Events&rdquo;</p>
+
+<pre><code>tell process "xxx"
+    set frontmost to true
+end tell
+click at {100,200}
+</code></pre>
+
+<p>end tell</p>
+
+<p>这个脚本运行后就是在屏幕坐标点为{100,200}的地方点击一下鼠标左健。</p>
+
+<h2>游戏《魔兽世界》中的运用</h2>
+
+<p>做为一个爱玩游戏的技术宅，这些功能非常适合运用到游戏当中。所以，呵呵。一个运用就是防止暂离，《魔兽世界》战场中是不容许暂离的，一旦暂离就会被清除战场，如果你没节操挂机的话，就要每隔一段时间手动操作一下人物，比如按一下空格跳跃一下。使用以下这个脚本就可以在挂机的时候防止暂离了。</p>
+
+<p>AntiAFK.scptd</p>
+
+<pre><code>tell application "System Events"
+    repeat while 1 is 1
+        if UI elements enabled then
+            tell process "World of Warcraft-64"
+                set frontmost to true
+            end tell
+        end if
+        keystroke " "
+        delay (random number from 50 to 75)
+    end repeat
+end tell
+</code></pre>
+
+<p>这个脚本会每隔50-75秒，按一下空格跳跃一次。这样就不会有暂离状态了。之所以用随机50-75秒，是为了防止固定操作容易被反外挂程序检测到。</p>
+
+<p>另外我还写一个刷地精声望的脚本</p>
+
+<p>地精声望.scptd</p>
+
+<pre><code>tell application "System Events"
+    repeat while 1 is 1
+        if UI elements enabled then
+            tell process "World of Warcraft-64"
+                set frontmost to true
+            end tell
+        end if
+        keystroke "z"
+        delay 2
+        if UI elements enabled then
+            tell process "World of Warcraft-64"
+                set frontmost to true
+            end tell
+        end if
+        keystroke "c"
+        delay 2
+        if UI elements enabled then
+            tell process "World of Warcraft-64"
+                set frontmost to true
+            end tell
+        end if
+        keystroke "x"
+        delay 2
+        set r to (random number from 1 to 10)
+        delay r
+    end repeat
+end tell
+</code></pre>
+
+<p>这个脚本是不停的按Z、X、C三个按键，可以根据情况绑定相应的技能。贫瘠之地有个勇士岛，岛上的一间屋子里有个叫“嘉维伊船长”的人，杀了他可以得到不少地精声望，而且他刷新很快，1-2分钟刷一次。这就让这个脚本来自动刷声望成为可能。
+这个Z按键我绑定选目标攻击的WOW宏，WOW宏内容如下：</p>
+
+<pre><code>/tar 嘉维伊船长
+/startattack [exists,nodead]
+</code></pre>
+
+<p>X按键我绑定了公会战旗，这样就可以多得到点声望了。而且可以全程有战旗覆盖。
+C按键我绑定了群体攻击大技能，这样就可以在群体技能冷却后杀死额外的小怪收获额外的声望。
+然后，你要走到“嘉维伊船长”的刷新点面对他后运行脚本，这样就可以睡觉刷声望了。虽然效率不是很高，但缺很省心，毫不费劲，最重要的是不占用我们的时间。毕竟“时间就是金钱，我的朋友。”</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[iOS5网页视图（UIWebView）中的输入框不能弹出键盘的问题]]></title>
+    <link href="http://shenqiliang.github.io/blog/2013/07/30/no-keyboard-in-webview-of-ios5/"/>
+    <updated>2013-07-30T10:32:00+08:00</updated>
+    <id>http://shenqiliang.github.io/blog/2013/07/30/no-keyboard-in-webview-of-ios5</id>
+    <content type="html"><![CDATA[<p>项目开发时，发现有时候在网页视图中的输入框获得焦点后，却不能弹出键盘。而且全部都是在iOS5的系统中出现了这个问题，iOS6中运行完全是正常的，而且即使是在iOS5中，其他的UITextView和UITextField仍然可以正常地弹出键盘。我仔细了看了一下代码，发现对UIWebView的一些操作和键盘弹出并没有什么关系。我看了一些UIWebView的一些资料，然后发现了这个问题：UIWebView要能弹出键盘，那么它所在的window必须是key window。</p>
+
+<h2>什么是key window？</h2>
+
+<p>key window就是接收键盘消息的window。键盘消息都会发送到key window上。而这个key window往往是系统自动设置的，但web view获得焦点并没有自动设置（也许是Apple开发偷了个懒），然而我们也可以用一个方法手动设置。</p>
+
+<pre><code>[window makeKeyAndVisiable]
+</code></pre>
+
+<h2>一个演示例子</h2>
+
+<p>为了验证这个问题我也写了一段简短的代码：</p>
+
+<pre><code>UIWebView *webView = [[UIWebView alloc] initWithFrame:self.window.bounds];
+[webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"http://www.google.com"]]];
+[self.window addSubview:webView];
+
+UIWindow *anotherWindow = [UIWindow new];
+[anotherWindow makeKeyAndVisible];
+</code></pre>
+
+<p>这段代码在iOS5中运行的话，即使输入框获得了焦点也不能弹出键盘。
+<img src="http://shenqiliang.github.io/images/post/no-keyboard-in-webview.jpg" alt="image" /></p>
+
+<h2>解决方案</h2>
+
+<p>如果在UIWebView被添加的window上时，将window设置为key window就好了。</p>
+
+<pre><code>[self.window makeKeyAndVisiable]
+[self.window addSubview:webView];
+</code></pre>
+
+<h2>小结</h2>
+
+<p>UIWebView要能弹出键盘，那么它所在的window必须是key window。如果你的App可能存在多个Window（如弹出自定义的Alert，状态条等），而且这些window有可能被设置为key window，一定要在web view显示时将它所在的window设置为key window。</p>
 ]]></content>
   </entry>
   
