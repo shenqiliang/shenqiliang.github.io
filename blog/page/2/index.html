@@ -9,9 +9,7 @@
   <meta name="author" content="谌启亮">
 
   
-  <meta name="description" content="今天一位同事调试时发现了一个问题：一个字符串在被replace后，调试时并没有被replace。代码如下： NSString *s = @"深圳市";
-s = [s stringByReplacingOccurrencesOfString:@"市" withString:@""];
-NSLog &hellip;">
+  <meta name="description" content="崩溃日志的产生 iOS中运行App过程中如果发生程序崩溃，会生成一个崩溃日志文件。这个文件会保存的特定系统目录下，扩展名是crash。当手机连接到iTunes时，会将该文件同步到电脑上。 在Mac系统中这些文件会同步到“~/Library/Logs/CrashReporter/ &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -67,66 +65,6 @@ NSLog &hellip;">
     <div id="content">
       <div class="blog-index">
   
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2013/01/25/xcode-debug-string-show/">Xcode字符串调试时显示问题</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-01-25T01:52:00+08:00" pubdate data-updated="true">Jan 25<span>th</span>, 2013</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>今天一位同事调试时发现了一个问题：一个字符串在被replace后，调试时并没有被replace。代码如下：</p>
-
-<pre><code>NSString *s = @"深圳市";
-s = [s stringByReplacingOccurrencesOfString:@"市" withString:@""];
-NSLog(@"%@",s);
-return YES;
-</code></pre>
-
-<p>我在最后设置的一个断点，看看运行后的情况：</p>
-
-<p><img src="/images/post/xcode-string-show-breakpoint.png" alt="image" /></p>
-
-<p>可以看出左侧的s中显示并不是“深圳”，而是“深圳市 ”，貌似并没有替换掉。但右侧Log输出却是深圳。那么究竟那个是对的呢？</p>
-
-<p>其实在系统中NSString对象主要有两个属性：一个unichar(2个字节)数组, 另一个是长度。如果仅仅是把字符串末位的一些字去掉的话，unichar数组的内容并没有修改，而仅仅修改了长度属性。</p>
-
-<p>我们在看看控制台左侧的显示格式，就会更明白了。</p>
-
-<p><img src="/images/post/xcode-string-show-summary.png" alt="image" /></p>
-
-<p>可以看出实际显示的是unichar*，由于replace后unichar*指针地址并没有改变，变的只是length属性，所以显示也没有变。</p>
-
-<h2>结论</h2>
-
-<p>有时候我们在看字符串的内容时，特别时仅仅进行了尾部替换为空这些操作时，我们不能仅仅看控制台变量的显示，我们要Print Descripton。</p>
-</div>
-  
-  
-
-
-    </article>
   
   
     <article>
@@ -638,6 +576,58 @@ ERROR: TodayDealListViewController dealInfosThisRound 没有在dealloc中release
 </code></pre>
 
 <p>项目地址：<a href="https://github.com/shenqiliang/occheck">https://github.com/shenqiliang/occheck</a></p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/04/18/xcode-codesense-no-effect/">解决Xcode中Code Sense无效问题</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-04-18T00:45:00+08:00" pubdate data-updated="true">Apr 18<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Code sense是Xcode中一项重要功能，它给代码加入高亮色彩，方便我们进行辨识，同时在写代码时自动提示出相关备选项，极大地提高我们的开发效率。</p>
+
+<p>当我们写代码时，Xcode的Code sense会经常失效，严重影响开发。下面这几个步骤可以很轻松的解决这个问题。</p>
+
+<p>首先关闭工程，点击Xcode的菜单“Window”－“Organizer”，在“Organizer”窗口中选择“Projects”标签。在左侧列表中选择你的工程或Workspace，在右侧的Derived Data行中，点击此行右边“Delete…”按钮，弹出提示时选择“Delete”。</p>
+
+<p><img src="/images/post/code-sense-step-one.png" alt="image" /></p>
+
+<p>经过这一步，一般再打开你的工程或Workspace，Code sense就有效了。如果仍然无效请继续以下步骤。</p>
+
+<p>关闭Xcode，然后找到工程的目录，再工程文件上点击右键选择“显示包内容”。</p>
+
+<p><img src="/images/post/code-sense-step-two.png" alt="image" /></p>
+
+<p>只留下“project.pbxproj”文件，其他全部删除。</p>
+
+<p><img src="/images/post/code-sense-step-three.png" alt="image" /></p>
 </div>
   
   

@@ -9,7 +9,7 @@
   <meta name="author" content="谌启亮">
 
   
-  <meta name="description" content="Code sense是Xcode中一项重要功能，它给代码加入高亮色彩，方便我们进行辨识，同时在写代码时自动提示出相关备选项，极大地提高我们的开发效率。 当我们写代码时，Xcode的Code sense会经常失效，严重影响开发。下面这几个步骤可以很轻松的解决这个问题。 首先关闭工程， &hellip;">
+  <meta name="description" content="iOS开始时经常会在键盘显示时调整界面布局，iOS 5中当切换为中文输入法时，键盘高度会增加，同时给iPad的键盘增加了分割功能，使得键盘处理情况更加多样化。键盘的消息通知有： 通知 描述 UIKeyboardWillShowNotification 键盘即将显示 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -65,58 +65,6 @@
     <div id="content">
       <div class="blog-index">
   
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/04/18/xcode-codesense-no-effect/">解决Xcode中Code Sense无效问题</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-04-18T00:45:00+08:00" pubdate data-updated="true">Apr 18<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Code sense是Xcode中一项重要功能，它给代码加入高亮色彩，方便我们进行辨识，同时在写代码时自动提示出相关备选项，极大地提高我们的开发效率。</p>
-
-<p>当我们写代码时，Xcode的Code sense会经常失效，严重影响开发。下面这几个步骤可以很轻松的解决这个问题。</p>
-
-<p>首先关闭工程，点击Xcode的菜单“Window”－“Organizer”，在“Organizer”窗口中选择“Projects”标签。在左侧列表中选择你的工程或Workspace，在右侧的Derived Data行中，点击此行右边“Delete…”按钮，弹出提示时选择“Delete”。</p>
-
-<p><img src="/images/post/code-sense-step-one.png" alt="image" /></p>
-
-<p>经过这一步，一般再打开你的工程或Workspace，Code sense就有效了。如果仍然无效请继续以下步骤。</p>
-
-<p>关闭Xcode，然后找到工程的目录，再工程文件上点击右键选择“显示包内容”。</p>
-
-<p><img src="/images/post/code-sense-step-two.png" alt="image" /></p>
-
-<p>只留下“project.pbxproj”文件，其他全部删除。</p>
-
-<p><img src="/images/post/code-sense-step-three.png" alt="image" /></p>
-</div>
-  
-  
-
-
-    </article>
   
   
     <article>
@@ -659,6 +607,78 @@ NSLog(@"%@",string1);
     <footer>
       <a rel="full-article" href="/blog/2012/03/19/new-to-ios5-uialertview-password/">Read on &rarr;</a>
     </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/03/17/new-to-ios5-uistepper/">iOS5新增内容之UIStepper控件详解</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-17T23:56:00+08:00" pubdate data-updated="true">Mar 17<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>在iOS5中新增了一个数字输入控件UIStepper，它可以递进式输入数量。UIStepper继承自UIControl，它主要的事件是UIControlEventValueChanged，每当它的值改变了就会触发这个事件。它的显示效果如下：</p>
+
+<p><img src="/images/post/ios5-uistepper.png" alt="image" /></p>
+
+<p>它主要有下面几个属性</p>
+
+<ul>
+<li>value 当前所表示的值，默认0.0</li>
+<li>minimumValue 最小可以表示的值，默认0.0</li>
+<li>maximumValue 最大可以表示的值，默认100.0</li>
+<li>stepValue 每次递增或递减的值，默认1.0</li>
+</ul>
+
+
+<p>设置以上几个值，一般就可以很方便的使用了。</p>
+
+<pre><code>UIStepper *stepper = [[UIStepper alloc] init];
+stepper.minimumValue = 2;
+stepper.maximumValue = 5;
+stepper.stepValue = 2;
+stepper.value = 3;
+stepper.center = CGPointMake(160, 240);
+[stepper addTarget:self action:@selector(valueChanged:) forControlEvents:UIControlEventValueChanged];
+</code></pre>
+
+<p>注意：上面我设置stepValue是2，当前value是3，最小值是2。但如果我们点击“－”，这是value会变成2，而不是1。即每次改变都是value±stepValue，然后将最终的值限制在[minimumValue,maximumValue]区间内。</p>
+
+<p>另外还有几个控制属性：</p>
+
+<ul>
+<li>continuous 控制是否持续触发UIControlEventValueChanged事件。默认YES，即当按住时每次值改变都触发一次UIControlEventValueChanged事件，否则只有在释放按钮时触发UIControlEventValueChanged事件。</li>
+<li>autorepeat 控制是否在按住是自动持续递增或递减。默认YES。</li>
+<li>wraps 控制值是否在[minimumValue,maximumValue]区间内循环。默认NO。</li>
+</ul>
+
+
+<p>这几个控制属性只有在特殊情况下使用，一般使用默认值即可。</p>
+</div>
+  
   
 
 

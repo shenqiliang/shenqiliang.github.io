@@ -4,7 +4,7 @@
   <title><![CDATA[Xcode Dev]]></title>
   <link href="http://shenqiliang.github.io/atom.xml" rel="self"/>
   <link href="http://shenqiliang.github.io/"/>
-  <updated>2013-10-15T02:59:09+08:00</updated>
+  <updated>2013-10-15T03:06:01+08:00</updated>
   <id>http://shenqiliang.github.io/</id>
   <author>
     <name><![CDATA[谌启亮]]></name>
@@ -852,24 +852,6 @@ popAnimation.timingFunctions = @[[CAMediaTimingFunction functionWithName:kCAMedi
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[另一个实用工具：Traveler]]></title>
-    <link href="http://shenqiliang.github.io/blog/2013/03/10/an-utility-ibe-traveler/"/>
-    <updated>2013-03-10T14:42:00+08:00</updated>
-    <id>http://shenqiliang.github.io/blog/2013/03/10/an-utility-ibe-traveler</id>
-    <content type="html"><![CDATA[<p>在完成了Star Invader之后，我就开始做了一个应用Traveler。这是一个方便国际旅行的实用工具。它提供这些功能：</p>
-
-<ul>
-<li>世界各地时区时间的快速查询。昼夜长短分析，帮助旅行者快速适应时差。</li>
-<li>各国重量、面积、体积等计量单位的快速转换。</li>
-<li>从网络上获取当前各国的货币汇率，快速进行货币兑换查询。</li>
-<li>世界各地区的衣服尺码比较和查询。</li>
-<li>各国区号、编码的查询。</li>
-</ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
     <title type="html"><![CDATA[Xcode字符串调试时显示问题]]></title>
     <link href="http://shenqiliang.github.io/blog/2013/01/25/xcode-debug-string-show/"/>
     <updated>2013-01-25T01:52:00+08:00</updated>
@@ -1261,6 +1243,31 @@ ERROR: TodayDealListViewController dealInfosThisRound 没有在dealloc中release
 </code></pre>
 
 <p>项目地址：<a href="https://github.com/shenqiliang/occheck">https://github.com/shenqiliang/occheck</a></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[解决Xcode中Code sense无效问题]]></title>
+    <link href="http://shenqiliang.github.io/blog/2012/04/18/xcode-codesense-no-effect/"/>
+    <updated>2012-04-18T00:45:00+08:00</updated>
+    <id>http://shenqiliang.github.io/blog/2012/04/18/xcode-codesense-no-effect</id>
+    <content type="html"><![CDATA[<p>Code sense是Xcode中一项重要功能，它给代码加入高亮色彩，方便我们进行辨识，同时在写代码时自动提示出相关备选项，极大地提高我们的开发效率。</p>
+
+<p>当我们写代码时，Xcode的Code sense会经常失效，严重影响开发。下面这几个步骤可以很轻松的解决这个问题。</p>
+
+<p>首先关闭工程，点击Xcode的菜单“Window”－“Organizer”，在“Organizer”窗口中选择“Projects”标签。在左侧列表中选择你的工程或Workspace，在右侧的Derived Data行中，点击此行右边“Delete…”按钮，弹出提示时选择“Delete”。</p>
+
+<p><img src="http://shenqiliang.github.io/images/post/code-sense-step-one.png" alt="image" /></p>
+
+<p>经过这一步，一般再打开你的工程或Workspace，Code sense就有效了。如果仍然无效请继续以下步骤。</p>
+
+<p>关闭Xcode，然后找到工程的目录，再工程文件上点击右键选择“显示包内容”。</p>
+
+<p><img src="http://shenqiliang.github.io/images/post/code-sense-step-two.png" alt="image" /></p>
+
+<p>只留下“project.pbxproj”文件，其他全部删除。</p>
+
+<p><img src="http://shenqiliang.github.io/images/post/code-sense-step-three.png" alt="image" /></p>
 ]]></content>
   </entry>
   

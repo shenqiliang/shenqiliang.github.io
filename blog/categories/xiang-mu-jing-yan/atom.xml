@@ -4,7 +4,7 @@
   <title><![CDATA[Category: 项目经验 | Xcode Dev]]></title>
   <link href="http://shenqiliang.github.io/blog/categories/xiang-mu-jing-yan/atom.xml" rel="self"/>
   <link href="http://shenqiliang.github.io/"/>
-  <updated>2013-10-15T02:59:09+08:00</updated>
+  <updated>2013-10-15T03:06:01+08:00</updated>
   <id>http://shenqiliang.github.io/</id>
   <author>
     <name><![CDATA[谌启亮]]></name>
@@ -12,24 +12,6 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
-  
-  <entry>
-    <title type="html"><![CDATA[另一个实用工具：Traveler]]></title>
-    <link href="http://shenqiliang.github.io/blog/2013/03/10/an-utility-ibe-traveler/"/>
-    <updated>2013-03-10T14:42:00+08:00</updated>
-    <id>http://shenqiliang.github.io/blog/2013/03/10/an-utility-ibe-traveler</id>
-    <content type="html"><![CDATA[<p>在完成了Star Invader之后，我就开始做了一个应用Traveler。这是一个方便国际旅行的实用工具。它提供这些功能：</p>
-
-<ul>
-<li>世界各地时区时间的快速查询。昼夜长短分析，帮助旅行者快速适应时差。</li>
-<li>各国重量、面积、体积等计量单位的快速转换。</li>
-<li>从网络上获取当前各国的货币汇率，快速进行货币兑换查询。</li>
-<li>世界各地区的衣服尺码比较和查询。</li>
-<li>各国区号、编码的查询。</li>
-</ul>
-
-]]></content>
-  </entry>
   
   <entry>
     <title type="html"><![CDATA[顺势：91农场]]></title>
@@ -68,6 +50,51 @@
     <content type="html"><![CDATA[<p>到网龙后，正好赶上来电秀项目的开发。来电秀是基于地址簿的关系网络对好友的手机的头像进行设置，后来又加上了私聊等SNS功能，其基于手机通讯录的SNS概念比我现在做的友趣、以及Kik、米聊、QQ通讯录等软件要早1年多。我后来想想，网龙的这个产品还是非常具有前瞻性的。用户数现在应该不算少，不过不知为何还没有达到火爆程度。可能是公司策略的局限使其只能安装在破解系统上，主要支持通过91手机助手安装，或者是软件功能太复杂，体验不明确。</p>
 
 <p>我主要负责的是这个项目当时的大部分界面以及破解SDK的短信发送功能</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[IBE多功能计算器（IBE Calc）]]></title>
+    <link href="http://shenqiliang.github.io/blog/2011/03/15/ibe-calc/"/>
+    <updated>2011-03-15T13:55:00+08:00</updated>
+    <id>http://shenqiliang.github.io/blog/2011/03/15/ibe-calc</id>
+    <content type="html"><![CDATA[<p>这是我在IBE做的最后一个项目。</p>
+
+<p>这个项目是模仿一个当时在手机平台上卖的比较好的程序：HiCalc。基于HiCalc增加部分实用功能。IBE Calc为iPhone用户提供功能强大的表达式计算功能。它包括15个计算功能：</p>
+
+<!--more-->
+
+
+<ol>
+<li>算术运算 支持一般的算术表达式运算，如＋、－、乘、除、根号、平方、立方、幂、阶乘等。</li>
+<li>角度／弧度计算 支持角度／弧度的相互转换，并计算sin、asin、cos、acos、tan、atan、ctan、actan等</li>
+<li>基数转化/计算 支持二进制、八进制、十进制、十六进制的相互转换与计算</li>
+<li>统计运算
+支持集合的平均值、总值、方差的各种统计学计算。</li>
+<li>矩阵计算
+支持矩阵与矩阵、矩阵与数字的各种算术运算。</li>
+<li>财务
+支持按揭贷款等财务计算。</li>
+<li>一元函数绘图
+输入一个一元函数，画出坐标轴和函数曲线。</li>
+<li>一元方程求值
+输入一个一元方程，对一元方程求值。</li>
+<li>用户宏
+用户制定一个宏对应一个一元函数表达式，用户宏相当与一个自定义函数。</li>
+<li>小费计算
+根据相关场所和消费情况计算出给多少小费最合理。</li>
+<li>单位转换
+支持重量、体积、面积、长度等单位转换</li>
+<li>货币转化
+支持世界各国之间的货币转换，货币利率联网实时更新。</li>
+<li>常量
+支持常量的查询与输入如：圆周率pi、自然对数e等</li>
+<li>生理周期
+支持生理周期计算，根据一定生理周期计算出自己智力、体能、情感的变化。</li>
+<li>日期／时间计算
+根据2个日期／时间计算出间隔，可以换算成年、月、天、时等，或者设定起始／终止日期／时间，根据间隔计算终止／起始日期时间。</li>
+</ol>
+
 ]]></content>
   </entry>
   
