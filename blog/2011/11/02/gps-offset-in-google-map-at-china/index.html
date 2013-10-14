@@ -1,0 +1,290 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>中国区GPS偏移纠正（适用于Google地图） - Xcode Dev</title>
+  <meta name="author" content="谌启亮">
+
+  
+  <meta name="description" content="在做iOS开发时，用到一个获取当前位置周边商家的功能。当时每次我在获取从iPhone里GPS返回过来的数据到Google Place API上获取时总是发现，获取的商家并不是最近的，而是几百米以外的。经多次尝试，确实是这样。我在网上搜索一下，发现原来是相关部门和谐掉了。相关部门规定： &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://shenqiliang.github.io/blog/2011/11/02/gps-offset-in-google-map-at-china">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Xcode Dev" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/lib/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Xcode Dev</a></h1>
+  
+    <h2>学习、分享、积累 – 亮了的原创开发博客</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:shenqiliang.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">中国区GPS偏移纠正（适用于Google地图）</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-11-02T22:50:00+08:00" pubdate data-updated="true">Nov 2<span>nd</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>在做iOS开发时，用到一个获取当前位置周边商家的功能。当时每次我在获取从iPhone里GPS返回过来的数据到Google Place API上获取时总是发现，获取的商家并不是最近的，而是几百米以外的。经多次尝试，确实是这样。我在网上搜索一下，发现原来是相关部门和谐掉了。相关部门规定：为了保证国家安全，所有的地图公司提供的地图必须对实际的GPS坐标进行一定的偏移，偏移后的GPS坐标系俗称火星坐标系，而这个偏移是不固定的，具体的算法是国家机密。悲催了，在网上找了很久，终于找到了一个解决方案：网上已经有人根据Google的相关接口，每隔0.1个经纬度获取一个地图偏移像素，把中国区的所有经纬度都转换了，组成一个数据文件。此数据文件是一个连续的结构数组：</p>
+
+<!--more-->
+
+
+<pre><code>typedef struct offset_data {
+    int16_t lng;    //12151表示121.51
+    int16_t lat;    //3130表示31.30
+    int16_t x_off;  //地图x轴偏移像素值
+    int16_t y_off;  //地图y轴偏移像素值
+}offset_data;
+</code></pre>
+
+<p>然而这个偏移量是地图图片偏移的像素值，而我们需要的是实际上偏移的经纬度。这就需要一个把经纬度转换成地图xy轴坐标的算法：</p>
+
+<pre><code>static double lngToPixel(double lng, int zoom) {
+    return (lng + 180) * (256L &lt;&lt; zoom) / 360;
+}
+static double latToPixel(double lat, int zoom) {
+    double siny =sin(lat * M_PI / 180);
+    double y = log((1 + siny) / (1 - siny));
+    return (128 &lt;&lt; zoom) * (1 - y / (2 * M_PI));
+}
+</code></pre>
+
+<p>然后把这个地图xy轴坐标加上对应的地图xy轴的偏移量，最后还要反过来将最终正确的地图xy轴坐标转换成正确的经纬度：</p>
+
+<pre><code>static double pixelToLng(double pixelX, int zoom) {
+    return pixelX * 360 / (256L &lt;&lt; zoom) - 180;
+}
+static double pixelToLat(double pixelY, int zoom) {
+    double y = 2 * M_PI * (1 - pixelY / (128 &lt;&lt; zoom)); 
+    double z = pow(M_E, y); double siny = (z - 1) / (z + 1);
+    return asin(siny) * 180 / M_PI; 
+}
+</code></pre>
+
+<p>我写了WGS2Mars方法，他的参数是经度和维度的地址，同时将转换好的经纬度传递回来。由于数据库的结构完全是按照顺序的，所以我用了c标准库的折半查找算法，你需要包含一下&lt;stdlib.h>这个头文件。</p>
+
+<pre><code>static int compare_offset_data(offset_data *data1, offset_data *data2){     int det_lng = (data1-&gt;lng)-(data2-&gt;lng);
+    if (det_lng!=0) {
+        return det_lng;
+    }
+    else{
+        return (data1-&gt;lat)-(data2-&gt;lat);
+    }
+}
+
+void WGS2Mars(double *lat, double *lng){
+    //NSData *offsetFileData = [NSData dataWithContentsOfFile:@"offset.dat"];
+    //推荐使用文件－内存映射模式，减少内存消耗。
+    NSData *offsetFileData = [NSData dataWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"offset" ofType:@"dat"] options:NSDataReadingMappedIfSafe error:NULL];
+    const void *buf = [offsetFileData bytes]; //byte buf for content of file "offset.dat"
+    long long buflen = [offsetFileData length]; //length of byte buf for content of file "offset.dat"
+    offset_data search_data;
+    search_data.lat = (int)(*lat*100);
+    search_data.lng = (int)(*lng*100);
+    offset_data *ret = bsearch(&amp;search_data, buf, buflen/sizeof(offset_data), sizeof(offset_data), (int (*)(const void *, const void *))compare_offset_data);//折半查找
+    double pixY = latToPixel(*lat, 18);
+    double pixX = lngToPixel(*lng, 18);
+    pixY += ret-&gt;y_off;
+    pixX += ret-&gt;x_off;
+    *lat = pixelToLat(pixY, 18);
+    *lng = pixelToLng(pixX, 18);
+}
+</code></pre>
+
+<p>2011年10月23日新增：</p>
+
+<p>大文件读取解决方案。详情：《<a href="http://">iOS将大文件映射到内存</a>》</p>
+
+<p>项目开源地址：<a href="https://github.com/shenqiliang/WGS2Mars">WGS2Mars</a></p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">谌启亮</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-11-02T22:50:00+08:00" pubdate data-updated="true">Nov 2<span>nd</span>, 2011</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/ioskai-fa/'>iOS开发</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://shenqiliang.github.io/blog/2011/11/02/gps-offset-in-google-map-at-china/" data-via="" data-counturl="http://shenqiliang.github.io/blog/2011/11/02/gps-offset-in-google-map-at-china/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2011/08/04/save-uiview-to-uiimage/" title="Previous Post: 如何将一个UIView对象的内容保存为UIImage">&laquo; 如何将一个UIView对象的内容保存为UIImage</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2011/11/06/unix-pipe-and-io-redirect/" title="Next Post: Unix命令行下的管道和I/O重定位">Unix命令行下的管道和I/O重定位 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/08/15/auto-key-press-using-appscript/">用AppleScript在Mac系统下实现按键精灵的功能以及在游戏中的运用</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/08/14/implement-objc-property-in-category/">Objective-C语言在Category中实现属性</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/07/30/no-keyboard-in-webview-of-ios5/">iOS5网页视图（UIWebView）中的输入框不能弹出键盘的问题</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/07/17/cant-scroll-in-tableview/">TableView中嵌套一个ScrollView有时导致ScrollView无法滚动</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/06/12/custom-ui-using-uiappearance/">iOS 5中使用UIAppearance来自定义应用的外观</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - 谌启亮 -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

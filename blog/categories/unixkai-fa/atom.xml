@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Unix开发 | Xcode Dev]]></title>
+  <link href="http://shenqiliang.github.io/blog/categories/unixkai-fa/atom.xml" rel="self"/>
+  <link href="http://shenqiliang.github.io/"/>
+  <updated>2013-10-15T02:16:00+08:00</updated>
+  <id>http://shenqiliang.github.io/</id>
+  <author>
+    <name><![CDATA[谌启亮]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Unix系统中设置文件的扩展属性]]></title>
+    <link href="http://shenqiliang.github.io/blog/2013/06/05/extented-file-property-in-unix/"/>
+    <updated>2013-06-05T10:03:00+08:00</updated>
+    <id>http://shenqiliang.github.io/blog/2013/06/05/extented-file-property-in-unix</id>
+    <content type="html"><![CDATA[<p>Unix文件系统中对单个文件提供了很多属性，比如创建时间、文件大小、修改时间等，这些信息都保存在文件系统中的inode节点中，获取这些属性并不需要读取文件，所以获取速度是很快的。在开发过程中常常会使用这些属性，但更多的时候我们需要一个自定义的属性，来保存我们需要的一些值。比如我们给文件定义一个有效期，或者给文件加一个特殊标记等。</p>
+
+<!--more-->
+
+
+<h2>解决方法</h2>
+
+<p>我们可以建立一个数据库，每个文件为一条数据，再自定义一些字段，然而这样做会有些同步问题，比如文件不小心被删除了，或者文件名字改了，这会导致数据库操作过于复杂；或者我们在文件中添加一些自定义内容，加入文件的特定部分，但这样每次获取这些属性时都要读取这个文件，开销代价很高。</p>
+
+<!--more-->
+
+
+<p>其实Unix系统中提供了文件扩展属性的功能，可以非常方便的实现为文件添加自定义属性，这些属性会保存到文件节点数据中。如果文件删除了，这些数据也同时删除；如果文件改名了，也不会影响节点数据，因此这些属性依然会和改名后的文件关联；同时获取这些属性也不用去读取文件。设置一个自定义属性需要用到:</p>
+
+<pre><code>int setxattr(const char *path, const char *name, void *value, size_t size, u_int32_t position, int options);
+int fsetxattr(int fd, const char *name, void *value, size_t size, u_int32_t position, int options);
+</code></pre>
+
+<p>这两个函数都是用来设置一个文件的扩展属性，唯一的区别是其中setxattr第一个参数是文件路径，而fsetxattr是已打开的文件描述符（由open/creat函数返回）。name是指定的属性的名字，是一个c字符串，为了保证名字的唯一性，建议使用反域名格式的名字，如“com.example.propertyname”。第三个参数value是值的地址，第四个参数size是值的大小，position设置为0。options可以有以下几个：</p>
+
+<ul>
+<li>XATTR_NOFOLLOW 不跟随符号链接，如果文件是符号链接的话，设置这个option后会设置符号链接本身的属性，而不是符号链接所指向的文件的。</li>
+<li>XATTR_CREATE 只能创建标志，如果文件已经有同名属性，则返回失败。</li>
+<li>XATTR_REPLACE 只能替换标志，如果文件没有同名属性，则返回失败。</li>
+</ul>
+
+
+<p>成功后这两个函数会返回0；否则返回-1，同时设置了系统的errno。
+同时Unix还提供了相应的获取已设置扩展属性的方法：</p>
+
+<pre><code>ssize_t getxattr(const char *path, const char *name, void *value, size_t size, u_int32_t position, int options);
+ssize_t fgetxattr(int fd, const char *name, void *value, size_t size, u_int32_t position, int options);
+</code></pre>
+
+<p>参数和设置方法的对应，只是传入的size是value的内存空间，返回的是值实际的大小。</p>
+
+<h2>具体用法</h2>
+
+<p>设置文件的过期日期</p>
+
+<pre><code>NSDate *expireDate = ...;
+const char* cfilePath = [filePath fileSystemRepresentation];
+const char* attrExpireDate = "com.xcodev.file.expireDate";
+double attrDate = [expireDate timeIntervalSince1970];
+setxattr(cfilePath, attrExpireDate, &amp;attrDate, sizeof(attrDate), 0, 0);
+</code></pre>
+
+<p>获取文件过期日期，如果过期了就删除。</p>
+
+<pre><code>const char* cfilePath = [path fileSystemRepresentation];
+const char* attrExpireDate = "com.xcodev.file.expireDate";
+double expireTimestamp = 0;
+if (getxattr(cfilePath, attrExpireDate, &amp;expireTimestamp, sizeof(expireTimestamp), 0, 0)&gt;0) {
+      NSDate *expireDate = [NSDate dateWithTimeIntervalSince1970:expireTimestamp];
+      if ([expireDate compare:[NSDate date]]==NSOrderedAscending) {
+            [[NSFileManager defaultManager] removeItemAtPath:path error:NULL];
+      }
+}
+</code></pre>
+
+<h2>Do not Backup</h2>
+
+<p>文件扩展属性的另一个在iOS中的具体应用就是设置不让iCould备份标记。</p>
+
+<pre><code>const char* cfilePath = [filePath fileSystemRepresentation];
+const char* attrBackup = "com.apple.MobileBackup";
+u_int8_t attrValue = 1;
+setxattr(cfilePath, attrBackup, &amp;attrValue, sizeof(attrValue), 0, 0);
+</code></pre>
+
+<p>把“com.apple.MobileBackup”的值设置为1后，iCloud就不再去备份这个文件了。</p>
+]]></content>
+  </entry>
+  
+</feed>

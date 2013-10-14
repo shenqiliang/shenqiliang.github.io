@@ -1,0 +1,219 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>最新Xcode编译出现的问题 - Xcode Dev</title>
+  <meta name="author" content="谌启亮">
+
+  
+  <meta name="description" content="iOS6发布的时候，我下载了新的SDK，Xcode也更新到了4.5。那时我们的app正好要提交AppStore，我就尝试用新的Xcode编译开发包。但是在提交时，发现总是验证失败提交不成功。原因是说我的binary里没有armv6的包，但我检查了编译选项发现在Architectures和Valid &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://shenqiliang.github.io/blog/2012/10/18/xcode-compile-problem-ios6">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Xcode Dev" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/lib/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Xcode Dev</a></h1>
+  
+    <h2>学习、分享、积累 – 亮了的原创开发博客</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:shenqiliang.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">最新Xcode编译出现的问题</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-10-18T20:53:00+08:00" pubdate data-updated="true">Oct 18<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>iOS6发布的时候，我下载了新的SDK，Xcode也更新到了4.5。那时我们的app正好要提交AppStore，我就尝试用新的Xcode编译开发包。但是在提交时，发现总是验证失败提交不成功。原因是说我的binary里没有armv6的包，但我检查了编译选项发现在Architectures和Valid Architectures里都包含里armv6。折腾了好久，原来我忽略了一个警告。本来我一直都很重视警告，但是我在旧版本的Xcode里编译时1个警告都没有，所以我以为只是新版Xcode环境问题，也没太在意，但问题就是这个警告说明的问题。我用nm命令看了一下包，原来真的没有armv6的binary。查看了相关资料发现原来新版本（4.5以上）的Xcode已经不在armv6处理器了！所以即使你的编译选项里明确指定armv6，也是无效的。所以编译后的包只有armv7。而我的app最低支持版本是4.0。在4.3以下的支持，AppStore会要求必须有armv6的binary，所以提交不了。所以如果app要支持4.3以下就必须用低版本Xcode编译了，否则app就只能支持4.3以上了。</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">谌启亮</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-10-18T20:53:00+08:00" pubdate data-updated="true">Oct 18<span>th</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/ioskai-fa/'>iOS开发</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://shenqiliang.github.io/blog/2012/10/18/xcode-compile-problem-ios6/" data-via="" data-counturl="http://shenqiliang.github.io/blog/2012/10/18/xcode-compile-problem-ios6/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/10/15/an-objc-static-check-tool-occheck/" title="Previous Post: 一个用于Objective-C静态检查的工具－occheck">&laquo; 一个用于Objective-C静态检查的工具－occheck</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2012/10/19/obj-setproperty-nonatomic-problem-update-ios6/" title="Next Post: _objc_setProperty_nonatomic和_objc_setProperty_atomic运行时没有找到的问题">_objc_setProperty_nonatomic和_objc_setProperty_atomic运行时没有找到的问题 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/08/15/auto-key-press-using-appscript/">用AppleScript在Mac系统下实现按键精灵的功能以及在游戏中的运用</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/08/14/implement-objc-property-in-category/">Objective-C语言在Category中实现属性</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/07/30/no-keyboard-in-webview-of-ios5/">iOS5网页视图（UIWebView）中的输入框不能弹出键盘的问题</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/07/17/cant-scroll-in-tableview/">TableView中嵌套一个ScrollView有时导致ScrollView无法滚动</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/06/12/custom-ui-using-uiappearance/">iOS 5中使用UIAppearance来自定义应用的外观</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - 谌启亮 -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

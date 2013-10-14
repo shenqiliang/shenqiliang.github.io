@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Category: iOS开发 | My Octopress Blog]]></title>
+  <title><![CDATA[Category: iOS开发 | Xcode Dev]]></title>
   <link href="http://shenqiliang.github.io/blog/categories/ioskai-fa/atom.xml" rel="self"/>
   <link href="http://shenqiliang.github.io/"/>
-  <updated>2013-10-14T20:20:17+08:00</updated>
+  <updated>2013-10-15T02:16:00+08:00</updated>
   <id>http://shenqiliang.github.io/</id>
   <author>
-    <name><![CDATA[Your Name]]></name>
+    <name><![CDATA[谌启亮]]></name>
     
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
@@ -19,6 +19,9 @@
     <updated>2013-07-30T10:32:00+08:00</updated>
     <id>http://shenqiliang.github.io/blog/2013/07/30/no-keyboard-in-webview-of-ios5</id>
     <content type="html"><![CDATA[<p>项目开发时，发现有时候在网页视图中的输入框获得焦点后，却不能弹出键盘。而且全部都是在iOS5的系统中出现了这个问题，iOS6中运行完全是正常的，而且即使是在iOS5中，其他的UITextView和UITextField仍然可以正常地弹出键盘。我仔细了看了一下代码，发现对UIWebView的一些操作和键盘弹出并没有什么关系。我看了一些UIWebView的一些资料，然后发现了这个问题：UIWebView要能弹出键盘，那么它所在的window必须是key window。</p>
+
+<!--more-->
+
 
 <h2>什么是key window？</h2>
 
@@ -53,6 +56,375 @@ UIWindow *anotherWindow = [UIWindow new];
 <h2>小结</h2>
 
 <p>UIWebView要能弹出键盘，那么它所在的window必须是key window。如果你的App可能存在多个Window（如弹出自定义的Alert，状态条等），而且这些window有可能被设置为key window，一定要在web view显示时将它所在的window设置为key window。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[UIAlertView弹出视图动画效果]]></title>
+    <link href="http://shenqiliang.github.io/blog/2013/04/10/uialertview-animation/"/>
+    <updated>2013-04-10T22:01:00+08:00</updated>
+    <id>http://shenqiliang.github.io/blog/2013/04/10/uialertview-animation</id>
+    <content type="html"><![CDATA[<p>在App设计中为了加强用户体验，我们会常常加入一些友好的动画效果。比如类似UIAlertView弹出的动画效果，由于系统中并没有直接提供类似的动画API，如果我们想要做出一样的效果，那就得深入的研究一下系统中的UIAlertView了。</p>
+
+<p>仔细观察UIAlertView的动画你就会发现：这个动画是由几部分组成，它带一个视图大小抖动的效果。先是由小变大，再由大变小，最后变成本来的大小。但是这个大小的具体参数值和动画的速度恐怕是肉眼所不能看出来的。
+本篇文章会使用一些objc runtime和CAAnimation的一些知识，通过本文你可以了解到如何研究一些objc中内部调用机制和动画基础。</p>
+
+<p>要想知道这些动画的组成，我们就要从比较低层次的API：CALayer的一些调用开始。iOS动画最终都是加到Layer中的，加入Layer就要调用Layer对象这个方法：</p>
+
+<pre><code>- (void)addAnimation:(CAAnimation *)anim forKey:(NSString *)key;
+</code></pre>
+
+<p>所以只要我们知道了anim参数，并把anim动画对象的属性揪出来，就可以知道到底是什么动画了，但是这个方法是系统Framework中的，通常我们是无法能知道anim到底是什么。这时我们就需要用一些objc的一些底层API：Objc Runtime来解决了。</p>
+
+<h2>Objc Runtime</h2>
+
+<p>Objc Runtime是由一组处理Objctive-C动态语言运行时的API函数组成，这些函数都是一些比较底层的C函数。它有很多实用功能比如查看对象的成员，类/对象方法签名等等。这次我们要用的就是其中把对象方法调用替换的API。</p>
+
+<pre><code>void method_exchangeImplementations(Method m1, Method m2) 
+</code></pre>
+
+<p>这个函数的功能就是把类/对象的方法m1和m2进行调换。如果执行了这个函数，那么在App运行过程中所有调用方法m1的指令，最终都会执行成了方法m2。</p>
+
+<h2>方法调换</h2>
+
+<p>有了Objc Rumtime的API，就可以很方便的将调用系统库中方法的代码，执行成我们自己的代码了。所以我们想要知道Layer中加入了什么方法，只要把addAnimation:forKey:这个方法调换成我们自己的方法就行了。下面的这段代码就实现了这个功能。</p>
+
+<pre><code>@implementation CALayer(Hacked)
+
++ (void)load{
+    method_exchangeImplementations(class_getInstanceMethod([CALayer class], @selector(addAnimation:forKey:)), class_getInstanceMethod([CALayer class], @selector(hackedAddAnimation:forKey:)));
+}
+
+- (void)hackedAddAnimation:(CABasicAnimation *)anim forKey:(NSString *)key{
+    [self hackedAddAnimation:anim forKey:key];
+    if ([anim isKindOfClass:[CABasicAnimation class]]) {
+        if ([anim.keyPath isEqualToString:@"transform"]) {
+            if (anim.fromValue) {
+                CATransform3D fromValue = [anim.fromValue CATransform3DValue];
+                NSLog(@"From:%@",NSStringFromCGAffineTransform(CATransform3DGetAffineTransform(fromValue)));
+            }
+            if (anim.toValue) {
+                CATransform3D toValue = [anim.toValue CATransform3DValue];
+                NSLog(@"To:%@",NSStringFromCGAffineTransform(CATransform3DGetAffineTransform(toValue)));
+            }
+            if (anim.byValue) {
+                CATransform3D byValue = [anim.byValue CATransform3DValue];
+                NSLog(@"By:%@",NSStringFromCGAffineTransform(CATransform3DGetAffineTransform(byValue)));
+            }
+            NSLog(@"Duration:%.2f",anim.duration);
+            NSLog(@"TimingFunction:%@",anim.timingFunction);
+        }
+    }
+}
+
+@end
+</code></pre>
+
+<p>下面来说明一下上面的代码，这段代码是CALayer做了一个Catalog处理。其中initialize是一个类的方法，是进程开始时初始化类时调用，一般只有类有加载这个方法就会第一个调用了。hackedAddAnimation:forKey:是要被调换的代码。在类的初始化方法initialize中（代码中的第5行）实现了CALayer的addAnimation:forKey:和hackedAddAnimation:forKey:方法的调换。在hackedAddAnimation:forKey:中首先直接调用了[self hackedAddAnimation:forKey:]，也许你会问：这不死循环递归了么？其实不是，应为method_exchangeImplementations实现的是调换而不是替换，所以代码中调用addAnimation:forKey:运行时就成了调用hackedAddAnimation:forKey:。而代码中调用hackedAddAnimation:forKey:运行时成了调用addAnimation:forKey:。所以这里虽然写的是hackedAddAnimation:forKey:，实际上会调用系统Framework中的addAnimation:forKey:。这样做的目的是保证虽然我们把系统的方法改变了，我们还是调用系统的一次，以保持系统功能运行是正常的。在hackedAddAnimation:forKey:剩下的代码就只是把anim动画对象的各个属性的值打印出来了。</p>
+
+<p>好了，把上面的这段代码粘贴到你的代码文件中。然后简单的写个UIAlertView弹出动画代码。</p>
+
+<pre><code>UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Title" message:@"Message" delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil];
+[alert show];
+</code></pre>
+
+<p>编译并运行上面这段代码，你就会在控制台中看到下面这些日志：</p>
+
+<pre><code>2013-04-10 19:13:11.795 Test[10952:c07] From:[0.01, 0, 0, 0.01, 0, 0]
+2013-04-10 19:13:11.796 Test[10952:c07] Duration:0.20
+2013-04-10 19:13:11.796 Test[10952:c07] TimingFunction:easeInEaseOut
+2013-04-10 19:13:11.999 Test[10952:c07] From:[1.1, 0, 0, 1.1, 0, 0]
+2013-04-10 19:13:12.000 Test[10952:c07] Duration:0.10
+2013-04-10 19:13:12.000 Test[10952:c07] TimingFunction:easeInEaseOut
+2013-04-10 19:13:12.101 Test[10952:c07] From:[0.9, 0, 0, 0.9, 0, 0]
+2013-04-10 19:13:12.101 Test[10952:c07] Duration:0.10
+2013-04-10 19:13:12.101 Test[10952:c07] TimingFunction:easeInEaseOut
+</code></pre>
+
+<p>查看CGAffineTransformMakeScale函数的头文件你会看到：</p>
+
+<pre><code>/* Return a transform which scales by `(sx, sy)':
+     t' = [ sx 0 0 sy 0 0 ] */
+
+CG_EXTERN CGAffineTransform CGAffineTransformMakeScale(CGFloat sx, CGFloat sy)
+  CG_AVAILABLE_STARTING(__MAC_10_0, __IPHONE_2_0);
+</code></pre>
+
+<p>所以根据日志我们会发现这其实是3个关键帧动画，首先scale(缩放比例)从0.01放大到1.1，历时0.2秒；然后从1.1到0.9，历时0.1秒；那么最后就是从0.9到1.0（正常缩放比例），历时0.1秒。哈哈，那我们就简单的写个关键帧动画对象就可以表示UIAlertView的弹出动画效果了。</p>
+
+<pre><code>CAKeyframeAnimation *popAnimation = [CAKeyframeAnimation animationWithKeyPath:@"transform"];
+popAnimation.duration = 0.4;
+popAnimation.values = @[[NSValue valueWithCATransform3D:CATransform3DMakeScale(0.01f, 0.01f, 1.0f)],
+                        [NSValue valueWithCATransform3D:CATransform3DMakeScale(1.1f, 1.1f, 1.0f)],
+                        [NSValue valueWithCATransform3D:CATransform3DMakeScale(0.9f, 0.9f, 1.0f)],
+                        [NSValue valueWithCATransform3D:CATransform3DIdentity]];
+popAnimation.keyTimes = @[@0.0f, @0.5f, @0.75f, @1.0f];
+popAnimation.timingFunctions = @[[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut],
+                                 [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut],
+                                 [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut]];
+[anAlertAnimationView.layer addAnimation:popAnimation forKey:nil];
+</code></pre>
+
+<p>你可以把popAnimation加入到你想进行动画的任何View中的layer中这样就实现了UIAlertView一样的弹出动画效果。</p>
+
+<h2>结论</h2>
+
+<ol>
+<li>UIAlertView动画其实是由三部分动画组成：缩放比例变化0.01->1.1->0.9->1.0。每次变化的时间函数（控制加速度）都是EaseInEaseOut。</li>
+<li>在研究系统中调用函数的参数是我们可以用method_exchangeImplementations来hack到系统调用中去，但不要忘记调用系统本身的方法。否则容易导致App异常。当然，如果你是研究测试不怕crash，那随便。</li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[iOS中的模糊效果]]></title>
+    <link href="http://shenqiliang.github.io/blog/2013/04/01/blur-effect-in-ios/"/>
+    <updated>2013-04-01T21:58:00+08:00</updated>
+    <id>http://shenqiliang.github.io/blog/2013/04/01/blur-effect-in-ios</id>
+    <content type="html"><![CDATA[<p>App设计时往往会用到一些模糊效果。iOS目前已提供一些模糊API可以让我们方便是使用。一种是使用Core Image，另一种是使用Accelerate.Framework中的vImage API。</p>
+
+<h2>使用Core Image进行模糊</h2>
+
+<p>Core Image很早在Mac系统中得到应用，后来这个Framework也开始应用到iOS，不过直到iOS6.0才开始支持模糊。这个API调用起来很方便简洁。</p>
+
+<pre><code>- (UIImage *)blurryImage:(UIImage *)image 
+           withBlurLevel:(CGFloat)blur {
+    CIImage *inputImage = [CIImage imageWithCGImage:image.CGImage];
+    CIFilter *filter = [CIFilter filterWithName:@"CIGaussianBlur"
+                         keysAndValues:kCIInputImageKey, inputImage,
+                                       @"inputRadius", @(blur), 
+                                       nil];
+
+    CIImage *outputImage = filter.outputImage;
+
+    CGImageRef outImage = [self.context createCGImage:outputImage 
+                                   fromRect:[outputImage extent]];
+    return [UIImage imageWithCGImage:outImage];
+}
+</code></pre>
+
+<h2>使用vImage API进行模糊</h2>
+
+<p>iOS5.0中新增了vImage API可以使用，它属于Accelerate.Framework，所以如果你要使用它要在工程中加入这个Framework。模糊算法使用的是vImageBoxConvolve_ARGB8888这个函数。</p>
+
+<pre><code>- (UIImage *)blurryImage:(UIImage *)image withBlurLevel:(CGFloat)blur {
+    if (blur &lt; 0.f || blur &gt; 1.f) {
+        blur = 0.5f;
+    }
+    int boxSize = (int)(blur * 100);
+    boxSize = boxSize - (boxSize % 2) + 1;
+
+    CGImageRef img = image.CGImage;
+
+    vImage_Buffer inBuffer, outBuffer;
+    vImage_Error error;
+
+    void *pixelBuffer;
+
+    CGDataProviderRef inProvider = CGImageGetDataProvider(img);
+    CFDataRef inBitmapData = CGDataProviderCopyData(inProvider);
+
+    inBuffer.width = CGImageGetWidth(img);
+    inBuffer.height = CGImageGetHeight(img);
+    inBuffer.rowBytes = CGImageGetBytesPerRow(img);
+
+    inBuffer.data = (void*)CFDataGetBytePtr(inBitmapData);
+
+    pixelBuffer = malloc(CGImageGetBytesPerRow(img) * 
+                         CGImageGetHeight(img));
+
+    if(pixelBuffer == NULL)
+        NSLog(@"No pixelbuffer");
+
+    outBuffer.data = pixelBuffer;
+    outBuffer.width = CGImageGetWidth(img);
+    outBuffer.height = CGImageGetHeight(img);
+    outBuffer.rowBytes = CGImageGetBytesPerRow(img);
+
+    error = vImageBoxConvolve_ARGB8888(&amp;inBuffer, 
+                                       &amp;outBuffer, 
+                                       NULL, 
+                                       0, 
+                                       0, 
+                                       boxSize, 
+                                       boxSize, 
+                                       NULL, 
+                                       kvImageEdgeExtend);
+
+
+    if (error) {
+        NSLog(@"error from convolution %ld", error);
+    }
+
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+    CGContextRef ctx = CGBitmapContextCreate(
+                                    outBuffer.data,
+                                    outBuffer.width,
+                                    outBuffer.height,
+                                    8,
+                                    outBuffer.rowBytes,
+                                    colorSpace,
+                                    kCGImageAlphaNoneSkipLast);
+    CGImageRef imageRef = CGBitmapContextCreateImage (ctx);
+    UIImage *returnImage = [UIImage imageWithCGImage:imageRef];
+
+    //clean up
+    CGContextRelease(ctx);
+    CGColorSpaceRelease(colorSpace);
+
+    free(pixelBuffer);
+    CFRelease(inBitmapData);
+
+    CGColorSpaceRelease(colorSpace);
+    CGImageRelease(imageRef);
+
+    return returnImage;
+}
+</code></pre>
+
+<p>参考：<a href="http://blog.denivip.ru/index.php/2013/01/blur-effect-in-ios-applications/?lang=en">Blur effect in iOS application</a></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Xcode字符串调试时显示问题]]></title>
+    <link href="http://shenqiliang.github.io/blog/2013/01/25/xcode-debug-string-show/"/>
+    <updated>2013-01-25T01:52:00+08:00</updated>
+    <id>http://shenqiliang.github.io/blog/2013/01/25/xcode-debug-string-show</id>
+    <content type="html"><![CDATA[<p>今天一位同事调试时发现了一个问题：一个字符串在被replace后，调试时并没有被replace。代码如下：</p>
+
+<pre><code>NSString *s = @"深圳市";
+s = [s stringByReplacingOccurrencesOfString:@"市" withString:@""];
+NSLog(@"%@",s);
+return YES;
+</code></pre>
+
+<p>我在最后设置的一个断点，看看运行后的情况：</p>
+
+<p><img src="/images/post/xcode-string-show-breakpoint.png" alt="image" /></p>
+
+<p>可以看出左侧的s中显示并不是“深圳”，而是“深圳市 ”，貌似并没有替换掉。但右侧Log输出却是深圳。那么究竟那个是对的呢？</p>
+
+<p>其实在系统中NSString对象主要有两个属性：一个unichar(2个字节)数组, 另一个是长度。如果仅仅是把字符串末位的一些字去掉的话，unichar数组的内容并没有修改，而仅仅修改了长度属性。</p>
+
+<p>我们在看看控制台左侧的显示格式，就会更明白了。</p>
+
+<p><img src="/images/post/xcode-string-show-summary.png" alt="image" /></p>
+
+<p>可以看出实际显示的是unichar*，由于replace后unichar*指针地址并没有改变，变的只是length属性，所以显示也没有变。</p>
+
+<h2>结论</h2>
+
+<p>有时候我们在看字符串的内容时，特别时仅仅进行了尾部替换为空这些操作时，我们不能仅仅看控制台变量的显示，我们要Print Descripton。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[iOS崩溃日志分析]]></title>
+    <link href="http://shenqiliang.github.io/blog/2012/12/07/ios-crash-log-analycis/"/>
+    <updated>2012-12-07T01:44:00+08:00</updated>
+    <id>http://shenqiliang.github.io/blog/2012/12/07/ios-crash-log-analycis</id>
+    <content type="html"><![CDATA[<h2>崩溃日志的产生</h2>
+
+<p>iOS中运行App过程中如果发生程序崩溃，会生成一个崩溃日志文件。这个文件会保存的特定系统目录下，扩展名是crash。当手机连接到iTunes时，会将该文件同步到电脑上。</p>
+
+<p>在Mac系统中这些文件会同步到“~/Library/Logs/CrashReporter/MobileDevice”下。</p>
+
+<p>而在Windows系统中会同步到“C:UsersAppDataRoamingApple computerLogsCrashReporter/MobileDevice”（Vista或以上）或“C:Documents and SettingsApplication DataApple computerLogsCrashReporter”（XP）。</p>
+
+<!--more-->
+
+
+<h2>崩溃日志的上传</h2>
+
+<p>iOS中崩溃日志是可以上传的App Store的服务器，并由开发者查看的。用户可以通过系统设置中的“通用－诊断与用量”来设定是否上传崩溃日志。同时开发者也可以通过捕获异常信号自己定制异常上报。</p>
+
+<h2>崩溃日志的格式</h2>
+
+<p>一般崩溃日志头部有如下字段</p>
+
+<pre><code>Exception Type:  EXC_BAD_ACCESS (SIGSEGV)
+Exception Codes: KERN_INVALID_ADDRESS at 0x20000008
+Crashed Thread:  0
+</code></pre>
+
+<p>其中Exception Type是异常类型，Exception Codes是异常代码。Crashed Thread指示异常的线程编号。上面表示Crash的线程编号是0（主线程的线程编号是0）。</p>
+
+<p>看崩溃日志时一般要分两种情况，一种是内存、CPU的系统错误，如内存访问错误、除零异常等。另外一种是程序通过写代码抛出的异常，即代码中通过throw关键字抛出的异常。程序抛出的异常是可以捕获并处理的，如果没有捕获，就会Crash，并生成崩溃日志。这两种在日志中有一些细微的差别。</p>
+
+<p>一般内存等系统异常Crash线程信息如下：</p>
+
+<pre><code>Thread 0 name:  Dispatch queue: com.apple.main-thread
+Thread 0 Crashed:
+0   libobjc.A.dylib                 0x3624cf78 objc_msgSend + 16
+1   QQYanChu                        0x0000d92a -[QYServerInterface connectionDidFinishLoading:] (QYServerInterface.m:328)
+2   Foundation                      0x30d03c22 __65-[NSURLConnectionInternal _withConnectionAndDelegate:onlyActive:]_block_invoke_0 + 10
+3   Foundation                      0x30c5b6d2 -[NSURLConnectionInternalConnection invokeForDelegate:] + 22
+4   Foundation                      0x30c5b69c -[NSURLConnectionInternal _withConnectionAndDelegate:onlyActive:] + 192
+5   Foundation                      0x30c5b5be -[NSURLConnectionInternal _withActiveConnectionAndDelegate:] + 54
+6   CFNetwork                       0x338077ee URLConnectionClient::_clientDidFinishLoading(URLConnectionClient::ClientConnectionEventQueue*) + 186
+7   CFNetwork                       0x337fc49e URLConnectionClient::ClientConnectionEventQueue::processAllEventsAndConsumePayload(XConnectionEventInfo&lt;XClientEvent, XClientEventParams&gt;*, long) + 418
+8   CFNetwork                       0x337fc592 URLConnectionClient::ClientConnectionEventQueue::processAllEventsAndConsumePayload(XConnectionEventInfo&lt;XClientEvent, XClientEventParams&gt;*, long) + 662
+9   CFNetwork                       0x337fc19c URLConnectionClient::processEvents() + 100
+10  CFNetwork                       0x337fc0d2 MultiplexerSource::perform() + 150
+11  CoreFoundation                  0x34dffacc __CFRUNLOOP_IS_CALLING_OUT_TO_A_SOURCE0_PERFORM_FUNCTION__ + 8
+12  CoreFoundation                  0x34dff298 __CFRunLoopDoSources0 + 208
+13  CoreFoundation                  0x34dfe03e __CFRunLoopRun + 646
+14  CoreFoundation                  0x34d8149e CFRunLoopRunSpecific + 294
+15  CoreFoundation                  0x34d81366 CFRunLoopRunInMode + 98
+16  GraphicsServices                0x3607d432 GSEventRunModal + 130
+17  UIKit                           0x31e77e76 UIApplicationMain + 1074
+18  QQYanChu                        0x0000feea main (main.m:39)
+19  QQYanChu                        0x00007ed4 start + 32
+</code></pre>
+
+<p>第一列是编号，表示堆栈中函数调用的嵌套顺序。最上面就是崩溃发生的函数，往下面看就可以看到我们的代码。第二列是堆栈中函数定义的位置，有的是在动态库或Framework中定义的，有的是我们的App定义的，如QQYanChu就是我们的App可执行文件，另外你还可以看到其他的动态库等，一般我们关注自己的QQYanChu的就行了。 如上面的例子就是在-[QYServerInterface connectionDidFinishLoading:] 这个调用中挂的。一般这个信息还会包含代码文件和说对应的行号，如上面红色部分就是说崩溃在QYServerInterface.m的328行。这就可以方便我们快速定位问题。</p>
+
+<p>下面是程序抛出的异常的日志。</p>
+
+<pre><code>Last Exception Backtrace:
+0   CoreFoundation                  0x3425929e __exceptionPreprocess + 158
+1   libobjc.A.dylib                 0x33a2b97a objc_exception_throw + 26
+2   CoreFoundation                  0x3425ce02 -[NSObject(NSObject) doesNotRecognizeSelector:] + 166
+3   CoreFoundation                  0x3425b52c ___forwarding___ + 388
+4   CoreFoundation                  0x341b2f64 _CF_forwarding_prep_0 + 20
+5   QQYanChu                        0x000ef372 -[QYUser staticDataFetcher:fetchedData:] (QYUser.m:168)
+6   QQYanChu                        0x001ee9f2 -[QStaticDataFetcher successWithData:] + 94
+7   QQYanChu                        0x001efb44 -[QStaticDataFetcher sendDelegateMessageWithLocalData] + 220
+8   Foundation                      0x39256a6a __NSFireDelayedPerform + 446
+9   CoreFoundation                  0x3422e5da __CFRUNLOOP_IS_CALLING_OUT_TO_A_TIMER_CALLBACK_FUNCTION__ + 10
+10  CoreFoundation                  0x3422e28c __CFRunLoopDoTimer + 268
+11  CoreFoundation                  0x3422cefc __CFRunLoopRun + 1228
+12  CoreFoundation                  0x3419feb8 CFRunLoopRunSpecific + 352
+13  CoreFoundation                  0x3419fd44 CFRunLoopRunInMode + 100
+14  GraphicsServices                0x34f082e6 GSEventRunModal + 70
+15  UIKit                           0x36de52fc UIApplicationMain + 1116
+16  QQYanChu                        0x000fcfc0 main (main.m:39)
+17  QQYanChu                        0x000ee4d4 start + 36
+
+
+Thread 0 name:  Dispatch queue: com.apple.main-thread
+Thread 0 Crashed:
+0   libsystem_kernel.dylib          0x32f28350 __pthread_kill + 8
+1   libsystem_c.dylib               0x3830311e pthread_kill + 54
+2   libsystem_c.dylib               0x3833f96e abort + 90
+3   libc++abi.dylib                 0x38e35d4a abort_message + 70
+4   libc++abi.dylib                 0x38e32ff4 default_terminate() + 20
+5   libobjc.A.dylib                 0x33a2ba74 _objc_terminate() + 144
+6   libc++abi.dylib                 0x38e33078 safe_handler_caller(void (*)()) + 76
+7   libc++abi.dylib                 0x38e33110 std::terminate() + 16
+8   libc++abi.dylib                 0x38e34594 __cxa_rethrow + 84
+9   libobjc.A.dylib                 0x33a2b9cc objc_exception_rethrow + 8
+10  CoreFoundation                  0x3419ff1c CFRunLoopRunSpecific + 452
+11  CoreFoundation                  0x3419fd44 CFRunLoopRunInMode + 100
+12  GraphicsServices                0x34f082e6 GSEventRunModal + 70
+13  UIKit                           0x36de52fc UIApplicationMain + 1116
+14  QQYanChu                        0x000fcfc0 main (main.m:39)
+15  QQYanChu                        0x000ee4d4 start + 36
+</code></pre>
+
+<p>可以看出相比系统异常日志中多出了Last Exception Backtrace字段。上面是线程0崩溃的，而线程0只调用的abort。这是我们要看Last Exception Backtrace这里的堆栈，这个堆栈是抛出异常时的线程当时的堆栈情况，这个信息才是有意义的。在我们程序抛出异常后，系统会执行一系列相关逻辑后调用abort异常结束程序。</p>
 ]]></content>
   </entry>
   

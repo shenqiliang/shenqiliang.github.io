@@ -1,0 +1,725 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Xcode Dev</title>
+  <meta name="author" content="谌启亮">
+
+  
+  <meta name="description" content="今天一位同事调试时发现了一个问题：一个字符串在被replace后，调试时并没有被replace。代码如下： NSString *s = @"深圳市";
+s = [s stringByReplacingOccurrencesOfString:@"市" withString:@""];
+NSLog &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://shenqiliang.github.io/blog/page/2">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Xcode Dev" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/lib/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Xcode Dev</a></h1>
+  
+    <h2>学习、分享、积累 – 亮了的原创开发博客</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:shenqiliang.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/01/25/xcode-debug-string-show/">Xcode字符串调试时显示问题</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-01-25T01:52:00+08:00" pubdate data-updated="true">Jan 25<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>今天一位同事调试时发现了一个问题：一个字符串在被replace后，调试时并没有被replace。代码如下：</p>
+
+<pre><code>NSString *s = @"深圳市";
+s = [s stringByReplacingOccurrencesOfString:@"市" withString:@""];
+NSLog(@"%@",s);
+return YES;
+</code></pre>
+
+<p>我在最后设置的一个断点，看看运行后的情况：</p>
+
+<p><img src="/images/post/xcode-string-show-breakpoint.png" alt="image" /></p>
+
+<p>可以看出左侧的s中显示并不是“深圳”，而是“深圳市 ”，貌似并没有替换掉。但右侧Log输出却是深圳。那么究竟那个是对的呢？</p>
+
+<p>其实在系统中NSString对象主要有两个属性：一个unichar(2个字节)数组, 另一个是长度。如果仅仅是把字符串末位的一些字去掉的话，unichar数组的内容并没有修改，而仅仅修改了长度属性。</p>
+
+<p>我们在看看控制台左侧的显示格式，就会更明白了。</p>
+
+<p><img src="/images/post/xcode-string-show-summary.png" alt="image" /></p>
+
+<p>可以看出实际显示的是unichar*，由于replace后unichar*指针地址并没有改变，变的只是length属性，所以显示也没有变。</p>
+
+<h2>结论</h2>
+
+<p>有时候我们在看字符串的内容时，特别时仅仅进行了尾部替换为空这些操作时，我们不能仅仅看控制台变量的显示，我们要Print Descripton。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/12/07/ios-crash-log-analycis/">iOS崩溃日志分析</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-12-07T01:44:00+08:00" pubdate data-updated="true">Dec 7<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h2>崩溃日志的产生</h2>
+
+<p>iOS中运行App过程中如果发生程序崩溃，会生成一个崩溃日志文件。这个文件会保存的特定系统目录下，扩展名是crash。当手机连接到iTunes时，会将该文件同步到电脑上。</p>
+
+<p>在Mac系统中这些文件会同步到“~/Library/Logs/CrashReporter/MobileDevice”下。</p>
+
+<p>而在Windows系统中会同步到“C:UsersAppDataRoamingApple computerLogsCrashReporter/MobileDevice”（Vista或以上）或“C:Documents and SettingsApplication DataApple computerLogsCrashReporter”（XP）。</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/12/07/ios-crash-log-analycis/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/11/16/passbook-in-ios6/">iOS6中的Passbook</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-11-16T13:41:00+08:00" pubdate data-updated="true">Nov 16<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>在iOS6中新增了一个内置App：Passbook。Passbook可以保存很多卡片、兑换券之类的东西。每一个叫做一个Pass。其实一个Pass就是一个zip压缩包。这个zip包里包含pass相关的各种文件，如Pass配置文件，显示图标，显示背景等。</p>
+
+<h2>Pass的种类</h2>
+
+<p>Pass目前有5种：Boarding pass、Coupon、Event ticket、Generic、Store card。每种种类都有各自的应用场景的展现布局。展现布局是固定的，但你可以自定义一些效果，如图标、背景和相关文本等。</p>
+
+<h2>Pass的安全性</h2>
+
+<p>Pass包中的每一个文件都经过签名，任何篡改的Pass都无法添加成功的。</p>
+
+<h2>Pass的更新</h2>
+
+<p>Pass可以通过Push进行更新，这需要一系列的服务器接口。需要注意的是Push所用的证书和签名证书是一样的。</p>
+
+<h2>结论</h2>
+
+<p>由于Pass只是一个zip包，客户端需要做的事情就是下载和调用api添加。一些复杂的签名和更新逻辑则需要服务器端完成。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/10/25/anti-alise-for-image-ios/">在iOS中让图片旋转时抗锯齿</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-10-25T11:36:00+08:00" pubdate data-updated="true">Oct 25<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>在iOS界面开发时，经常会将某一个视图进行旋转，旋转时会发现图片边缘出现了很多锯齿。即使把layer的edgeAntialiasingMask属性设置了依然会有锯齿。如何才能消除锯齿呢？如果你仔细，你会发现那些边缘虚化(透明)的图片在旋转时并不会出现锯齿。那么如果我们把这些图片的边缘透明化，会不会解决这个问题呢？
+我取了一个图片，不进行任何处理，然后让它旋转0.1弧度：</p>
+
+<p><img src="/images/post/image-without-anti-alise.png" alt="image" /></p>
+
+<p>可见确实出现了很多锯齿。
+我在图片边缘加了一个像素的透明区域，代码如下：</p>
+
+<pre><code>- (UIImage*)antialiasedImageOfSize:(CGSize)size scale:(CGFloat)scale{
+    UIGraphicsBeginImageContextWithOptions(size, NO, scale);
+    [self drawInRect:CGRectMake(1, 1, size.width-2, size.height-2)];
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return image;
+}
+</code></pre>
+
+<p>结果完全实现了抗锯齿效果：</p>
+
+<p><img src="/images/post/image-with-anti-alise.png" alt="image" /></p>
+
+<h2>结论</h2>
+
+<p>Layer的edgeAntialiasingMask属性并不能有效抗锯齿，只需要在图片边缘加入1个像素的透明区域就可以完美实现图片抗锯齿了。</p>
+
+<p>我把这些代码发布在我的开源项目中了，里面有Demo。项目地址是：<a href="https://github.com/shenqiliang/ImageAntialiase">ImageAntialiase</a></p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/10/24/add-occheck-to-project-when-run/">让项目在编译时自动加上occheck</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-10-24T21:18:00+08:00" pubdate data-updated="true">Oct 24<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>之前我开源了一个项目occheck，它是一个检查内存泄漏和高危函数的自动化工具。但是如何利用好它呢？如果能够像Xcode静态分析那样能自动在编译时执行就好了。呵呵，言归正传，这篇文章将为你详细介绍如何在项目调试前进行自动检查，以达到减少不安全的代码目的。我们开始吧！</p>
+
+<h4>1、创建一个Runscript(运行脚本)</h4>
+
+<p>打开项目配置，选择合适的target，在右侧选择“Build Phases”。然后在下方点击“Add Build Phases”－“Add Run Script”。如下图：</p>
+
+<p><img src="/images/post/add-occheck-to-runscript-step-one.png" alt="image" /></p>
+
+<h4>2、输入相应的运行脚本</h4>
+
+<p>点击“Add Run Script”菜单后，将会在中间添加“Run Script”项，在此项的第二个文本框里输入脚本：</p>
+
+<p>/path/to/occheck /path/to/class目录
+如下图：</p>
+
+<p><img src="/images/post/add-occheck-to-runscript-step-two.png" alt="image" /></p>
+
+<h4>3、运行</h4>
+
+<p>Build&amp;Run吧，如果检查到内存信息或高危函数，将无法运行。同时，在build日志里会显示那个类或文件出错了。如：</p>
+
+<pre><code>ERROR: QHTTPCacheManager cacheRootPath 没有在dealloc中release.
+ERROR: CategoryView buttons 没有在dealloc中release.
+ERROR: TodayDealListViewController dealInfosThisRounds 没有在dealloc中release.
+ERROR: TodayDealListViewController dealInfosThisRound 没有在dealloc中release.
+</code></pre>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/10/23/ios-mmap-api/">iOS将大文件映射到内存</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-10-23T21:23:00+08:00" pubdate data-updated="true">Oct 23<span>rd</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>在《<a href="/blog/2011/11/02/gps-offset-in-google-map-at-china/">中国区GPS偏移纠正（适用于Google地图）</a>》一文中曾读取一个78M的大数据文件，一开始采用了NSData的dataWithContentsOfFile:方法。不少人反馈说如果直接使用，将会耗尽iOS的内存。其实这个是可以改善的。
+NSData还有一个API：</p>
+
+<pre><code>+ (id)dataWithContentsOfFile:(NSString *)path options:(NSDataReadingOptions)readOptionsMask error:(NSError **)errorPtr;
+</code></pre>
+
+<p>其中NSDataReadingOptions可以附加一个参数NSDataReadingMappedIfSafe参数。使用这个参数后，iOS就不会把整个文件全部读取的内存了，而是将文件映射到进程的地址空间中，这么做并不会占用实际内存。这样就可以解决内存满的问题。</p>
+
+<h2>实际测试效果</h2>
+
+<p>不带参数时内存占用：
+<img src="/images/post/mem-of-gps-data-not-mmap.png" alt="image" /></p>
+
+<p>使用NSDataReadingMappedIfSafe参数后内存占用：
+<img src="/images/post/mem-of-gps-data-mmap.png" alt="image" /></p>
+
+<p>由此可见，对于体积很大文件，使用内存映射方式读取将会减少大量内存占用。
+什么是文件内存映射呢</p>
+
+<p>文件内存映射是指把一个文件的内容映射到进程的内存虚拟地址空间中，这个实际上并没有为文件内容分配物理内存。实际上就相当于将内存地址值指向文件的磁盘地址。如果对这些内存进行读写，实际上就是对文件在磁盘上内容进行读写。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/10/21/a-class-simulate-web-form/">一个模拟网页表单请求封装类（支持文件上传）</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-10-21T21:05:00+08:00" pubdate data-updated="true">Oct 21<span>st</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>自己在作项目时经常会遇到要上传文件同时还要附带一些字符串参数的网络请求，由于文件有时是二进制数据，采用http查询参数就不太适合了。最好的方式是采取Web表单的方式上传文件，自己写了这么一个类，就分享一下。
+代码地址：<a href="https://github.com/shenqiliang/HTTPForm-iOS">https://github.com/shenqiliang/HTTPForm-iOS</a></p>
+
+<p>使用方法：</p>
+
+<pre><code>PPPostWebForm *a = [[PPPostWebForm alloc] initWithPostURL:[NSURL URLWithString:@"http://www.example.com/upload/uploadFile"]];
+[a addFileElement:@"文件参数" value:@"文件路径"];
+[a addTextElement:@"参数名" value:@"参数值"];
+[a addTextElement:@"参数名2" value:@"参数值2"];
+a.delegate = self;
+[a commitFormAsynchronous];
+</code></pre>
+
+<p>网络请求完毕后会得到回调：</p>
+
+<pre><code>- (void)postWebForm:(PPPostWebForm*)form didReceivedAsynchronousData:(NSData*)data{
+    NSString *s = [NSString stringWithUTF8String:[data bytes]];
+    NSLog(s);
+}
+</code></pre>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/10/19/obj-setproperty-nonatomic-problem-update-ios6/">_objc_setProperty_nonatomic和_objc_setProperty_atomic运行时没有找到的问题</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-10-19T20:59:00+08:00" pubdate data-updated="true">Oct 19<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>上次我们一个项目在iOS6上运行正常，但在iOS5.0上运行时却出现了一个错误：</p>
+
+<pre><code>dyld: lazy symbol binding failed: Symbol not found: _objc_setProperty_nonatomic
+</code></pre>
+
+<p>或者</p>
+
+<pre><code>dyld: lazy symbol binding failed: Symbol not found: _objc_setProperty_atomic
+</code></pre>
+
+<p>这个错误就是说App可执行文件里引用了objc_setProperty_nonatomic或objc_setProperty_atomic这些函数。但是代码里显然没有直接调用这2个函数，应该是系统在编译时生成的。经过Debug调试发现总是在设置一个对象的属性时出现这个错误。而这个对象的类定义在静态库里面，所以我看了看静态库。
+经过排查，发现导致这一问题的原因是这个静态库的Deployment Target设置成了6.0。因为objc_setProperty_nonatomic和objc_setProperty_atomic是iOS6中新增的函数，所以如果静态库的Deployment Target设置成iOS6，那么编译后就会使用objc_setProperty_nonatomic和objc_setProperty_atomic这些新的API。由于iOS5中没有这些API，运行后将会崩溃。</p>
+
+<h2>结论</h2>
+
+<p>静态库在编译时，Deployment Target一定要低于和等于工程的Deployment Target。否则容易出现低版本iOS运行不兼容的情况。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/10/18/xcode-compile-problem-ios6/">最新Xcode编译出现的问题</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-10-18T20:53:00+08:00" pubdate data-updated="true">Oct 18<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>iOS6发布的时候，我下载了新的SDK，Xcode也更新到了4.5。那时我们的app正好要提交AppStore，我就尝试用新的Xcode编译开发包。但是在提交时，发现总是验证失败提交不成功。原因是说我的binary里没有armv6的包，但我检查了编译选项发现在Architectures和Valid Architectures里都包含里armv6。折腾了好久，原来我忽略了一个警告。本来我一直都很重视警告，但是我在旧版本的Xcode里编译时1个警告都没有，所以我以为只是新版Xcode环境问题，也没太在意，但问题就是这个警告说明的问题。我用nm命令看了一下包，原来真的没有armv6的binary。查看了相关资料发现原来新版本（4.5以上）的Xcode已经不在armv6处理器了！所以即使你的编译选项里明确指定armv6，也是无效的。所以编译后的包只有armv7。而我的app最低支持版本是4.0。在4.3以下的支持，AppStore会要求必须有armv6的binary，所以提交不了。所以如果app要支持4.3以下就必须用低版本Xcode编译了，否则app就只能支持4.3以上了。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/10/15/an-objc-static-check-tool-occheck/">一个用于Objective-C静态检查的工具－occheck</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-10-15T01:01:00+08:00" pubdate data-updated="true">Oct 15<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>在ObjC的MRC（手动引用计数）内存管理时, 使用引用计数来维护内存的回收，引用计数的错误常常导致内存泄漏。有一个很常见的错误就是一个retain的属性或成员没有在dealloc中释放。而这种错误用静态代码分析工具检测不出来。当代码写的很多时，一个类一个类的检查很麻烦，而且容易疏露。我写了一个自动检查这种错误的小工具（occheck）。另外这个工具还能检查代码中的高危函数。</p>
+
+<p>安装occheck(有些同学反馈command not fond的解决方法):
+occheck是个二进制命令行工具，拷贝到/usr/bin目录下才可以直接在终端中输入使用。</p>
+
+<pre><code>sudo cp /path/to/occheck /usr/bin/occheck
+sudo chmod -R 755 /usr/bin/occheck
+</code></pre>
+
+<p>使用方法：</p>
+
+<pre><code>occheck [-arc] [path] ...
+</code></pre>
+
+<p>[path]是要检查代码所在的目录，可以是你的工程目录。运行之后会自动检查path目录下的所有objc文件。自动检测类的retain成员，如果忘记在dealloc中release相关成员就会输出错误。
+如果你的项目使用ARC，可以不检查内存泄漏，指定”-arc”参数将只检查高危函数。</p>
+
+<p>如：</p>
+
+<pre><code>occheck /Users/brightshen/Documents/elife/trunk/ios/QQGroupon
+</code></pre>
+
+<p>输出：</p>
+
+<pre><code>ERROR: QHTTPCacheManager cacheRootPath 没有在dealloc中release.
+ERROR: CategoryView buttons 没有在dealloc中release.
+ERROR: TodayDealListViewController dealInfosThisRounds 没有在dealloc中release.
+ERROR: TodayDealListViewController dealInfosThisRound 没有在dealloc中release.
+</code></pre>
+
+<p>可以强制指定一个类成员为assign而不是retain
+只需要在变量类型前面加入ASSIGN
+比如：</p>
+
+<pre><code>#define ASSIGN
+@interface QPicker : UIView{
+   NSArray *items;
+   UIPickerView *pickerView;
+   UIToolbar *toolBar;
+   UIView *coverView;
+   ASSIGN id&lt;QPickerDelegate&gt;delegate;
+   id userInfo;
+}
+@end
+</code></pre>
+
+<p>这样就不会把delegate作为一个retain的成员来处理。如果delegate在属性中定义为assign，那么前面的ASSIGN可以不加，会自动检测。</p>
+
+<p>也可以设置一个类是单例的，这样就不会检查dealloc了，只需要在类的名字前面加上SINGLETON</p>
+
+<pre><code>#define SINGLETON
+@interface SINGLETON QQTicketAppDelegate : NSObject &lt;UIApplicationDelegate,UIAlertViewDelegate&gt; {
+    QTTabBarController *tabBarController;
+    UIViewController *movieViewController;
+    UIViewController *cinemaViewController;
+    UIViewController *myViewController;
+    UIViewController *moreViewController;
+    UIWindow *window;
+    UILocalNotification *movieNotification;
+}
+@end
+</code></pre>
+
+<p>项目地址：<a href="https://github.com/shenqiliang/occheck">https://github.com/shenqiliang/occheck</a></p>
+</div>
+  
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+      <a class="prev" href="/blog/page/3/">&larr; Older</a>
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+    <a class="next" href="/">Newer &rarr;</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/08/15/auto-key-press-using-appscript/">用AppleScript在Mac系统下实现按键精灵的功能以及在游戏中的运用</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/08/14/implement-objc-property-in-category/">Objective-C语言在Category中实现属性</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/07/30/no-keyboard-in-webview-of-ios5/">iOS5网页视图（UIWebView）中的输入框不能弹出键盘的问题</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/07/17/cant-scroll-in-tableview/">TableView中嵌套一个ScrollView有时导致ScrollView无法滚动</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/06/12/custom-ui-using-uiappearance/">iOS 5中使用UIAppearance来自定义应用的外观</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - 谌启亮 -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

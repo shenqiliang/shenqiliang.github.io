@@ -1,0 +1,318 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>iOS崩溃日志分析 - Xcode Dev</title>
+  <meta name="author" content="谌启亮">
+
+  
+  <meta name="description" content="崩溃日志的产生 iOS中运行App过程中如果发生程序崩溃，会生成一个崩溃日志文件。这个文件会保存的特定系统目录下，扩展名是crash。当手机连接到iTunes时，会将该文件同步到电脑上。 在Mac系统中这些文件会同步到“~/Library/Logs/CrashReporter/ &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://shenqiliang.github.io/blog/2012/12/07/ios-crash-log-analycis">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Xcode Dev" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/lib/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Xcode Dev</a></h1>
+  
+    <h2>学习、分享、积累 – 亮了的原创开发博客</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:shenqiliang.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">iOS崩溃日志分析</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-12-07T01:44:00+08:00" pubdate data-updated="true">Dec 7<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><h2>崩溃日志的产生</h2>
+
+<p>iOS中运行App过程中如果发生程序崩溃，会生成一个崩溃日志文件。这个文件会保存的特定系统目录下，扩展名是crash。当手机连接到iTunes时，会将该文件同步到电脑上。</p>
+
+<p>在Mac系统中这些文件会同步到“~/Library/Logs/CrashReporter/MobileDevice”下。</p>
+
+<p>而在Windows系统中会同步到“C:UsersAppDataRoamingApple computerLogsCrashReporter/MobileDevice”（Vista或以上）或“C:Documents and SettingsApplication DataApple computerLogsCrashReporter”（XP）。</p>
+
+<!--more-->
+
+
+<h2>崩溃日志的上传</h2>
+
+<p>iOS中崩溃日志是可以上传的App Store的服务器，并由开发者查看的。用户可以通过系统设置中的“通用－诊断与用量”来设定是否上传崩溃日志。同时开发者也可以通过捕获异常信号自己定制异常上报。</p>
+
+<h2>崩溃日志的格式</h2>
+
+<p>一般崩溃日志头部有如下字段</p>
+
+<pre><code>Exception Type:  EXC_BAD_ACCESS (SIGSEGV)
+Exception Codes: KERN_INVALID_ADDRESS at 0x20000008
+Crashed Thread:  0
+</code></pre>
+
+<p>其中Exception Type是异常类型，Exception Codes是异常代码。Crashed Thread指示异常的线程编号。上面表示Crash的线程编号是0（主线程的线程编号是0）。</p>
+
+<p>看崩溃日志时一般要分两种情况，一种是内存、CPU的系统错误，如内存访问错误、除零异常等。另外一种是程序通过写代码抛出的异常，即代码中通过throw关键字抛出的异常。程序抛出的异常是可以捕获并处理的，如果没有捕获，就会Crash，并生成崩溃日志。这两种在日志中有一些细微的差别。</p>
+
+<p>一般内存等系统异常Crash线程信息如下：</p>
+
+<pre><code>Thread 0 name:  Dispatch queue: com.apple.main-thread
+Thread 0 Crashed:
+0   libobjc.A.dylib                 0x3624cf78 objc_msgSend + 16
+1   QQYanChu                        0x0000d92a -[QYServerInterface connectionDidFinishLoading:] (QYServerInterface.m:328)
+2   Foundation                      0x30d03c22 __65-[NSURLConnectionInternal _withConnectionAndDelegate:onlyActive:]_block_invoke_0 + 10
+3   Foundation                      0x30c5b6d2 -[NSURLConnectionInternalConnection invokeForDelegate:] + 22
+4   Foundation                      0x30c5b69c -[NSURLConnectionInternal _withConnectionAndDelegate:onlyActive:] + 192
+5   Foundation                      0x30c5b5be -[NSURLConnectionInternal _withActiveConnectionAndDelegate:] + 54
+6   CFNetwork                       0x338077ee URLConnectionClient::_clientDidFinishLoading(URLConnectionClient::ClientConnectionEventQueue*) + 186
+7   CFNetwork                       0x337fc49e URLConnectionClient::ClientConnectionEventQueue::processAllEventsAndConsumePayload(XConnectionEventInfo&lt;XClientEvent, XClientEventParams&gt;*, long) + 418
+8   CFNetwork                       0x337fc592 URLConnectionClient::ClientConnectionEventQueue::processAllEventsAndConsumePayload(XConnectionEventInfo&lt;XClientEvent, XClientEventParams&gt;*, long) + 662
+9   CFNetwork                       0x337fc19c URLConnectionClient::processEvents() + 100
+10  CFNetwork                       0x337fc0d2 MultiplexerSource::perform() + 150
+11  CoreFoundation                  0x34dffacc __CFRUNLOOP_IS_CALLING_OUT_TO_A_SOURCE0_PERFORM_FUNCTION__ + 8
+12  CoreFoundation                  0x34dff298 __CFRunLoopDoSources0 + 208
+13  CoreFoundation                  0x34dfe03e __CFRunLoopRun + 646
+14  CoreFoundation                  0x34d8149e CFRunLoopRunSpecific + 294
+15  CoreFoundation                  0x34d81366 CFRunLoopRunInMode + 98
+16  GraphicsServices                0x3607d432 GSEventRunModal + 130
+17  UIKit                           0x31e77e76 UIApplicationMain + 1074
+18  QQYanChu                        0x0000feea main (main.m:39)
+19  QQYanChu                        0x00007ed4 start + 32
+</code></pre>
+
+<p>第一列是编号，表示堆栈中函数调用的嵌套顺序。最上面就是崩溃发生的函数，往下面看就可以看到我们的代码。第二列是堆栈中函数定义的位置，有的是在动态库或Framework中定义的，有的是我们的App定义的，如QQYanChu就是我们的App可执行文件，另外你还可以看到其他的动态库等，一般我们关注自己的QQYanChu的就行了。 如上面的例子就是在-[QYServerInterface connectionDidFinishLoading:] 这个调用中挂的。一般这个信息还会包含代码文件和说对应的行号，如上面红色部分就是说崩溃在QYServerInterface.m的328行。这就可以方便我们快速定位问题。</p>
+
+<p>下面是程序抛出的异常的日志。</p>
+
+<pre><code>Last Exception Backtrace:
+0   CoreFoundation                  0x3425929e __exceptionPreprocess + 158
+1   libobjc.A.dylib                 0x33a2b97a objc_exception_throw + 26
+2   CoreFoundation                  0x3425ce02 -[NSObject(NSObject) doesNotRecognizeSelector:] + 166
+3   CoreFoundation                  0x3425b52c ___forwarding___ + 388
+4   CoreFoundation                  0x341b2f64 _CF_forwarding_prep_0 + 20
+5   QQYanChu                        0x000ef372 -[QYUser staticDataFetcher:fetchedData:] (QYUser.m:168)
+6   QQYanChu                        0x001ee9f2 -[QStaticDataFetcher successWithData:] + 94
+7   QQYanChu                        0x001efb44 -[QStaticDataFetcher sendDelegateMessageWithLocalData] + 220
+8   Foundation                      0x39256a6a __NSFireDelayedPerform + 446
+9   CoreFoundation                  0x3422e5da __CFRUNLOOP_IS_CALLING_OUT_TO_A_TIMER_CALLBACK_FUNCTION__ + 10
+10  CoreFoundation                  0x3422e28c __CFRunLoopDoTimer + 268
+11  CoreFoundation                  0x3422cefc __CFRunLoopRun + 1228
+12  CoreFoundation                  0x3419feb8 CFRunLoopRunSpecific + 352
+13  CoreFoundation                  0x3419fd44 CFRunLoopRunInMode + 100
+14  GraphicsServices                0x34f082e6 GSEventRunModal + 70
+15  UIKit                           0x36de52fc UIApplicationMain + 1116
+16  QQYanChu                        0x000fcfc0 main (main.m:39)
+17  QQYanChu                        0x000ee4d4 start + 36
+
+
+Thread 0 name:  Dispatch queue: com.apple.main-thread
+Thread 0 Crashed:
+0   libsystem_kernel.dylib          0x32f28350 __pthread_kill + 8
+1   libsystem_c.dylib               0x3830311e pthread_kill + 54
+2   libsystem_c.dylib               0x3833f96e abort + 90
+3   libc++abi.dylib                 0x38e35d4a abort_message + 70
+4   libc++abi.dylib                 0x38e32ff4 default_terminate() + 20
+5   libobjc.A.dylib                 0x33a2ba74 _objc_terminate() + 144
+6   libc++abi.dylib                 0x38e33078 safe_handler_caller(void (*)()) + 76
+7   libc++abi.dylib                 0x38e33110 std::terminate() + 16
+8   libc++abi.dylib                 0x38e34594 __cxa_rethrow + 84
+9   libobjc.A.dylib                 0x33a2b9cc objc_exception_rethrow + 8
+10  CoreFoundation                  0x3419ff1c CFRunLoopRunSpecific + 452
+11  CoreFoundation                  0x3419fd44 CFRunLoopRunInMode + 100
+12  GraphicsServices                0x34f082e6 GSEventRunModal + 70
+13  UIKit                           0x36de52fc UIApplicationMain + 1116
+14  QQYanChu                        0x000fcfc0 main (main.m:39)
+15  QQYanChu                        0x000ee4d4 start + 36
+</code></pre>
+
+<p>可以看出相比系统异常日志中多出了Last Exception Backtrace字段。上面是线程0崩溃的，而线程0只调用的abort。这是我们要看Last Exception Backtrace这里的堆栈，这个堆栈是抛出异常时的线程当时的堆栈情况，这个信息才是有意义的。在我们程序抛出异常后，系统会执行一系列相关逻辑后调用abort异常结束程序。</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">谌启亮</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-12-07T01:44:00+08:00" pubdate data-updated="true">Dec 7<span>th</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/ioskai-fa/'>iOS开发</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://shenqiliang.github.io/blog/2012/12/07/ios-crash-log-analycis/" data-via="" data-counturl="http://shenqiliang.github.io/blog/2012/12/07/ios-crash-log-analycis/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/11/16/passbook-in-ios6/" title="Previous Post: iOS6中的Passbook">&laquo; iOS6中的Passbook</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2013/01/25/xcode-debug-string-show/" title="Next Post: Xcode字符串调试时显示问题">Xcode字符串调试时显示问题 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/08/15/auto-key-press-using-appscript/">用AppleScript在Mac系统下实现按键精灵的功能以及在游戏中的运用</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/08/14/implement-objc-property-in-category/">Objective-C语言在Category中实现属性</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/07/30/no-keyboard-in-webview-of-ios5/">iOS5网页视图（UIWebView）中的输入框不能弹出键盘的问题</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/07/17/cant-scroll-in-tableview/">TableView中嵌套一个ScrollView有时导致ScrollView无法滚动</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/06/12/custom-ui-using-uiappearance/">iOS 5中使用UIAppearance来自定义应用的外观</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - 谌启亮 -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

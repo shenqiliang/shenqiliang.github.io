@@ -1,0 +1,350 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Objective-C中方法签名(Method Signature)机制 - Xcode Dev</title>
+  <meta name="author" content="谌启亮">
+
+  
+  <meta name="description" content="引言 在ObjC语言中，我们会自定义各种各样的类，在类定义中，我们又会定义各种方法，当方法达到一定的数量，有时会不可避免的出现一些同名的方法。而同名的方法有时会导致运行时出现很奇怪的问题。比如传递参数不一致时，出现运行时错误。这些都和ObjC中的方法签名（Method Signature）相关。 &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://shenqiliang.github.io/blog/2013/05/30/method-signature-in-objc">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Xcode Dev" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/lib/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Xcode Dev</a></h1>
+  
+    <h2>学习、分享、积累 – 亮了的原创开发博客</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:shenqiliang.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Objective-C中方法签名(Method Signature)机制</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-05-30T15:23:00+08:00" pubdate data-updated="true">May 30<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><h2>引言</h2>
+
+<p>在ObjC语言中，我们会自定义各种各样的类，在类定义中，我们又会定义各种方法，当方法达到一定的数量，有时会不可避免的出现一些同名的方法。而同名的方法有时会导致运行时出现很奇怪的问题。比如传递参数不一致时，出现运行时错误。这些都和ObjC中的方法签名（Method Signature）相关。</p>
+
+<!--more-->
+
+
+<h2>什么是方法签名</h2>
+
+<p>方法签名是ObjC中对一个方法的参数类型和返回值类型的一条记录。每个方法都对应一个方法签名。</p>
+
+<h2>一些基本概念</h2>
+
+<p>有几个名词在深入理解方法签名机制之前必须区分清楚：
+部分可参考我之前的一篇博文：
+<a href="/blog/2012/03/22/difference-between-message-and-method/">Objective-C中消息（Message）和方法（Method）的区别</a></p>
+
+<h3>消息</h3>
+
+<p>消息由消息的名字和参数组成，可以有返回值，用于发送给某个对象。大部分我们写的代码都是向一个对象发送消息。比如：</p>
+
+<p>[receiver message];
+方法
+方法对应一段可执行代码，是implementation的一部分。当我们向某个对象发送消息时，系统会分析我们所发送的消息，动态地调用响应的方法。对应ObjC中的IMP类型。</p>
+
+<p>Selector
+ObjC中有个SEL类型，这个类型就是Selector的类型。我们可以用@selector操作符来获取一个Selector。Selector可理解为方法的名字，但这并不包含参数和返回值，仅仅是名字。你还需注意，Selector不和任何类关联，你不能说某个Selector属于一个类，它仅仅是名字。</p>
+
+<p>NSMethodSignature类</p>
+
+<p>ObjC中有一个NSMethodSignature类，这个类很好的帮助我们来分析一下ObjC中的方法签名机制，这个类中定义了以下几个方法</p>
+
+<ul>
+<li>(NSUInteger)numberOfArguments;//参数的数量</li>
+<li>(const char *)getArgumentTypeAtIndex:(NSUInteger)idx;//第idx个参数的类型</li>
+<li>(const char *)methodReturnType;//返回值类型</li>
+<li><p>(NSUInteger)methodReturnLength;//返回值长度，单位字节
+从这些定义中我们可以看出，方法签名中会包含方法的参数个数，每个参数的类型，返回值类型，以及返回值占用的空间大小。
+NSObject基类中提供了获取这个对象的方法</p></li>
+<li><p>(NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector
+所以，只要知道一个对象，和一个SEL（selector），那么就可以动态的获取这个方法签名了。</p></li>
+</ul>
+
+
+<p>参数类型签名不同导致的一个奇怪现象</p>
+
+<p>下面先举个例子，来看看参数类型签名不同导致的一个奇怪现象。
+首先我们定义两个类，两个类是继承关系，但定义了同名的方法，但方法的参数类型不同。（所以它们的方法签名是不同的。）</p>
+
+<p>//基类
+@interface ParamBase : NSObject
+&ndash; (void)doSomeThing:(int)i;
+@end</p>
+
+<p>@implementation ParamBase
+&ndash; (void)doSomeThing:(int)i{</p>
+
+<pre><code>NSLog(@"Base doSomeThing called with int: %d",i);
+</code></pre>
+
+<p>}
+@end</p>
+
+<p>//子类
+@interface ParamSub : ParamBase
+&ndash; (void)doSomeThing:(double)d;
+@end</p>
+
+<p>@implementation ParamSub
+&ndash; (void)doSomeThing:(double)d{</p>
+
+<pre><code>NSLog(@"Sub doSomeThing called with double: %f",d);
+</code></pre>
+
+<p>}
+@end
+然后，我们创建个子类对象，然后分别在不同情况下执行doSomeThing，我们都传递相同的参数。</p>
+
+<p>ParamBase <em>a = [ParamSub new];
+[a doSomeThing:1.0];
+[(ParamSub</em>)a doSomeThing:1.0];
+然后运行，你会得到如下结果。</p>
+
+<p>2013-05-30 14:25:03.242 MethodSignTest[2144:c07] Sub doSomeThing called with double: 0.000000
+2013-05-30 14:25:03.244 MethodSignTest[2144:c07] Sub doSomeThing called with double: 1.000000
+向一个对象发送了相同的消息，并且参数相同，为什么两次得到的结果不同。明明发送了1，为什么确变成0了。这其实是方法签名在编译阶段时捣鬼。当编译第二行代码时，编译器发现ParamBase对象的doSomeThing方法签名中的第一个参数是int类型，虽然代码了写的是1.0，但编译后就转换整数1了。运行时在子类的doSomeThing把整数1强制以double类型打印出来就是0了。而第3行代码就没有问题。应为编译器已经知道a已强制为ParamSub类型，而ParamSub对象doSomeThing方法签名中的第一个参数是double类型，而不是int类型，所以就没问题了。</p>
+
+<p>在ARC（自动引用计数机制）下返回值类型签名不同导致Crash</p>
+
+<p>我们再定义两个类，两个类还是继承关系，定义了同名的方法，但方法的返回值类型不同。（所以它们的方法签名也是不同的。）</p>
+
+<p>//基类
+@interface ReturnBase : NSObject
+&ndash; (id)getSomeThing;
+@end</p>
+
+<p>@implementation ReturnBase
+&ndash; (id)getSomeThing{</p>
+
+<pre><code>NSLog(@"Return Base called");
+return [NSArray new];
+</code></pre>
+
+<p>}
+@end</p>
+
+<p>//子类
+@interface ReturnSub : ReturnBase
+&ndash; (void)getSomeThing;
+@end</p>
+
+<p>@implementation ReturnSub
+&ndash; (void)getSomeThing{</p>
+
+<pre><code>NSLog(@"nothing");
+</code></pre>
+
+<p>}
+@end
+然后我们执行下面这段代码：</p>
+
+<p>ReturnBase <em>b = [ReturnSub new];
+[(ReturnSub</em>)b getSomeThing];
+[b getSomeThing];
+结果程序在第3行Crash了，Crash类型一般是内存访问（BAD ACCESS）错误。第2行和第3行在ObjC动态绑定的机制下完全是相同的代码啊，为什么第2行没Crash，到第3行就Crash了呢？这是由于ARC和方法签名机制共同作用的结果，ARC下系统会对消息的返回值自动做一些retain或release等操作，而b在运行时ReturnSub类型，getSomeThing是不返回任何对象的。第二行时编译器知道b是ReturnSub类型，所以不会处理返回值了，而在第3行时，编译器认为b是ReturnBase类型，而根据ReturnBase类的方法getSomeThing的签名，是有返回值的，所以第3行编译后会自动对getSomeThing的返回值加一些retain/release等操作，而运行时却是没有返回值的（void类型），那么返回值就是不确定的，对这个不确定的值进行retain/release操作，一般就会导致内存访问（BAD ACCESS）错误。
+也许你会想，我如果把b设为id类型，会怎样。</p>
+
+<p>id b = [ReturnSub new];
+[(ReturnSub*)b getSomeThing];
+[b getSomeThing];
+结果是编译不通过，名字为getSomeThing的方法的签名不一致，编译器就不知道有没有返回值了。</p>
+
+<p>结论</p>
+
+<p>方法签名在编译时对方法的参数进行一定的转换。
+ARC下会根据方法签名中的返回值进行retain/release等操作
+最好不要写方法名字相同，当方法签名不同的方法，以免出现怪异现象。
+有时我们改变了一个基类的参数类型或返回值类型，不要忘记了在子类中进行相应的修改。</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">谌启亮</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-05-30T15:23:00+08:00" pubdate data-updated="true">May 30<span>th</span>, 2013</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://shenqiliang.github.io/blog/2013/05/30/method-signature-in-objc/" data-via="" data-counturl="http://shenqiliang.github.io/blog/2013/05/30/method-signature-in-objc/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2013/04/10/uialertview-animation/" title="Previous Post: UIAlertView弹出视图动画效果">&laquo; UIAlertView弹出视图动画效果</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2013/06/05/extented-file-property-in-unix/" title="Next Post: Unix系统中设置文件的扩展属性">Unix系统中设置文件的扩展属性 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/08/15/auto-key-press-using-appscript/">用AppleScript在Mac系统下实现按键精灵的功能以及在游戏中的运用</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/08/14/implement-objc-property-in-category/">Objective-C语言在Category中实现属性</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/07/30/no-keyboard-in-webview-of-ios5/">iOS5网页视图（UIWebView）中的输入框不能弹出键盘的问题</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/07/17/cant-scroll-in-tableview/">TableView中嵌套一个ScrollView有时导致ScrollView无法滚动</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/06/12/custom-ui-using-uiappearance/">iOS 5中使用UIAppearance来自定义应用的外观</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - 谌启亮 -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

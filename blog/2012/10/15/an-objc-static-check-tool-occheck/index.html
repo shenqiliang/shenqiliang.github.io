@@ -1,0 +1,282 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>一个用于Objective-C静态检查的工具－occheck - Xcode Dev</title>
+  <meta name="author" content="谌启亮">
+
+  
+  <meta name="description" content="在ObjC的MRC（手动引用计数）内存管理时, 使用引用计数来维护内存的回收，引用计数的错误常常导致内存泄漏。有一个很常见的错误就是一个retain的属性或成员没有在dealloc中释放。而这种错误用静态代码分析工具检测不出来。当代码写的很多时，一个类一个类的检查很麻烦，而且容易疏露。 &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://shenqiliang.github.io/blog/2012/10/15/an-objc-static-check-tool-occheck">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Xcode Dev" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/lib/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Xcode Dev</a></h1>
+  
+    <h2>学习、分享、积累 – 亮了的原创开发博客</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:shenqiliang.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">一个用于Objective-C静态检查的工具－occheck</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-10-15T01:01:00+08:00" pubdate data-updated="true">Oct 15<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>在ObjC的MRC（手动引用计数）内存管理时, 使用引用计数来维护内存的回收，引用计数的错误常常导致内存泄漏。有一个很常见的错误就是一个retain的属性或成员没有在dealloc中释放。而这种错误用静态代码分析工具检测不出来。当代码写的很多时，一个类一个类的检查很麻烦，而且容易疏露。我写了一个自动检查这种错误的小工具（occheck）。另外这个工具还能检查代码中的高危函数。</p>
+
+<p>安装occheck(有些同学反馈command not fond的解决方法):
+occheck是个二进制命令行工具，拷贝到/usr/bin目录下才可以直接在终端中输入使用。</p>
+
+<pre><code>sudo cp /path/to/occheck /usr/bin/occheck
+sudo chmod -R 755 /usr/bin/occheck
+</code></pre>
+
+<p>使用方法：</p>
+
+<pre><code>occheck [-arc] [path] ...
+</code></pre>
+
+<p>[path]是要检查代码所在的目录，可以是你的工程目录。运行之后会自动检查path目录下的所有objc文件。自动检测类的retain成员，如果忘记在dealloc中release相关成员就会输出错误。
+如果你的项目使用ARC，可以不检查内存泄漏，指定”-arc”参数将只检查高危函数。</p>
+
+<p>如：</p>
+
+<pre><code>occheck /Users/brightshen/Documents/elife/trunk/ios/QQGroupon
+</code></pre>
+
+<p>输出：</p>
+
+<pre><code>ERROR: QHTTPCacheManager cacheRootPath 没有在dealloc中release.
+ERROR: CategoryView buttons 没有在dealloc中release.
+ERROR: TodayDealListViewController dealInfosThisRounds 没有在dealloc中release.
+ERROR: TodayDealListViewController dealInfosThisRound 没有在dealloc中release.
+</code></pre>
+
+<p>可以强制指定一个类成员为assign而不是retain
+只需要在变量类型前面加入ASSIGN
+比如：</p>
+
+<pre><code>#define ASSIGN
+@interface QPicker : UIView{
+   NSArray *items;
+   UIPickerView *pickerView;
+   UIToolbar *toolBar;
+   UIView *coverView;
+   ASSIGN id&lt;QPickerDelegate&gt;delegate;
+   id userInfo;
+}
+@end
+</code></pre>
+
+<p>这样就不会把delegate作为一个retain的成员来处理。如果delegate在属性中定义为assign，那么前面的ASSIGN可以不加，会自动检测。</p>
+
+<p>也可以设置一个类是单例的，这样就不会检查dealloc了，只需要在类的名字前面加上SINGLETON</p>
+
+<pre><code>#define SINGLETON
+@interface SINGLETON QQTicketAppDelegate : NSObject &lt;UIApplicationDelegate,UIAlertViewDelegate&gt; {
+    QTTabBarController *tabBarController;
+    UIViewController *movieViewController;
+    UIViewController *cinemaViewController;
+    UIViewController *myViewController;
+    UIViewController *moreViewController;
+    UIWindow *window;
+    UILocalNotification *movieNotification;
+}
+@end
+</code></pre>
+
+<p>项目地址：<a href="https://github.com/shenqiliang/occheck">https://github.com/shenqiliang/occheck</a></p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">谌启亮</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-10-15T01:01:00+08:00" pubdate data-updated="true">Oct 15<span>th</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/ioskai-fa/'>iOS开发</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://shenqiliang.github.io/blog/2012/10/15/an-objc-static-check-tool-occheck/" data-via="" data-counturl="http://shenqiliang.github.io/blog/2012/10/15/an-objc-static-check-tool-occheck/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/04/18/xcode-codesense-no-effect/" title="Previous Post: 解决Xcode中Code sense无效问题">&laquo; 解决Xcode中Code sense无效问题</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2012/10/18/xcode-compile-problem-ios6/" title="Next Post: 最新Xcode编译出现的问题">最新Xcode编译出现的问题 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/08/15/auto-key-press-using-appscript/">用AppleScript在Mac系统下实现按键精灵的功能以及在游戏中的运用</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/08/14/implement-objc-property-in-category/">Objective-C语言在Category中实现属性</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/07/30/no-keyboard-in-webview-of-ios5/">iOS5网页视图（UIWebView）中的输入框不能弹出键盘的问题</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/07/17/cant-scroll-in-tableview/">TableView中嵌套一个ScrollView有时导致ScrollView无法滚动</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/06/12/custom-ui-using-uiappearance/">iOS 5中使用UIAppearance来自定义应用的外观</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - 谌启亮 -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

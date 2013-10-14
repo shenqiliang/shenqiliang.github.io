@@ -1,0 +1,763 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Xcode Dev</title>
+  <meta name="author" content="谌启亮">
+
+  
+  <meta name="description" content="在iOS5中新增了一个数字输入控件UIStepper，它可以递进式输入数量。UIStepper继承自UIControl，它主要的事件是UIControlEventValueChanged，每当它的值改变了就会触发这个事件。它的显示效果如下： 它主要有下面几个属性 value 当前所表示的值，默认0 &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://shenqiliang.github.io/blog/page/4">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Xcode Dev" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/lib/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Xcode Dev</a></h1>
+  
+    <h2>学习、分享、积累 – 亮了的原创开发博客</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:shenqiliang.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/03/17/new-to-ios5-uistepper/">iOS5新增内容之UIStepper控件详解</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-17T23:56:00+08:00" pubdate data-updated="true">Mar 17<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>在iOS5中新增了一个数字输入控件UIStepper，它可以递进式输入数量。UIStepper继承自UIControl，它主要的事件是UIControlEventValueChanged，每当它的值改变了就会触发这个事件。它的显示效果如下：</p>
+
+<p><img src="/images/post/ios5-uistepper.png" alt="image" /></p>
+
+<p>它主要有下面几个属性</p>
+
+<ul>
+<li>value 当前所表示的值，默认0.0</li>
+<li>minimumValue 最小可以表示的值，默认0.0</li>
+<li>maximumValue 最大可以表示的值，默认100.0</li>
+<li>stepValue 每次递增或递减的值，默认1.0</li>
+</ul>
+
+
+<p>设置以上几个值，一般就可以很方便的使用了。</p>
+
+<pre><code>UIStepper *stepper = [[UIStepper alloc] init];
+stepper.minimumValue = 2;
+stepper.maximumValue = 5;
+stepper.stepValue = 2;
+stepper.value = 3;
+stepper.center = CGPointMake(160, 240);
+[stepper addTarget:self action:@selector(valueChanged:) forControlEvents:UIControlEventValueChanged];
+</code></pre>
+
+<p>注意：上面我设置stepValue是2，当前value是3，最小值是2。但如果我们点击“－”，这是value会变成2，而不是1。即每次改变都是value±stepValue，然后将最终的值限制在[minimumValue,maximumValue]区间内。</p>
+
+<p>另外还有几个控制属性：</p>
+
+<ul>
+<li>continuous 控制是否持续触发UIControlEventValueChanged事件。默认YES，即当按住时每次值改变都触发一次UIControlEventValueChanged事件，否则只有在释放按钮时触发UIControlEventValueChanged事件。</li>
+<li>autorepeat 控制是否在按住是自动持续递增或递减。默认YES。</li>
+<li>wraps 控制值是否在[minimumValue,maximumValue]区间内循环。默认NO。</li>
+</ul>
+
+
+<p>这几个控制属性只有在特殊情况下使用，一般使用默认值即可。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/03/15/using-nsubiquitous-key-value-store/">NSUbiquitousKeyValueStore使用和注意事项</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-15T23:52:00+08:00" pubdate data-updated="true">Mar 15<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>NSUbiquitousKeyValueStore是iOS5中新增的类，它提供对iCloud进行Key－Value方式的存储。一般用于保存跨设备的用户配置，如阅读软件保存当前用户阅读的位置，如果用户更换其他设备，可以使用户无缝地从上次的位置继续阅读。它的使用方法几乎和NSUserDefault对象一致。首先通过类方法defaultStore获取默认的Store，然后调用setInteger:forKey:、integerForKey、setObject:forKey、objectForKey:等方法存储和获取数据。</p>
+
+<p>使用NSUbiquitousKeyValueStore一定要注意一下几点：</p>
+
+<ol>
+<li>它最多能存储1M的数据，最多可以同时存储1024个键（Key），单个值不能超过1M。</li>
+<li>单个键的长度在UTF8编码时不能超过64个字节</li>
+<li>当你注册NSUbiquitousKeyValueStoreDidChangeExternallyNotification监听时务必要指定默认的NSUbiquitousKeyValueStore对象（通过类方法defaultStore获取）为要监听的对象</li>
+<li>同步方法synchronize并没有立刻将所有的设置都写入iCloud，而只是保存到磁盘。可能需要一段时间才能和iCloud同步。</li>
+</ol>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/03/14/ios-preference-system-intro/">iOS偏好设置系统详解</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-14T23:38:00+08:00" pubdate data-updated="true">Mar 14<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>偏好设置（Preference）系统是大部分App的一个重要部分，它给你的App提供了长期保存相关配置数据的功能，即使你的App退出了，数据依然在下次启动是可以获取到。在偏好设置中我们会常常保存控制App特性的变量，而这些变量应该是property list类型的，即它们要么是NSString、NSNumber、NSDate、NSData这些简单类型，要么只是由这些简单类型组成的NSArray或NSDictionary。这些数据的设置和获取都是通过NSUserDefaults这个类来进行的，可以调用standardUserDefaults这个类消息获取App全局静态的NSUserDefaults对象，然后就可以调用这个对象的相关方法访问配置。</p>
+
+<h2>偏好设置的域</h2>
+
+<p>在iOS中每个偏好设置包括3个部分：</p>
+
+<ol>
+<li>保存偏好设置的域</li>
+<li>名字（Key）</li>
+<li>值（Value）</li>
+</ol>
+
+
+<p>其中域有几个域，并且有一个优先级。当我们从NSUserDefaults中获取值时，会先从优先级最高的域中获取，如果没有才会按优先级从高到底逐个获取。不同的域的偏好设置生命周期也是不同的，有些域是易失性的，即只在本次启动有效；而有些则是长期保存的，即设置一次以后每次启动都有效。iOS主要的配置域和这些域的生命周期是：</p>
+
+<ol>
+<li>Application域 － 长期保存</li>
+<li>NSGlobalDomain － 长期保存</li>
+<li>NSRegistrationDomain － 易失性的</li>
+</ol>
+
+
+<p>Application域是最常用的，NSUserDefaults的除registerDefaults:外大部分设置方法都是设置这个域的值，如：setObject:forKey:、setInteger:forKey:等。NSGlobalDomain域一般是整个系统的设置，如：语言设置、时区设置等。NSRegistrationDomain域是易失性的，一般用于在程序启动时设置某些偏好设置的默认值，由于它的优先级比较低，所以只有在其他域都没有的情况下才会取到这个域的值，可以调用registerDefaults:方法，传递一个包含默认设置的NSDictionary对象设置这个默认值。</p>
+
+<pre><code>- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    // 设置默认偏好设置。
+    NSDictionary *appDefaults = [NSDictionary dictionaryWithObject:[NSNumber numberWithBool:YES] forKey:@"Default"];
+    [[NSUserDefaults standardUserDefaults] registerDefaults:appDefaults];
+    .......
+}
+</code></pre>
+
+<p>注意：NSRegistrationDomain域是易失性的，所以如果你要设置偏好设置的默认值的话，一定要在App每次启动时都调用registerDefaults:。</p>
+
+<h2>同步偏好设置</h2>
+
+<p>当你设置了一些偏好设置后，向NSUserDefaults对象发送synchronize消息，就可以让你的设置保存的磁盘上。请务必在必要时同步一下，否则程序在异常崩溃时可以丢失设置数据。</p>
+
+<pre><code>[[NSUserDefaults standardUserDefaults] synchronize];
+</code></pre>
+
+<h2>监听偏好设置的改变通知</h2>
+
+<p>在偏好设置被系统自带的“设置”App改变后，你应该根据更改后的偏好设置来调整App的特性。这时你就可以监听NSUserDefaultsDidChangeNotification消息来处理相应的逻辑。</p>
+
+<h2>在系统设置中添加App偏好设置项</h2>
+
+<p>有些偏好设置需要为用户显示界面或提供给用户对其调整的图形接口，通常使用一个控件来展示，如：UISwitch、UISlider、UITextField等。有两种方式来展示这些控件，一种是内置到App里面，比如放到一个UITabBarController中；另外一种则是集成到系统“设置”应用里去。一般频繁修改的偏好设置内置到App里。而如果你的偏好设置很少修改，那么你应该把它放到系统“设置”里，这样还有个好处是为你的App省下进行调整偏好设置的界面空间。你可以直接用Xcode新建一个文件，在选择文件类型时选择Resource->Setting Bundle就可以了，创建完成后展开Settings.bundle可以看到Root.plist这个文件，你可以在这个文件中添加你需要的偏好设置。每个偏好设置项可以配置类型（Type）、显示在cell左边的标题（Title）等，其中类型（Type）有如下几种：</p>
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th> 设置控件      </th>
+<th> 类型                            </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td> 文本框         </td>
+<td> PSTextFieldSpecifier          |</td>
+</tr>
+<tr>
+<td></td>
+<td> 文字            </td>
+<td> PSTitleValueSpecifier         |</td>
+</tr>
+<tr>
+<td></td>
+<td> 开关控件      </td>
+<td> PSToggleSwitchSpecifier       |</td>
+</tr>
+<tr>
+<td></td>
+<td> Slider        </td>
+<td> PSSliderSpecifier             |</td>
+</tr>
+<tr>
+<td></td>
+<td> Multivalue    </td>
+<td> PSMultiValueSpecifier         |</td>
+</tr>
+<tr>
+<td></td>
+<td> Group         </td>
+<td> PSGroupSpecifier              |</td>
+</tr>
+<tr>
+<td></td>
+<td> 子面板         </td>
+<td> PSChildPaneSpecifier          |</td>
+</tr>
+</tbody>
+</table>
+
+
+<p>不同的控件可以表示不同值的类型，如开关控件（UISwitch）可以表示一个Bool值，而文本框表示一个字符串。这样你的App安装后，就可以在系统“设置”中看到App的偏好设置了。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/03/13/open-setting-use-url-schema/">通过URL Schema中打开iOS设置</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-13T22:34:00+08:00" pubdate data-updated="true">Mar 13<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>iOS5.0中增加了通过URL Schema打开系统设置功能，并且可以具体打开到相关设置页。这样就很方便在我们提示用户修改系统设置时进行相关跳转。
+比如打开位置服务设置的URL是：</p>
+
+<pre><code>prefs:root=LOCATION_SERVICES
+</code></pre>
+
+<p>如果位置服务没有打开我们就可以用以下代码来跳转到位置服务设置，这样方便了很多。</p>
+
+<pre><code>[[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"prefs:root=LOCATION_SERVICES"]];
+</code></pre>
+
+<p>也可以打开你自己应用的设置</p>
+
+<pre><code>[[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"prefs:root=Apps&amp;amp;path=AppDisplayName"]];
+</code></pre>
+
+<p>还有其他一些很常用的URL：</p>
+
+<pre><code>prefs:root=TWITTER 设置Twitter
+prefs:root=General&amp;path=Bluetooth 设置蓝牙
+prefs:root=WIFI 设置WiFi
+prefs:root=General&amp;path=DATE_AND_TIME 设置日期／时间
+prefs:root=Wallpaper 设置壁纸
+</code></pre>
+
+<p><strong>注意：这种方式在iOS5.1和以上版本已经无效了。</strong></p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/03/12/objc-name-keyword/">Objective-C对象消息名关键词</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-12T23:31:00+08:00" pubdate data-updated="true">Mar 12<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>我们在写Objective－C的代码时，在进行某个动作（action）时，会发送一些相关联的消息。经常会遇到以下的一些关键词：</p>
+
+<ol>
+<li><p>should
+决定某个动作是否要发生，如果返回NO，则不会执行这个动作，也不会有will和did消息（下面将会说明）了。如shouldAutorotateToInterfaceOrientation:</p></li>
+<li><p>will
+通常在某个动作发生之前，如viewWillAppear、viewWillDisappear等</p></li>
+<li><p>did
+通常在某个动作发生之后，如viewDidAppear，didAddSubView等</p></li>
+</ol>
+
+
+<p>所以它们的调用顺序依次是：
+should->will->action->did
+写代码时一定要搞清这个顺序，否则很容易出现逻辑错误。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/03/09/create-your-own-mac-dict/">打造自己的Mac系统字典</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-09T23:25:00+08:00" pubdate data-updated="true">Mar 9<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>看SDK英文文档头疼啊…
+软件还要支持英文的国际化…
+iOS开发中经常会遇到这些问题，每个Mac OS都自带了“字典”应用，不幸的是，这个字典只支持英文对英文的解释。对于咱们对英文不熟的人来说，这个应用确实是个鸡肋。我们最需要的是英文到中文或中文到英文的翻译，也许你会尝试去寻找其他Mac OS字典应用来满足你的需求，但其实系统自带的字典app只需简单几步就可以加入这些翻译功能，而且可以随意添加我们想要的字典，牛津、朗文随便挑选了。(^o^)</p>
+
+<p>1、下载并安装DicUnifier
+DicUnifier是一个专门将一些字典转换成Mac OS字典格式的应用。
+<a href="http://code.google.com/p/mac-dictionary-kit/downloads/list">http://code.google.com/p/mac-dictionary-kit/downloads/list</a></p>
+
+<p>2、下载字典文件
+你可以选择下面链接下载简体中文字典：
+<a href="http://abloz.com/huzheng/stardict-dic/zh_CN/">http://abloz.com/huzheng/stardict-dic/zh_CN/</a>
+也可以下载所有字典（包括其他语言：日文，德文等）：
+<a href="http://abloz.com/huzheng/stardict-dic/">http://abloz.com/huzheng/stardict-dic/</a></p>
+
+<p>3、打开DicUnifier，并将第2步下载的字典文件（不要解压）直接拖到DicUnifier的窗口上，选择确认后就开始转换。这可能会需要几分钟时间。</p>
+
+<p>4、DicUnifier转换完成后，重新开启你的字典app。你也可以在字典的偏好设置里设置你需要的字典并排序。</p>
+
+<p><img src="/images/post/mac-dict.png" alt="image" /></p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/03/09/view-controller-response-uitouch/">ViewController如何响应Touch事件？</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-09T12:21:00+08:00" pubdate data-updated="true">Mar 9<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>ViewController类都继承自UIResponder类，它们也可以响应Touch事件。ViewController何时响应Touch事件呢？iOS中Touch事件响应是根据响应链来进行处理的，Touch事件会逐个发向各个节点直到这个节点响应这个事件。</p>
+
+<p>而根据SDK记载：
+ViewController在响应链中的位于ViewController的view和它的superView之间的，因此只有在Touch在ViewController的view内部，而且viewController的view不响应Touch，ViewController才接受到Touch事件。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/02/02/resolove-ios-mem-error/">如何解决iOS内存错误</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-02-02T22:10:00+08:00" pubdate data-updated="true">Feb 2<span>nd</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>由于iOS5.0之前没有自动应用计数机制，也没有Java那样的垃圾回收功能。我们都需要自己管理和控制对象的回收，这是一件很麻烦的事情，也是做iOS项目中最容易出现的问题。如果不掌握这些方法，调试这些问题几乎没有头绪。</p>
+
+<h2>EXC_BAD_ACCESS内存错误与NSZombieEnabled</h2>
+
+<p>EXC_BAD_ACCESS是最常见的错误了，这个一般是访问了释放了的内存地址空间造成的。比如一个对象已经dealloc了，如果你仍向这个对象发送消息，就会出现这个错误。由于出现这个错误时，几乎不显示什么有用的信息，我们根本无法确定程序错在何处。使用NSZombieEnabled环境变量可以很好的解决这个问题。
+打开你的工程，选择菜单“Product->Edit Scheme”或快捷键“Commend+&lt;”</p>
+
+<p><img src="/images/post/xcode-set-nszombieenabled.png" alt="image" /></p>
+
+<p>NSZombieEnabled环境变量使释放的内存继续保持对象的信息，如果我们向一个已经释放的对象发送一个消息，我们会得到一个错误消息，而且程序自动断点到出错的位置。如我们向一个已经释放了的UIButton对象发送description消息，就会在调试终端上得到以下消息：</p>
+
+<pre><code>*** -[UIButton description]: message sent to deallocated instance 0x1580f360
+</code></pre>
+
+<p>此时，程序将自动断点到”[UIButton description];”这行代码上。</p>
+
+<p><img src="/images/post/ios-mem-crash-on-button-description.png" alt="image" /></p>
+
+<h2>Framework内部对象出现Overrelease与MallocStackLoggingNoCompact</h2>
+
+<p>通过NSZombieEnabled环境变量，我们可以很多Bug了。但有时错误发生在framework内部，这时断点的当前栈并不在我们的代码当中。比如：</p>
+
+<pre><code>xxx: *** -[CALayer release]: message sent to deallocated instance 0xe250df0
+</code></pre>
+
+<p>这个CALayer并不是我们直接创建，而且release消息也不发生在我们的代码中。我们完全不知道这个CALayer是那个View的。所以就没法明确那个类出现问题。如果知道这个CALayer在什么地方alloc的就好了，这时我们就需要MallocStackLoggingNoCompact环境变量了。这个环境变量开启的alloc日志，它会记录每个对象alloc时的栈的情况。根据栈的情况我们就可以弄清楚那个类初始化了这个Layer，从而检查代码解决问题。设置方法和NSZombieEnabled类似：</p>
+
+<p><img src="/images/post/xcode-set-malloc-log.png" alt="image" /></p>
+
+<p>当message sent to deallocated instance消息产生时，在调试终端输入：</p>
+
+<pre><code>info malloc-history 0xe250df0
+</code></pre>
+
+<p>就会打印layer alloc时栈的情况，可以看到代码调用情况，找到我们自己的代码，检查代码并修改吧。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/02/02/what-in-the-uiapplicationmain/">UIApplicationMain函数做了什么</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-02-02T21:07:00+08:00" pubdate data-updated="true">Feb 2<span>nd</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>在iOS应用中，每个程序得main函数中都调用了UIApplicationMain函数。</p>
+
+<pre><code>int main(int argc, char *argv[])
+{
+    @autoreleasepool {
+        return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));
+    }
+}
+</code></pre>
+
+<p>先来看看UIApplicationMain函数的原型：</p>
+
+<pre><code>int UIApplicationMain (
+    int argc,
+    char *argv[],
+    NSString *principalClassName,
+    NSString *delegateClassName
+);
+</code></pre>
+
+<p>前面的argc和argv是ISO C标准的main函数的参数，直接传递给UIApplicationMain进行相关处理。principalClassName是应用程序类的名字，该类必须继承自UIApplication类。而delegateClassName是应用程序类的代理类。如果主要nib文件（在info.plist文件中指定，key是NSMainNibFile）存在，就会在nib文件对象里寻找Application对象和连接它的delegate。此函数会根据principalClassName创建UIApplication对象，然后根据delegateClassName创建一个delegate对象，并将UIApplication对象中的delegate属性设置为delegate对象。接着会建立应用的main runloop，进行事件的处理（首先会调用– application:didFinishLaunchingWithOptions:）。程序正常退出时才返回（如今iOS支持后台运行，系统在必要时会强行杀死不用的进程，一般这个函数不等返回进程就终止了）。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/02/01/bye-bye-shanghai/">再见，上海！</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-02-01T02:05:00+08:00" pubdate data-updated="true">Feb 1<span>st</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>刚到深圳，由于工作比较忙，很久没关注自己的博客了。现在正好想写写之前在上海的一些经历。在上海也呆1年多了，由于工作原因得离开这个繁华的城市。在这里我做过外包，创过业，个中艰辛只能自己体会，它给我一个很好的人生经验。想过自己的理想，而现实往往是残酷的，虽然放弃，有些不舍，但我还是梦想能在新的地方闯出自己的一番天地。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+      <a class="prev" href="/blog/page/5/">&larr; Older</a>
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+    <a class="next" href="/blog/page/3/">Newer &rarr;</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/08/15/auto-key-press-using-appscript/">用AppleScript在Mac系统下实现按键精灵的功能以及在游戏中的运用</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/08/14/implement-objc-property-in-category/">Objective-C语言在Category中实现属性</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/07/30/no-keyboard-in-webview-of-ios5/">iOS5网页视图（UIWebView）中的输入框不能弹出键盘的问题</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/07/17/cant-scroll-in-tableview/">TableView中嵌套一个ScrollView有时导致ScrollView无法滚动</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/06/12/custom-ui-using-uiappearance/">iOS 5中使用UIAppearance来自定义应用的外观</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - 谌启亮 -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

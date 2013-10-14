@@ -1,0 +1,316 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>iOS偏好设置系统详解 - Xcode Dev</title>
+  <meta name="author" content="谌启亮">
+
+  
+  <meta name="description" content="偏好设置（Preference）系统是大部分App的一个重要部分，它给你的App提供了长期保存相关配置数据的功能，即使你的App退出了，数据依然在下次启动是可以获取到。在偏好设置中我们会常常保存控制App特性的变量，而这些变量应该是property list类型的，即它们要么是NSString、 &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://shenqiliang.github.io/blog/2012/03/14/ios-preference-system-intro">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Xcode Dev" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/lib/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Xcode Dev</a></h1>
+  
+    <h2>学习、分享、积累 – 亮了的原创开发博客</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:shenqiliang.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">iOS偏好设置系统详解</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-14T23:38:00+08:00" pubdate data-updated="true">Mar 14<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>偏好设置（Preference）系统是大部分App的一个重要部分，它给你的App提供了长期保存相关配置数据的功能，即使你的App退出了，数据依然在下次启动是可以获取到。在偏好设置中我们会常常保存控制App特性的变量，而这些变量应该是property list类型的，即它们要么是NSString、NSNumber、NSDate、NSData这些简单类型，要么只是由这些简单类型组成的NSArray或NSDictionary。这些数据的设置和获取都是通过NSUserDefaults这个类来进行的，可以调用standardUserDefaults这个类消息获取App全局静态的NSUserDefaults对象，然后就可以调用这个对象的相关方法访问配置。</p>
+
+<h2>偏好设置的域</h2>
+
+<p>在iOS中每个偏好设置包括3个部分：</p>
+
+<ol>
+<li>保存偏好设置的域</li>
+<li>名字（Key）</li>
+<li>值（Value）</li>
+</ol>
+
+
+<p>其中域有几个域，并且有一个优先级。当我们从NSUserDefaults中获取值时，会先从优先级最高的域中获取，如果没有才会按优先级从高到底逐个获取。不同的域的偏好设置生命周期也是不同的，有些域是易失性的，即只在本次启动有效；而有些则是长期保存的，即设置一次以后每次启动都有效。iOS主要的配置域和这些域的生命周期是：</p>
+
+<ol>
+<li>Application域 － 长期保存</li>
+<li>NSGlobalDomain － 长期保存</li>
+<li>NSRegistrationDomain － 易失性的</li>
+</ol>
+
+
+<p>Application域是最常用的，NSUserDefaults的除registerDefaults:外大部分设置方法都是设置这个域的值，如：setObject:forKey:、setInteger:forKey:等。NSGlobalDomain域一般是整个系统的设置，如：语言设置、时区设置等。NSRegistrationDomain域是易失性的，一般用于在程序启动时设置某些偏好设置的默认值，由于它的优先级比较低，所以只有在其他域都没有的情况下才会取到这个域的值，可以调用registerDefaults:方法，传递一个包含默认设置的NSDictionary对象设置这个默认值。</p>
+
+<pre><code>- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    // 设置默认偏好设置。
+    NSDictionary *appDefaults = [NSDictionary dictionaryWithObject:[NSNumber numberWithBool:YES] forKey:@"Default"];
+    [[NSUserDefaults standardUserDefaults] registerDefaults:appDefaults];
+    .......
+}
+</code></pre>
+
+<p>注意：NSRegistrationDomain域是易失性的，所以如果你要设置偏好设置的默认值的话，一定要在App每次启动时都调用registerDefaults:。</p>
+
+<h2>同步偏好设置</h2>
+
+<p>当你设置了一些偏好设置后，向NSUserDefaults对象发送synchronize消息，就可以让你的设置保存的磁盘上。请务必在必要时同步一下，否则程序在异常崩溃时可以丢失设置数据。</p>
+
+<pre><code>[[NSUserDefaults standardUserDefaults] synchronize];
+</code></pre>
+
+<h2>监听偏好设置的改变通知</h2>
+
+<p>在偏好设置被系统自带的“设置”App改变后，你应该根据更改后的偏好设置来调整App的特性。这时你就可以监听NSUserDefaultsDidChangeNotification消息来处理相应的逻辑。</p>
+
+<h2>在系统设置中添加App偏好设置项</h2>
+
+<p>有些偏好设置需要为用户显示界面或提供给用户对其调整的图形接口，通常使用一个控件来展示，如：UISwitch、UISlider、UITextField等。有两种方式来展示这些控件，一种是内置到App里面，比如放到一个UITabBarController中；另外一种则是集成到系统“设置”应用里去。一般频繁修改的偏好设置内置到App里。而如果你的偏好设置很少修改，那么你应该把它放到系统“设置”里，这样还有个好处是为你的App省下进行调整偏好设置的界面空间。你可以直接用Xcode新建一个文件，在选择文件类型时选择Resource->Setting Bundle就可以了，创建完成后展开Settings.bundle可以看到Root.plist这个文件，你可以在这个文件中添加你需要的偏好设置。每个偏好设置项可以配置类型（Type）、显示在cell左边的标题（Title）等，其中类型（Type）有如下几种：</p>
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th> 设置控件      </th>
+<th> 类型                            </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td> 文本框         </td>
+<td> PSTextFieldSpecifier          |</td>
+</tr>
+<tr>
+<td></td>
+<td> 文字            </td>
+<td> PSTitleValueSpecifier         |</td>
+</tr>
+<tr>
+<td></td>
+<td> 开关控件      </td>
+<td> PSToggleSwitchSpecifier       |</td>
+</tr>
+<tr>
+<td></td>
+<td> Slider        </td>
+<td> PSSliderSpecifier             |</td>
+</tr>
+<tr>
+<td></td>
+<td> Multivalue    </td>
+<td> PSMultiValueSpecifier         |</td>
+</tr>
+<tr>
+<td></td>
+<td> Group         </td>
+<td> PSGroupSpecifier              |</td>
+</tr>
+<tr>
+<td></td>
+<td> 子面板         </td>
+<td> PSChildPaneSpecifier          |</td>
+</tr>
+</tbody>
+</table>
+
+
+<p>不同的控件可以表示不同值的类型，如开关控件（UISwitch）可以表示一个Bool值，而文本框表示一个字符串。这样你的App安装后，就可以在系统“设置”中看到App的偏好设置了。</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">谌启亮</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-14T23:38:00+08:00" pubdate data-updated="true">Mar 14<span>th</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/ioskai-fa/'>iOS开发</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://shenqiliang.github.io/blog/2012/03/14/ios-preference-system-intro/" data-via="" data-counturl="http://shenqiliang.github.io/blog/2012/03/14/ios-preference-system-intro/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/03/13/open-setting-use-url-schema/" title="Previous Post: 通过URL Schema中打开iOS设置">&laquo; 通过URL Schema中打开iOS设置</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2012/03/15/using-nsubiquitous-key-value-store/" title="Next Post: NSUbiquitousKeyValueStore使用和注意事项">NSUbiquitousKeyValueStore使用和注意事项 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/08/15/auto-key-press-using-appscript/">用AppleScript在Mac系统下实现按键精灵的功能以及在游戏中的运用</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/08/14/implement-objc-property-in-category/">Objective-C语言在Category中实现属性</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/07/30/no-keyboard-in-webview-of-ios5/">iOS5网页视图（UIWebView）中的输入框不能弹出键盘的问题</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/07/17/cant-scroll-in-tableview/">TableView中嵌套一个ScrollView有时导致ScrollView无法滚动</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/06/12/custom-ui-using-uiappearance/">iOS 5中使用UIAppearance来自定义应用的外观</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - 谌启亮 -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

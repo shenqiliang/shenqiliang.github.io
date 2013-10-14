@@ -1,0 +1,328 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>UIAlertView弹出视图动画效果 - Xcode Dev</title>
+  <meta name="author" content="谌启亮">
+
+  
+  <meta name="description" content="在App设计中为了加强用户体验，我们会常常加入一些友好的动画效果。比如类似UIAlertView弹出的动画效果，由于系统中并没有直接提供类似的动画API，如果我们想要做出一样的效果，那就得深入的研究一下系统中的UIAlertView了。 仔细观察UIAlertView的动画你就会发现： &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://shenqiliang.github.io/blog/2013/04/10/uialertview-animation">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Xcode Dev" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/lib/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Xcode Dev</a></h1>
+  
+    <h2>学习、分享、积累 – 亮了的原创开发博客</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:shenqiliang.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">UIAlertView弹出视图动画效果</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-04-10T22:01:00+08:00" pubdate data-updated="true">Apr 10<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>在App设计中为了加强用户体验，我们会常常加入一些友好的动画效果。比如类似UIAlertView弹出的动画效果，由于系统中并没有直接提供类似的动画API，如果我们想要做出一样的效果，那就得深入的研究一下系统中的UIAlertView了。</p>
+
+<p>仔细观察UIAlertView的动画你就会发现：这个动画是由几部分组成，它带一个视图大小抖动的效果。先是由小变大，再由大变小，最后变成本来的大小。但是这个大小的具体参数值和动画的速度恐怕是肉眼所不能看出来的。
+本篇文章会使用一些objc runtime和CAAnimation的一些知识，通过本文你可以了解到如何研究一些objc中内部调用机制和动画基础。</p>
+
+<p>要想知道这些动画的组成，我们就要从比较低层次的API：CALayer的一些调用开始。iOS动画最终都是加到Layer中的，加入Layer就要调用Layer对象这个方法：</p>
+
+<pre><code>- (void)addAnimation:(CAAnimation *)anim forKey:(NSString *)key;
+</code></pre>
+
+<p>所以只要我们知道了anim参数，并把anim动画对象的属性揪出来，就可以知道到底是什么动画了，但是这个方法是系统Framework中的，通常我们是无法能知道anim到底是什么。这时我们就需要用一些objc的一些底层API：Objc Runtime来解决了。</p>
+
+<h2>Objc Runtime</h2>
+
+<p>Objc Runtime是由一组处理Objctive-C动态语言运行时的API函数组成，这些函数都是一些比较底层的C函数。它有很多实用功能比如查看对象的成员，类/对象方法签名等等。这次我们要用的就是其中把对象方法调用替换的API。</p>
+
+<pre><code>void method_exchangeImplementations(Method m1, Method m2) 
+</code></pre>
+
+<p>这个函数的功能就是把类/对象的方法m1和m2进行调换。如果执行了这个函数，那么在App运行过程中所有调用方法m1的指令，最终都会执行成了方法m2。</p>
+
+<h2>方法调换</h2>
+
+<p>有了Objc Rumtime的API，就可以很方便的将调用系统库中方法的代码，执行成我们自己的代码了。所以我们想要知道Layer中加入了什么方法，只要把addAnimation:forKey:这个方法调换成我们自己的方法就行了。下面的这段代码就实现了这个功能。</p>
+
+<pre><code>@implementation CALayer(Hacked)
+
++ (void)load{
+    method_exchangeImplementations(class_getInstanceMethod([CALayer class], @selector(addAnimation:forKey:)), class_getInstanceMethod([CALayer class], @selector(hackedAddAnimation:forKey:)));
+}
+
+- (void)hackedAddAnimation:(CABasicAnimation *)anim forKey:(NSString *)key{
+    [self hackedAddAnimation:anim forKey:key];
+    if ([anim isKindOfClass:[CABasicAnimation class]]) {
+        if ([anim.keyPath isEqualToString:@"transform"]) {
+            if (anim.fromValue) {
+                CATransform3D fromValue = [anim.fromValue CATransform3DValue];
+                NSLog(@"From:%@",NSStringFromCGAffineTransform(CATransform3DGetAffineTransform(fromValue)));
+            }
+            if (anim.toValue) {
+                CATransform3D toValue = [anim.toValue CATransform3DValue];
+                NSLog(@"To:%@",NSStringFromCGAffineTransform(CATransform3DGetAffineTransform(toValue)));
+            }
+            if (anim.byValue) {
+                CATransform3D byValue = [anim.byValue CATransform3DValue];
+                NSLog(@"By:%@",NSStringFromCGAffineTransform(CATransform3DGetAffineTransform(byValue)));
+            }
+            NSLog(@"Duration:%.2f",anim.duration);
+            NSLog(@"TimingFunction:%@",anim.timingFunction);
+        }
+    }
+}
+
+@end
+</code></pre>
+
+<p>下面来说明一下上面的代码，这段代码是CALayer做了一个Catalog处理。其中initialize是一个类的方法，是进程开始时初始化类时调用，一般只有类有加载这个方法就会第一个调用了。hackedAddAnimation:forKey:是要被调换的代码。在类的初始化方法initialize中（代码中的第5行）实现了CALayer的addAnimation:forKey:和hackedAddAnimation:forKey:方法的调换。在hackedAddAnimation:forKey:中首先直接调用了[self hackedAddAnimation:forKey:]，也许你会问：这不死循环递归了么？其实不是，应为method_exchangeImplementations实现的是调换而不是替换，所以代码中调用addAnimation:forKey:运行时就成了调用hackedAddAnimation:forKey:。而代码中调用hackedAddAnimation:forKey:运行时成了调用addAnimation:forKey:。所以这里虽然写的是hackedAddAnimation:forKey:，实际上会调用系统Framework中的addAnimation:forKey:。这样做的目的是保证虽然我们把系统的方法改变了，我们还是调用系统的一次，以保持系统功能运行是正常的。在hackedAddAnimation:forKey:剩下的代码就只是把anim动画对象的各个属性的值打印出来了。</p>
+
+<p>好了，把上面的这段代码粘贴到你的代码文件中。然后简单的写个UIAlertView弹出动画代码。</p>
+
+<pre><code>UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Title" message:@"Message" delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil];
+[alert show];
+</code></pre>
+
+<p>编译并运行上面这段代码，你就会在控制台中看到下面这些日志：</p>
+
+<pre><code>2013-04-10 19:13:11.795 Test[10952:c07] From:[0.01, 0, 0, 0.01, 0, 0]
+2013-04-10 19:13:11.796 Test[10952:c07] Duration:0.20
+2013-04-10 19:13:11.796 Test[10952:c07] TimingFunction:easeInEaseOut
+2013-04-10 19:13:11.999 Test[10952:c07] From:[1.1, 0, 0, 1.1, 0, 0]
+2013-04-10 19:13:12.000 Test[10952:c07] Duration:0.10
+2013-04-10 19:13:12.000 Test[10952:c07] TimingFunction:easeInEaseOut
+2013-04-10 19:13:12.101 Test[10952:c07] From:[0.9, 0, 0, 0.9, 0, 0]
+2013-04-10 19:13:12.101 Test[10952:c07] Duration:0.10
+2013-04-10 19:13:12.101 Test[10952:c07] TimingFunction:easeInEaseOut
+</code></pre>
+
+<p>查看CGAffineTransformMakeScale函数的头文件你会看到：</p>
+
+<pre><code>/* Return a transform which scales by `(sx, sy)':
+     t' = [ sx 0 0 sy 0 0 ] */
+
+CG_EXTERN CGAffineTransform CGAffineTransformMakeScale(CGFloat sx, CGFloat sy)
+  CG_AVAILABLE_STARTING(__MAC_10_0, __IPHONE_2_0);
+</code></pre>
+
+<p>所以根据日志我们会发现这其实是3个关键帧动画，首先scale(缩放比例)从0.01放大到1.1，历时0.2秒；然后从1.1到0.9，历时0.1秒；那么最后就是从0.9到1.0（正常缩放比例），历时0.1秒。哈哈，那我们就简单的写个关键帧动画对象就可以表示UIAlertView的弹出动画效果了。</p>
+
+<pre><code>CAKeyframeAnimation *popAnimation = [CAKeyframeAnimation animationWithKeyPath:@"transform"];
+popAnimation.duration = 0.4;
+popAnimation.values = @[[NSValue valueWithCATransform3D:CATransform3DMakeScale(0.01f, 0.01f, 1.0f)],
+                        [NSValue valueWithCATransform3D:CATransform3DMakeScale(1.1f, 1.1f, 1.0f)],
+                        [NSValue valueWithCATransform3D:CATransform3DMakeScale(0.9f, 0.9f, 1.0f)],
+                        [NSValue valueWithCATransform3D:CATransform3DIdentity]];
+popAnimation.keyTimes = @[@0.0f, @0.5f, @0.75f, @1.0f];
+popAnimation.timingFunctions = @[[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut],
+                                 [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut],
+                                 [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut]];
+[anAlertAnimationView.layer addAnimation:popAnimation forKey:nil];
+</code></pre>
+
+<p>你可以把popAnimation加入到你想进行动画的任何View中的layer中这样就实现了UIAlertView一样的弹出动画效果。</p>
+
+<h2>结论</h2>
+
+<ol>
+<li>UIAlertView动画其实是由三部分动画组成：缩放比例变化0.01->1.1->0.9->1.0。每次变化的时间函数（控制加速度）都是EaseInEaseOut。</li>
+<li>在研究系统中调用函数的参数是我们可以用method_exchangeImplementations来hack到系统调用中去，但不要忘记调用系统本身的方法。否则容易导致App异常。当然，如果你是研究测试不怕crash，那随便。</li>
+</ol>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">谌启亮</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-04-10T22:01:00+08:00" pubdate data-updated="true">Apr 10<span>th</span>, 2013</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/ioskai-fa/'>iOS开发</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://shenqiliang.github.io/blog/2013/04/10/uialertview-animation/" data-via="" data-counturl="http://shenqiliang.github.io/blog/2013/04/10/uialertview-animation/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2013/04/01/blur-effect-in-ios/" title="Previous Post: iOS中的模糊效果">&laquo; iOS中的模糊效果</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2013/05/30/method-signature-in-objc/" title="Next Post: Objective-C中方法签名(Method Signature)机制">Objective-C中方法签名(Method Signature)机制 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/08/15/auto-key-press-using-appscript/">用AppleScript在Mac系统下实现按键精灵的功能以及在游戏中的运用</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/08/14/implement-objc-property-in-category/">Objective-C语言在Category中实现属性</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/07/30/no-keyboard-in-webview-of-ios5/">iOS5网页视图（UIWebView）中的输入框不能弹出键盘的问题</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/07/17/cant-scroll-in-tableview/">TableView中嵌套一个ScrollView有时导致ScrollView无法滚动</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/06/12/custom-ui-using-uiappearance/">iOS 5中使用UIAppearance来自定义应用的外观</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - 谌启亮 -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

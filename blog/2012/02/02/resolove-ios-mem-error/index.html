@@ -1,0 +1,253 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>如何解决iOS内存错误 - Xcode Dev</title>
+  <meta name="author" content="谌启亮">
+
+  
+  <meta name="description" content="由于iOS5.0之前没有自动应用计数机制，也没有Java那样的垃圾回收功能。我们都需要自己管理和控制对象的回收，这是一件很麻烦的事情，也是做iOS项目中最容易出现的问题。如果不掌握这些方法，调试这些问题几乎没有头绪。 EXC_BAD_ACCESS内存错误与NSZombieEnabled &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://shenqiliang.github.io/blog/2012/02/02/resolove-ios-mem-error">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Xcode Dev" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/lib/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Xcode Dev</a></h1>
+  
+    <h2>学习、分享、积累 – 亮了的原创开发博客</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:shenqiliang.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">如何解决iOS内存错误</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-02-02T22:10:00+08:00" pubdate data-updated="true">Feb 2<span>nd</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>由于iOS5.0之前没有自动应用计数机制，也没有Java那样的垃圾回收功能。我们都需要自己管理和控制对象的回收，这是一件很麻烦的事情，也是做iOS项目中最容易出现的问题。如果不掌握这些方法，调试这些问题几乎没有头绪。</p>
+
+<h2>EXC_BAD_ACCESS内存错误与NSZombieEnabled</h2>
+
+<p>EXC_BAD_ACCESS是最常见的错误了，这个一般是访问了释放了的内存地址空间造成的。比如一个对象已经dealloc了，如果你仍向这个对象发送消息，就会出现这个错误。由于出现这个错误时，几乎不显示什么有用的信息，我们根本无法确定程序错在何处。使用NSZombieEnabled环境变量可以很好的解决这个问题。
+打开你的工程，选择菜单“Product->Edit Scheme”或快捷键“Commend+&lt;”</p>
+
+<p><img src="/images/post/xcode-set-nszombieenabled.png" alt="image" /></p>
+
+<p>NSZombieEnabled环境变量使释放的内存继续保持对象的信息，如果我们向一个已经释放的对象发送一个消息，我们会得到一个错误消息，而且程序自动断点到出错的位置。如我们向一个已经释放了的UIButton对象发送description消息，就会在调试终端上得到以下消息：</p>
+
+<pre><code>*** -[UIButton description]: message sent to deallocated instance 0x1580f360
+</code></pre>
+
+<p>此时，程序将自动断点到”[UIButton description];”这行代码上。</p>
+
+<p><img src="/images/post/ios-mem-crash-on-button-description.png" alt="image" /></p>
+
+<h2>Framework内部对象出现Overrelease与MallocStackLoggingNoCompact</h2>
+
+<p>通过NSZombieEnabled环境变量，我们可以很多Bug了。但有时错误发生在framework内部，这时断点的当前栈并不在我们的代码当中。比如：</p>
+
+<pre><code>xxx: *** -[CALayer release]: message sent to deallocated instance 0xe250df0
+</code></pre>
+
+<p>这个CALayer并不是我们直接创建，而且release消息也不发生在我们的代码中。我们完全不知道这个CALayer是那个View的。所以就没法明确那个类出现问题。如果知道这个CALayer在什么地方alloc的就好了，这时我们就需要MallocStackLoggingNoCompact环境变量了。这个环境变量开启的alloc日志，它会记录每个对象alloc时的栈的情况。根据栈的情况我们就可以弄清楚那个类初始化了这个Layer，从而检查代码解决问题。设置方法和NSZombieEnabled类似：</p>
+
+<p><img src="/images/post/xcode-set-malloc-log.png" alt="image" /></p>
+
+<p>当message sent to deallocated instance消息产生时，在调试终端输入：</p>
+
+<pre><code>info malloc-history 0xe250df0
+</code></pre>
+
+<p>就会打印layer alloc时栈的情况，可以看到代码调用情况，找到我们自己的代码，检查代码并修改吧。</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">谌启亮</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-02-02T22:10:00+08:00" pubdate data-updated="true">Feb 2<span>nd</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/ioskai-fa/'>iOS开发</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://shenqiliang.github.io/blog/2012/02/02/resolove-ios-mem-error/" data-via="" data-counturl="http://shenqiliang.github.io/blog/2012/02/02/resolove-ios-mem-error/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/02/02/what-in-the-uiapplicationmain/" title="Previous Post: UIApplicationMain函数做了什么">&laquo; UIApplicationMain函数做了什么</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2012/03/09/view-controller-response-uitouch/" title="Next Post: ViewController如何响应Touch事件？">ViewController如何响应Touch事件？ &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/08/15/auto-key-press-using-appscript/">用AppleScript在Mac系统下实现按键精灵的功能以及在游戏中的运用</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/08/14/implement-objc-property-in-category/">Objective-C语言在Category中实现属性</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/07/30/no-keyboard-in-webview-of-ios5/">iOS5网页视图（UIWebView）中的输入框不能弹出键盘的问题</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/07/17/cant-scroll-in-tableview/">TableView中嵌套一个ScrollView有时导致ScrollView无法滚动</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/06/12/custom-ui-using-uiappearance/">iOS 5中使用UIAppearance来自定义应用的外观</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - 谌启亮 -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

@@ -5,8 +5,8 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>My Octopress Blog</title>
-  <meta name="author" content="Your Name">
+  <title>Xcode Dev</title>
+  <meta name="author" content="谌启亮">
 
   
   <meta name="description" content="什么是AppleScript AppleScript是Mac系统提供的一个脚本语言，这个脚本语言简单易读，稍微懂一点脚本语言就可以快速学会了。AppleScript可以让我们的日常工作流程化，简化繁琐的固定输入，自动化完成一般的日常工作。
@@ -22,7 +22,7 @@ AppleScript提供了很多很多强大的功能， &hellip;">
   <link rel="canonical" href="http://shenqiliang.github.io">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-  <link href="/atom.xml" rel="alternate" title="My Octopress Blog" type="application/atom+xml">
+  <link href="/atom.xml" rel="alternate" title="Xcode Dev" type="application/atom+xml">
   <script src="/javascripts/modernizr-2.0.js"></script>
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
   <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/lib/jquery.min.js"%3E%3C/script%3E'))</script>
@@ -37,9 +37,9 @@ AppleScript提供了很多很多强大的功能， &hellip;">
 
 <body   >
   <header role="banner"><hgroup>
-  <h1><a href="/">My Octopress Blog</a></h1>
+  <h1><a href="/">Xcode Dev</a></h1>
   
-    <h2>A blogging framework for hackers.</h2>
+    <h2>学习、分享、积累 – 亮了的原创开发博客</h2>
   
 </hgroup>
 
@@ -100,119 +100,57 @@ AppleScript提供了很多很多强大的功能， &hellip;">
 <p>AppleScript是Mac系统提供的一个脚本语言，这个脚本语言简单易读，稍微懂一点脚本语言就可以快速学会了。AppleScript可以让我们的日常工作流程化，简化繁琐的固定输入，自动化完成一般的日常工作。
 AppleScript提供了很多很多强大的功能，本文就只简单的介绍一下如何用它来实现类似Windows下按键精灵的功能。</p>
 
-<h2>前提工作</h2>
-
-<p>如果想要让AppleScript自动帮我们按键，点击鼠标。首先还是要在设置里“启用辅助设备的控制”，否则AppleScript就没有权限控制我们的键盘、鼠标这些辅助设备。
-打开“系统偏好设置”->“辅助功能”页面，然后勾选“启用辅助设备的控制”。</p>
-
-<p><img src="/images/post/enable-assist-device-control.png" alt="image" /></p>
-
-<h2>如何按键</h2>
-
-<p>在Mac系统中有个叫“System Events”的App，AppleScript可以让它做按键或者点击鼠标的动作。</p>
-
-<pre><code>tell application "TextEdit"
-    activate
-end tell
-
-tell application "System Events"
-    tell process "TextEdit"
-        set frontmost to true
-    end tell
-
-    key down shift
-    keystroke "e"
-    delay 1
-    key up shift
-    keystroke "e"
-    keystroke return
-end tell
-</code></pre>
-
-<p>1-3行脚本用来运行系统自带App“文本编辑器”，第6-8行是将文本编辑器设置为前台App，这样我们的键盘鼠标消息才可以发到“文本编辑器”的进程上去。key down是按下某个按键不放，key up是松开某个按键，keystroke是点按一下某个按键。第10-13行相当与按shift+e，这样在文本编辑器中就输入的大写的“E”，然后14行就是又按了一下“e”，就紧接着输入了一个小写的“e”。15行按了一下回车，那么“文本编辑器”会换行。</p>
-
-<h2>如何点击鼠标</h2>
-
-<p>点击鼠标脚本和按键脚本类似，不同的是用了click at命令。如：</p>
-
-<p>tell application &ldquo;System Events&rdquo;</p>
-
-<pre><code>tell process "xxx"
-    set frontmost to true
-end tell
-click at {100,200}
-</code></pre>
-
-<p>end tell</p>
-
-<p>这个脚本运行后就是在屏幕坐标点为{100,200}的地方点击一下鼠标左健。</p>
-
-<h2>游戏《魔兽世界》中的运用</h2>
-
-<p>做为一个爱玩游戏的技术宅，这些功能非常适合运用到游戏当中。所以，呵呵。一个运用就是防止暂离，《魔兽世界》战场中是不容许暂离的，一旦暂离就会被清除战场，如果你没节操挂机的话，就要每隔一段时间手动操作一下人物，比如按一下空格跳跃一下。使用以下这个脚本就可以在挂机的时候防止暂离了。</p>
-
-<p>AntiAFK.scptd</p>
-
-<pre><code>tell application "System Events"
-    repeat while 1 is 1
-        if UI elements enabled then
-            tell process "World of Warcraft-64"
-                set frontmost to true
-            end tell
-        end if
-        keystroke " "
-        delay (random number from 50 to 75)
-    end repeat
-end tell
-</code></pre>
-
-<p>这个脚本会每隔50-75秒，按一下空格跳跃一次。这样就不会有暂离状态了。之所以用随机50-75秒，是为了防止固定操作容易被反外挂程序检测到。</p>
-
-<p>另外我还写一个刷地精声望的脚本</p>
-
-<p>地精声望.scptd</p>
-
-<pre><code>tell application "System Events"
-    repeat while 1 is 1
-        if UI elements enabled then
-            tell process "World of Warcraft-64"
-                set frontmost to true
-            end tell
-        end if
-        keystroke "z"
-        delay 2
-        if UI elements enabled then
-            tell process "World of Warcraft-64"
-                set frontmost to true
-            end tell
-        end if
-        keystroke "c"
-        delay 2
-        if UI elements enabled then
-            tell process "World of Warcraft-64"
-                set frontmost to true
-            end tell
-        end if
-        keystroke "x"
-        delay 2
-        set r to (random number from 1 to 10)
-        delay r
-    end repeat
-end tell
-</code></pre>
-
-<p>这个脚本是不停的按Z、X、C三个按键，可以根据情况绑定相应的技能。贫瘠之地有个勇士岛，岛上的一间屋子里有个叫“嘉维伊船长”的人，杀了他可以得到不少地精声望，而且他刷新很快，1-2分钟刷一次。这就让这个脚本来自动刷声望成为可能。
-这个Z按键我绑定选目标攻击的WOW宏，WOW宏内容如下：</p>
-
-<pre><code>/tar 嘉维伊船长
-/startattack [exists,nodead]
-</code></pre>
-
-<p>X按键我绑定了公会战旗，这样就可以多得到点声望了。而且可以全程有战旗覆盖。
-C按键我绑定了群体攻击大技能，这样就可以在群体技能冷却后杀死额外的小怪收获额外的声望。
-然后，你要走到“嘉维伊船长”的刷新点面对他后运行脚本，这样就可以睡觉刷声望了。虽然效率不是很高，但缺很省心，毫不费劲，最重要的是不占用我们的时间。毕竟“时间就是金钱，我的朋友。”</p>
 </div>
   
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/08/15/auto-key-press-using-appscript/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/08/14/implement-objc-property-in-category/">Objective-C语言在Category中实现属性</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-08-14T10:43:00+08:00" pubdate data-updated="true">Aug 14<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>做开发时我们常常会需要在已经实现了的类中增加一些方法，这时候我们一般会用Category的方式来做。但是这样做我们也只能扩展一些方法，而有时候我们更多的是想给它增加一个属性。由于类已经是编译好的了，就不能静态的增加成员了，这样我们就需要自己来实现getter和setter方法了，在这些方法中动态的读写属性变量来实现属性。一种比较简单的做法是使用Objective-C运行时的这两个方法：</p>
+
+<pre><code>void objc_setAssociatedObject(id object, const void *key, id value, objc_AssociationPolicy policy);
+id objc_getAssociatedObject(id object, const void *key);
+</code></pre>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/08/14/implement-objc-property-in-category/">Read on &rarr;</a>
+    </footer>
   
 
 
@@ -248,41 +186,12 @@ C按键我绑定了群体攻击大技能，这样就可以在群体技能冷却�
 
   <div class="entry-content"><p>项目开发时，发现有时候在网页视图中的输入框获得焦点后，却不能弹出键盘。而且全部都是在iOS5的系统中出现了这个问题，iOS6中运行完全是正常的，而且即使是在iOS5中，其他的UITextView和UITextField仍然可以正常地弹出键盘。我仔细了看了一下代码，发现对UIWebView的一些操作和键盘弹出并没有什么关系。我看了一些UIWebView的一些资料，然后发现了这个问题：UIWebView要能弹出键盘，那么它所在的window必须是key window。</p>
 
-<h2>什么是key window？</h2>
-
-<p>key window就是接收键盘消息的window。键盘消息都会发送到key window上。而这个key window往往是系统自动设置的，但web view获得焦点并没有自动设置（也许是Apple开发偷了个懒），然而我们也可以用一个方法手动设置。</p>
-
-<pre><code>[window makeKeyAndVisiable]
-</code></pre>
-
-<h2>一个演示例子</h2>
-
-<p>为了验证这个问题我也写了一段简短的代码：</p>
-
-<pre><code>UIWebView *webView = [[UIWebView alloc] initWithFrame:self.window.bounds];
-[webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"http://www.google.com"]]];
-[self.window addSubview:webView];
-
-UIWindow *anotherWindow = [UIWindow new];
-[anotherWindow makeKeyAndVisible];
-</code></pre>
-
-<p>这段代码在iOS5中运行的话，即使输入框获得了焦点也不能弹出键盘。
-<img src="/images/post/no-keyboard-in-webview.jpg" alt="image" /></p>
-
-<h2>解决方案</h2>
-
-<p>如果在UIWebView被添加的window上时，将window设置为key window就好了。</p>
-
-<pre><code>[self.window makeKeyAndVisiable]
-[self.window addSubview:webView];
-</code></pre>
-
-<h2>小结</h2>
-
-<p>UIWebView要能弹出键盘，那么它所在的window必须是key window。如果你的App可能存在多个Window（如弹出自定义的Alert，状态条等），而且这些window有可能被设置为key window，一定要在web view显示时将它所在的window设置为key window。</p>
 </div>
   
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/07/30/no-keyboard-in-webview-of-ios5/">Read on &rarr;</a>
+    </footer>
   
 
 
@@ -293,7 +202,7 @@ UIWindow *anotherWindow = [UIWindow new];
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2011/03/01/a-profile-event/">简历风波</a></h1>
+      <h1 class="entry-title"><a href="/blog/2013/07/17/cant-scroll-in-tableview/">TableView中嵌套一个ScrollView有时导致ScrollView无法滚动</a></h1>
     
     
       <p class="meta">
@@ -309,16 +218,26 @@ UIWindow *anotherWindow = [UIWindow new];
   
 
 
-<time datetime="2011-03-01T08:29:00+08:00" pubdate data-updated="true">Mar 1<span>st</span>, 2011</time>
+<time datetime="2013-07-17T15:34:00+08:00" pubdate data-updated="true">Jul 17<span>th</span>, 2013</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>前几天我把我的简历整理一下。正好看到苹果在招系统工程师，就投了个简历试试。没想到今天苹果公司竟然真的打电话过来了，不过我现在正在创业，并不想放弃，没办法就只能拒绝了。搞得打电话的那个人肯定很郁闷。</p>
+  <div class="entry-content"><h2>TableView中嵌套ScrollView导致ScrollView无法滚动</h2>
+
+<p>开发时，经常会在一个TableView中嵌套一个横向滚动ScrollView，当ScrollView进行滑动时，TableView中展示的信息也会需要相应的改变，那么有时就需要重新载入TableView的数据（reloadData）。这时当ScrollView连续滚动多次，经常会出现ScrollView滚动不了。在控制台上同时会出现以下日志信息：</p>
+
+<pre><code>Ignoring call to [UIPanGestureRecognizer setTranslation:inView:] since gesture recognizer is not active.
+</code></pre>
+
 </div>
   
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/07/17/cant-scroll-in-tableview/">Read on &rarr;</a>
+    </footer>
   
 
 
@@ -329,7 +248,7 @@ UIWindow *anotherWindow = [UIWindow new];
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2011/03/01/my-first-blog/">博客开通第一天</a></h1>
+      <h1 class="entry-title"><a href="/blog/2013/06/12/custom-ui-using-uiappearance/">iOS 5中使用UIAppearance来自定义应用的外观</a></h1>
     
     
       <p class="meta">
@@ -345,18 +264,430 @@ UIWindow *anotherWindow = [UIWindow new];
   
 
 
-<time datetime="2011-03-01T07:48:00+08:00" pubdate data-updated="true">Mar 1<span>st</span>, 2011</time>
+<time datetime="2013-06-12T16:31:00+08:00" pubdate data-updated="true">Jun 12<span>th</span>, 2013</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>本博客今日起开通！</p>
+  <div class="entry-content"><p>做App时，我们经常需要自定义一些界面展现，来适合我们App的内容，或来使App看起来更漂亮，有时我们不得不写大量的自定义控件来达到这个目的。iOS 5新增了UIAppearance协议，使得自定义风格简单方便了很多，通过UIAppearance协议，我们快速的修改系统内置的控件的外观，也可以自己定义一些可自定义外观的控件。</p>
 
-<p>我做过接近3年的iPhone开发，从已经被人们遗忘的toolchain到今天的iOS4.2。对iOS开发充满的浓厚的兴趣，希望和大家一起分享iOS开发经验，提供开发技术，并讨论移动互联网业界动态。</p>
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/06/12/custom-ui-using-uiappearance/">Read on &rarr;</a>
+    </footer>
+  
 
-<p>不积跬步，无以至千里；不积小流，无以成江海。学习永无止境！</p>
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/06/05/extented-file-property-in-unix/">Unix系统中设置文件的扩展属性</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-06-05T10:03:00+08:00" pubdate data-updated="true">Jun 5<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Unix文件系统中对单个文件提供了很多属性，比如创建时间、文件大小、修改时间等，这些信息都保存在文件系统中的inode节点中，获取这些属性并不需要读取文件，所以获取速度是很快的。在开发过程中常常会使用这些属性，但更多的时候我们需要一个自定义的属性，来保存我们需要的一些值。比如我们给文件定义一个有效期，或者给文件加一个特殊标记等。</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/06/05/extented-file-property-in-unix/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/05/30/method-signature-in-objc/">Objective-C中方法签名(Method Signature)机制</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-05-30T15:23:00+08:00" pubdate data-updated="true">May 30<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h2>引言</h2>
+
+<p>在ObjC语言中，我们会自定义各种各样的类，在类定义中，我们又会定义各种方法，当方法达到一定的数量，有时会不可避免的出现一些同名的方法。而同名的方法有时会导致运行时出现很奇怪的问题。比如传递参数不一致时，出现运行时错误。这些都和ObjC中的方法签名（Method Signature）相关。</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/05/30/method-signature-in-objc/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/04/10/uialertview-animation/">UIAlertView弹出视图动画效果</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-04-10T22:01:00+08:00" pubdate data-updated="true">Apr 10<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>在App设计中为了加强用户体验，我们会常常加入一些友好的动画效果。比如类似UIAlertView弹出的动画效果，由于系统中并没有直接提供类似的动画API，如果我们想要做出一样的效果，那就得深入的研究一下系统中的UIAlertView了。</p>
+
+<p>仔细观察UIAlertView的动画你就会发现：这个动画是由几部分组成，它带一个视图大小抖动的效果。先是由小变大，再由大变小，最后变成本来的大小。但是这个大小的具体参数值和动画的速度恐怕是肉眼所不能看出来的。
+本篇文章会使用一些objc runtime和CAAnimation的一些知识，通过本文你可以了解到如何研究一些objc中内部调用机制和动画基础。</p>
+
+<p>要想知道这些动画的组成，我们就要从比较低层次的API：CALayer的一些调用开始。iOS动画最终都是加到Layer中的，加入Layer就要调用Layer对象这个方法：</p>
+
+<pre><code>- (void)addAnimation:(CAAnimation *)anim forKey:(NSString *)key;
+</code></pre>
+
+<p>所以只要我们知道了anim参数，并把anim动画对象的属性揪出来，就可以知道到底是什么动画了，但是这个方法是系统Framework中的，通常我们是无法能知道anim到底是什么。这时我们就需要用一些objc的一些底层API：Objc Runtime来解决了。</p>
+
+<h2>Objc Runtime</h2>
+
+<p>Objc Runtime是由一组处理Objctive-C动态语言运行时的API函数组成，这些函数都是一些比较底层的C函数。它有很多实用功能比如查看对象的成员，类/对象方法签名等等。这次我们要用的就是其中把对象方法调用替换的API。</p>
+
+<pre><code>void method_exchangeImplementations(Method m1, Method m2) 
+</code></pre>
+
+<p>这个函数的功能就是把类/对象的方法m1和m2进行调换。如果执行了这个函数，那么在App运行过程中所有调用方法m1的指令，最终都会执行成了方法m2。</p>
+
+<h2>方法调换</h2>
+
+<p>有了Objc Rumtime的API，就可以很方便的将调用系统库中方法的代码，执行成我们自己的代码了。所以我们想要知道Layer中加入了什么方法，只要把addAnimation:forKey:这个方法调换成我们自己的方法就行了。下面的这段代码就实现了这个功能。</p>
+
+<pre><code>@implementation CALayer(Hacked)
+
++ (void)load{
+    method_exchangeImplementations(class_getInstanceMethod([CALayer class], @selector(addAnimation:forKey:)), class_getInstanceMethod([CALayer class], @selector(hackedAddAnimation:forKey:)));
+}
+
+- (void)hackedAddAnimation:(CABasicAnimation *)anim forKey:(NSString *)key{
+    [self hackedAddAnimation:anim forKey:key];
+    if ([anim isKindOfClass:[CABasicAnimation class]]) {
+        if ([anim.keyPath isEqualToString:@"transform"]) {
+            if (anim.fromValue) {
+                CATransform3D fromValue = [anim.fromValue CATransform3DValue];
+                NSLog(@"From:%@",NSStringFromCGAffineTransform(CATransform3DGetAffineTransform(fromValue)));
+            }
+            if (anim.toValue) {
+                CATransform3D toValue = [anim.toValue CATransform3DValue];
+                NSLog(@"To:%@",NSStringFromCGAffineTransform(CATransform3DGetAffineTransform(toValue)));
+            }
+            if (anim.byValue) {
+                CATransform3D byValue = [anim.byValue CATransform3DValue];
+                NSLog(@"By:%@",NSStringFromCGAffineTransform(CATransform3DGetAffineTransform(byValue)));
+            }
+            NSLog(@"Duration:%.2f",anim.duration);
+            NSLog(@"TimingFunction:%@",anim.timingFunction);
+        }
+    }
+}
+
+@end
+</code></pre>
+
+<p>下面来说明一下上面的代码，这段代码是CALayer做了一个Catalog处理。其中initialize是一个类的方法，是进程开始时初始化类时调用，一般只有类有加载这个方法就会第一个调用了。hackedAddAnimation:forKey:是要被调换的代码。在类的初始化方法initialize中（代码中的第5行）实现了CALayer的addAnimation:forKey:和hackedAddAnimation:forKey:方法的调换。在hackedAddAnimation:forKey:中首先直接调用了[self hackedAddAnimation:forKey:]，也许你会问：这不死循环递归了么？其实不是，应为method_exchangeImplementations实现的是调换而不是替换，所以代码中调用addAnimation:forKey:运行时就成了调用hackedAddAnimation:forKey:。而代码中调用hackedAddAnimation:forKey:运行时成了调用addAnimation:forKey:。所以这里虽然写的是hackedAddAnimation:forKey:，实际上会调用系统Framework中的addAnimation:forKey:。这样做的目的是保证虽然我们把系统的方法改变了，我们还是调用系统的一次，以保持系统功能运行是正常的。在hackedAddAnimation:forKey:剩下的代码就只是把anim动画对象的各个属性的值打印出来了。</p>
+
+<p>好了，把上面的这段代码粘贴到你的代码文件中。然后简单的写个UIAlertView弹出动画代码。</p>
+
+<pre><code>UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Title" message:@"Message" delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil];
+[alert show];
+</code></pre>
+
+<p>编译并运行上面这段代码，你就会在控制台中看到下面这些日志：</p>
+
+<pre><code>2013-04-10 19:13:11.795 Test[10952:c07] From:[0.01, 0, 0, 0.01, 0, 0]
+2013-04-10 19:13:11.796 Test[10952:c07] Duration:0.20
+2013-04-10 19:13:11.796 Test[10952:c07] TimingFunction:easeInEaseOut
+2013-04-10 19:13:11.999 Test[10952:c07] From:[1.1, 0, 0, 1.1, 0, 0]
+2013-04-10 19:13:12.000 Test[10952:c07] Duration:0.10
+2013-04-10 19:13:12.000 Test[10952:c07] TimingFunction:easeInEaseOut
+2013-04-10 19:13:12.101 Test[10952:c07] From:[0.9, 0, 0, 0.9, 0, 0]
+2013-04-10 19:13:12.101 Test[10952:c07] Duration:0.10
+2013-04-10 19:13:12.101 Test[10952:c07] TimingFunction:easeInEaseOut
+</code></pre>
+
+<p>查看CGAffineTransformMakeScale函数的头文件你会看到：</p>
+
+<pre><code>/* Return a transform which scales by `(sx, sy)':
+     t' = [ sx 0 0 sy 0 0 ] */
+
+CG_EXTERN CGAffineTransform CGAffineTransformMakeScale(CGFloat sx, CGFloat sy)
+  CG_AVAILABLE_STARTING(__MAC_10_0, __IPHONE_2_0);
+</code></pre>
+
+<p>所以根据日志我们会发现这其实是3个关键帧动画，首先scale(缩放比例)从0.01放大到1.1，历时0.2秒；然后从1.1到0.9，历时0.1秒；那么最后就是从0.9到1.0（正常缩放比例），历时0.1秒。哈哈，那我们就简单的写个关键帧动画对象就可以表示UIAlertView的弹出动画效果了。</p>
+
+<pre><code>CAKeyframeAnimation *popAnimation = [CAKeyframeAnimation animationWithKeyPath:@"transform"];
+popAnimation.duration = 0.4;
+popAnimation.values = @[[NSValue valueWithCATransform3D:CATransform3DMakeScale(0.01f, 0.01f, 1.0f)],
+                        [NSValue valueWithCATransform3D:CATransform3DMakeScale(1.1f, 1.1f, 1.0f)],
+                        [NSValue valueWithCATransform3D:CATransform3DMakeScale(0.9f, 0.9f, 1.0f)],
+                        [NSValue valueWithCATransform3D:CATransform3DIdentity]];
+popAnimation.keyTimes = @[@0.0f, @0.5f, @0.75f, @1.0f];
+popAnimation.timingFunctions = @[[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut],
+                                 [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut],
+                                 [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut]];
+[anAlertAnimationView.layer addAnimation:popAnimation forKey:nil];
+</code></pre>
+
+<p>你可以把popAnimation加入到你想进行动画的任何View中的layer中这样就实现了UIAlertView一样的弹出动画效果。</p>
+
+<h2>结论</h2>
+
+<ol>
+<li>UIAlertView动画其实是由三部分动画组成：缩放比例变化0.01->1.1->0.9->1.0。每次变化的时间函数（控制加速度）都是EaseInEaseOut。</li>
+<li>在研究系统中调用函数的参数是我们可以用method_exchangeImplementations来hack到系统调用中去，但不要忘记调用系统本身的方法。否则容易导致App异常。当然，如果你是研究测试不怕crash，那随便。</li>
+</ol>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/04/01/blur-effect-in-ios/">iOS中的模糊效果</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-04-01T21:58:00+08:00" pubdate data-updated="true">Apr 1<span>st</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>App设计时往往会用到一些模糊效果。iOS目前已提供一些模糊API可以让我们方便是使用。一种是使用Core Image，另一种是使用Accelerate.Framework中的vImage API。</p>
+
+<h2>使用Core Image进行模糊</h2>
+
+<p>Core Image很早在Mac系统中得到应用，后来这个Framework也开始应用到iOS，不过直到iOS6.0才开始支持模糊。这个API调用起来很方便简洁。</p>
+
+<pre><code>- (UIImage *)blurryImage:(UIImage *)image 
+           withBlurLevel:(CGFloat)blur {
+    CIImage *inputImage = [CIImage imageWithCGImage:image.CGImage];
+    CIFilter *filter = [CIFilter filterWithName:@"CIGaussianBlur"
+                         keysAndValues:kCIInputImageKey, inputImage,
+                                       @"inputRadius", @(blur), 
+                                       nil];
+
+    CIImage *outputImage = filter.outputImage;
+
+    CGImageRef outImage = [self.context createCGImage:outputImage 
+                                   fromRect:[outputImage extent]];
+    return [UIImage imageWithCGImage:outImage];
+}
+</code></pre>
+
+<h2>使用vImage API进行模糊</h2>
+
+<p>iOS5.0中新增了vImage API可以使用，它属于Accelerate.Framework，所以如果你要使用它要在工程中加入这个Framework。模糊算法使用的是vImageBoxConvolve_ARGB8888这个函数。</p>
+
+<pre><code>- (UIImage *)blurryImage:(UIImage *)image withBlurLevel:(CGFloat)blur {
+    if (blur &lt; 0.f || blur &gt; 1.f) {
+        blur = 0.5f;
+    }
+    int boxSize = (int)(blur * 100);
+    boxSize = boxSize - (boxSize % 2) + 1;
+
+    CGImageRef img = image.CGImage;
+
+    vImage_Buffer inBuffer, outBuffer;
+    vImage_Error error;
+
+    void *pixelBuffer;
+
+    CGDataProviderRef inProvider = CGImageGetDataProvider(img);
+    CFDataRef inBitmapData = CGDataProviderCopyData(inProvider);
+
+    inBuffer.width = CGImageGetWidth(img);
+    inBuffer.height = CGImageGetHeight(img);
+    inBuffer.rowBytes = CGImageGetBytesPerRow(img);
+
+    inBuffer.data = (void*)CFDataGetBytePtr(inBitmapData);
+
+    pixelBuffer = malloc(CGImageGetBytesPerRow(img) * 
+                         CGImageGetHeight(img));
+
+    if(pixelBuffer == NULL)
+        NSLog(@"No pixelbuffer");
+
+    outBuffer.data = pixelBuffer;
+    outBuffer.width = CGImageGetWidth(img);
+    outBuffer.height = CGImageGetHeight(img);
+    outBuffer.rowBytes = CGImageGetBytesPerRow(img);
+
+    error = vImageBoxConvolve_ARGB8888(&amp;inBuffer, 
+                                       &amp;outBuffer, 
+                                       NULL, 
+                                       0, 
+                                       0, 
+                                       boxSize, 
+                                       boxSize, 
+                                       NULL, 
+                                       kvImageEdgeExtend);
+
+
+    if (error) {
+        NSLog(@"error from convolution %ld", error);
+    }
+
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+    CGContextRef ctx = CGBitmapContextCreate(
+                                    outBuffer.data,
+                                    outBuffer.width,
+                                    outBuffer.height,
+                                    8,
+                                    outBuffer.rowBytes,
+                                    colorSpace,
+                                    kCGImageAlphaNoneSkipLast);
+    CGImageRef imageRef = CGBitmapContextCreateImage (ctx);
+    UIImage *returnImage = [UIImage imageWithCGImage:imageRef];
+
+    //clean up
+    CGContextRelease(ctx);
+    CGColorSpaceRelease(colorSpace);
+
+    free(pixelBuffer);
+    CFRelease(inBitmapData);
+
+    CGColorSpaceRelease(colorSpace);
+    CGImageRelease(imageRef);
+
+    return returnImage;
+}
+</code></pre>
+
+<p>参考：<a href="http://blog.denivip.ru/index.php/2013/01/blur-effect-in-ios-applications/?lang=en">Blur effect in iOS application</a></p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/03/10/an-utility-ibe-traveler/">另一个实用工具：Traveler</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-03-10T14:42:00+08:00" pubdate data-updated="true">Mar 10<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>在完成了Star Invader之后，我就开始做了一个应用Traveler。这是一个方便国际旅行的实用工具。它提供这些功能：</p>
+
+<ul>
+<li>世界各地时区时间的快速查询。昼夜长短分析，帮助旅行者快速适应时差。</li>
+<li>各国重量、面积、体积等计量单位的快速转换。</li>
+<li>从网络上获取当前各国的货币汇率，快速进行货币兑换查询。</li>
+<li>世界各地区的衣服尺码比较和查询。</li>
+<li>各国区号、编码的查询。</li>
+</ul>
+
 </div>
   
   
@@ -365,6 +696,8 @@ UIWindow *anotherWindow = [UIWindow new];
     </article>
   
   <div class="pagination">
+    
+      <a class="prev" href="/blog/page/2/">&larr; Older</a>
     
     <a href="/blog/archives">Blog Archives</a>
     
@@ -381,15 +714,19 @@ UIWindow *anotherWindow = [UIWindow new];
       </li>
     
       <li class="post">
+        <a href="/blog/2013/08/14/implement-objc-property-in-category/">Objective-C语言在Category中实现属性</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/07/30/no-keyboard-in-webview-of-ios5/">iOS5网页视图（UIWebView）中的输入框不能弹出键盘的问题</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2011/03/01/a-profile-event/">简历风波</a>
+        <a href="/blog/2013/07/17/cant-scroll-in-tableview/">TableView中嵌套一个ScrollView有时导致ScrollView无法滚动</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2011/03/01/my-first-blog/">博客开通第一天</a>
+        <a href="/blog/2013/06/12/custom-ui-using-uiappearance/">iOS 5中使用UIAppearance来自定义应用的外观</a>
       </li>
     
   </ul>
@@ -405,7 +742,7 @@ UIWindow *anotherWindow = [UIWindow new];
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2013 - Your Name -
+  Copyright &copy; 2013 - 谌启亮 -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 

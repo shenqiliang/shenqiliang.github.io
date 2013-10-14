@@ -1,0 +1,239 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>打造自己的Mac系统字典 - Xcode Dev</title>
+  <meta name="author" content="谌启亮">
+
+  
+  <meta name="description" content="看SDK英文文档头疼啊…
+软件还要支持英文的国际化…
+iOS开发中经常会遇到这些问题，每个Mac OS都自带了“字典”应用，不幸的是，这个字典只支持英文对英文的解释。对于咱们对英文不熟的人来说，这个应用确实是个鸡肋。我们最需要的是英文到中文或中文到英文的翻译，也许你会尝试去寻找其他Mac &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://shenqiliang.github.io/blog/2012/03/09/create-your-own-mac-dict">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Xcode Dev" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/lib/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Xcode Dev</a></h1>
+  
+    <h2>学习、分享、积累 – 亮了的原创开发博客</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:shenqiliang.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">打造自己的Mac系统字典</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-09T23:25:00+08:00" pubdate data-updated="true">Mar 9<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>看SDK英文文档头疼啊…
+软件还要支持英文的国际化…
+iOS开发中经常会遇到这些问题，每个Mac OS都自带了“字典”应用，不幸的是，这个字典只支持英文对英文的解释。对于咱们对英文不熟的人来说，这个应用确实是个鸡肋。我们最需要的是英文到中文或中文到英文的翻译，也许你会尝试去寻找其他Mac OS字典应用来满足你的需求，但其实系统自带的字典app只需简单几步就可以加入这些翻译功能，而且可以随意添加我们想要的字典，牛津、朗文随便挑选了。(^o^)</p>
+
+<p>1、下载并安装DicUnifier
+DicUnifier是一个专门将一些字典转换成Mac OS字典格式的应用。
+<a href="http://code.google.com/p/mac-dictionary-kit/downloads/list">http://code.google.com/p/mac-dictionary-kit/downloads/list</a></p>
+
+<p>2、下载字典文件
+你可以选择下面链接下载简体中文字典：
+<a href="http://abloz.com/huzheng/stardict-dic/zh_CN/">http://abloz.com/huzheng/stardict-dic/zh_CN/</a>
+也可以下载所有字典（包括其他语言：日文，德文等）：
+<a href="http://abloz.com/huzheng/stardict-dic/">http://abloz.com/huzheng/stardict-dic/</a></p>
+
+<p>3、打开DicUnifier，并将第2步下载的字典文件（不要解压）直接拖到DicUnifier的窗口上，选择确认后就开始转换。这可能会需要几分钟时间。</p>
+
+<p>4、DicUnifier转换完成后，重新开启你的字典app。你也可以在字典的偏好设置里设置你需要的字典并排序。</p>
+
+<p><img src="/images/post/mac-dict.png" alt="image" /></p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">谌启亮</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-09T23:25:00+08:00" pubdate data-updated="true">Mar 9<span>th</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/macxi-tong/'>Mac系统</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://shenqiliang.github.io/blog/2012/03/09/create-your-own-mac-dict/" data-via="" data-counturl="http://shenqiliang.github.io/blog/2012/03/09/create-your-own-mac-dict/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/03/09/view-controller-response-uitouch/" title="Previous Post: ViewController如何响应Touch事件？">&laquo; ViewController如何响应Touch事件？</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2012/03/12/objc-name-keyword/" title="Next Post: Objective-C对象消息名关键词">Objective-C对象消息名关键词 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/08/15/auto-key-press-using-appscript/">用AppleScript在Mac系统下实现按键精灵的功能以及在游戏中的运用</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/08/14/implement-objc-property-in-category/">Objective-C语言在Category中实现属性</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/07/30/no-keyboard-in-webview-of-ios5/">iOS5网页视图（UIWebView）中的输入框不能弹出键盘的问题</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/07/17/cant-scroll-in-tableview/">TableView中嵌套一个ScrollView有时导致ScrollView无法滚动</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/06/12/custom-ui-using-uiappearance/">iOS 5中使用UIAppearance来自定义应用的外观</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - 谌启亮 -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

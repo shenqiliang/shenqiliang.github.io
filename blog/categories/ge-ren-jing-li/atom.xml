@@ -1,24 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Category: 个人经历 | My Octopress Blog]]></title>
+  <title><![CDATA[Category: 个人经历 | Xcode Dev]]></title>
   <link href="http://shenqiliang.github.io/blog/categories/ge-ren-jing-li/atom.xml" rel="self"/>
   <link href="http://shenqiliang.github.io/"/>
-  <updated>2013-10-14T20:20:17+08:00</updated>
+  <updated>2013-10-15T02:16:00+08:00</updated>
   <id>http://shenqiliang.github.io/</id>
   <author>
-    <name><![CDATA[Your Name]]></name>
+    <name><![CDATA[谌启亮]]></name>
     
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
   
   <entry>
+    <title type="html"><![CDATA[再见，上海！]]></title>
+    <link href="http://shenqiliang.github.io/blog/2012/02/01/bye-bye-shanghai/"/>
+    <updated>2012-02-01T02:05:00+08:00</updated>
+    <id>http://shenqiliang.github.io/blog/2012/02/01/bye-bye-shanghai</id>
+    <content type="html"><![CDATA[<p>刚到深圳，由于工作比较忙，很久没关注自己的博客了。现在正好想写写之前在上海的一些经历。在上海也呆1年多了，由于工作原因得离开这个繁华的城市。在这里我做过外包，创过业，个中艰辛只能自己体会，它给我一个很好的人生经验。想过自己的理想，而现实往往是残酷的，虽然放弃，有些不舍，但我还是梦想能在新的地方闯出自己的一番天地。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[加入网龙]]></title>
+    <link href="http://shenqiliang.github.io/blog/2011/04/05/join-91-at-netdragon/"/>
+    <updated>2011-04-05T15:02:00+08:00</updated>
+    <id>http://shenqiliang.github.io/blog/2011/04/05/join-91-at-netdragon</id>
+    <content type="html"><![CDATA[<p>2009年2月，我离开了IBE，来到了91手机助手的开发公司－－网龙。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[在IBE工作总结]]></title>
+    <link href="http://shenqiliang.github.io/blog/2011/04/03/summery-work-at-ibe/"/>
+    <updated>2011-04-03T21:59:00+08:00</updated>
+    <id>http://shenqiliang.github.io/blog/2011/04/03/summery-work-at-ibe</id>
+    <content type="html"><![CDATA[<p>毕业时，学习不怎么好。寻工作烦恼之际，IBE收留了我，它给了我一个很好起点。虽然据我了解，那时大部分从IBE出来的，都对它有很多的抱怨，工资低啊、克扣工资啊、还加班啊等等。但是它给了很多刚毕业的学生一个很好的起点，可以说已经很幸运了。对于刚毕业的学生来说，最重要的不是赚钱，而是学习技能和知识。如果没有什么技能和知识，又不是什么领导子弟，那又凭什么去拿很高的工资吗。再过几年，对于一个从事IT工作的人来说，毕业时拿的那点工资或许都是浮云了。我在IBE不是为了赚钱，是为了学习。那时钱不多，但消费很低，差不多够花，这就行了。但我所学的知识的价值远远超过了工资，这也是一种收获。</p>
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[简历风波]]></title>
-    <link href="http://shenqiliang.github.io/blog/2011/03/01/a-profile-event/"/>
-    <updated>2011-03-01T08:29:00+08:00</updated>
-    <id>http://shenqiliang.github.io/blog/2011/03/01/a-profile-event</id>
+    <link href="http://shenqiliang.github.io/blog/2011/03/02/a-profile-event/"/>
+    <updated>2011-03-02T08:29:00+08:00</updated>
+    <id>http://shenqiliang.github.io/blog/2011/03/02/a-profile-event</id>
     <content type="html"><![CDATA[<p>前几天我把我的简历整理一下。正好看到苹果在招系统工程师，就投了个简历试试。没想到今天苹果公司竟然真的打电话过来了，不过我现在正在创业，并不想放弃，没办法就只能拒绝了。搞得打电话的那个人肯定很郁闷。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[博客开通第一天]]></title>
+    <link href="http://shenqiliang.github.io/blog/2011/03/01/my-first-blog/"/>
+    <updated>2011-03-01T07:48:00+08:00</updated>
+    <id>http://shenqiliang.github.io/blog/2011/03/01/my-first-blog</id>
+    <content type="html"><![CDATA[<p>本博客今日起开通！</p>
+
+<p>我做过接近3年的iPhone开发，从已经被人们遗忘的toolchain到今天的iOS4.2。对iOS开发充满的浓厚的兴趣，希望和大家一起分享iOS开发经验，提供开发技术，并讨论移动互联网业界动态。</p>
+
+<p>不积跬步，无以至千里；不积小流，无以成江海。学习永无止境！</p>
 ]]></content>
   </entry>
   
