@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: 个人经历 | My Octopress Blog]]></title>
+  <link href="http://shenqiliang.github.io/blog/categories/ge-ren-jing-li/atom.xml" rel="self"/>
+  <link href="http://shenqiliang.github.io/"/>
+  <updated>2013-10-14T14:07:51+08:00</updated>
+  <id>http://shenqiliang.github.io/</id>
+  <author>
+    <name><![CDATA[Your Name]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[简历风波]]></title>
+    <link href="http://shenqiliang.github.io/blog/2011/03/01/a-profile-event/"/>
+    <updated>2011-03-01T08:29:00+08:00</updated>
+    <id>http://shenqiliang.github.io/blog/2011/03/01/a-profile-event</id>
+    <content type="html"><![CDATA[<p>前几天我把我的简历整理一下。正好看到苹果在招系统工程师，就投了个简历试试。没想到今天苹果公司竟然真的打电话过来了，不过我现在正在创业，并不想放弃，没办法就只能拒绝了。搞得打电话的那个人肯定很郁闷。</p>
+]]></content>
+  </entry>
+  
+</feed>

@@ -5,14 +5,12 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Blog Archive - My Octopress Blog</title>
+  <title>用AppleScript在Mac系统下实现按键精灵的功能以及在游戏中的运用 - My Octopress Blog</title>
   <meta name="author" content="Your Name">
 
   
-  <meta name="description" content="Blog Archive 2013 用AppleScript在Mac系统下实现按键精灵的功能以及在游戏中的运用
-Aug 15 2013 2011 简历风波
-Mar 01 2011 posted in 个人经历 博客开通第一天
-Mar 01 2011 Recent Posts &hellip;">
+  <meta name="description" content="什么是AppleScript AppleScript是Mac系统提供的一个脚本语言，这个脚本语言简单易读，稍微懂一点脚本语言就可以快速学会了。AppleScript可以让我们的日常工作流程化，简化繁琐的固定输入，自动化完成一般的日常工作。
+AppleScript提供了很多很多强大的功能， &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -21,7 +19,7 @@ Mar 01 2011 Recent Posts &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://shenqiliang.github.io/blog/archives">
+  <link rel="canonical" href="http://shenqiliang.github.io/blog/2013/08/15/auto-key-press-using-appscript">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="My Octopress Blog" type="application/atom+xml">
@@ -67,58 +65,88 @@ Mar 01 2011 Recent Posts &hellip;">
   <div id="main">
     <div id="content">
       <div>
-<article role="article">
+<article class="hentry" role="article">
   
   <header>
-    <h1 class="entry-title">Blog Archive</h1>
+    
+      <h1 class="entry-title">用AppleScript在Mac系统下实现按键精灵的功能以及在游戏中的运用</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-08-15T01:11:00+08:00" pubdate data-updated="true">Aug 15<span>th</span>, 2013</time>
+        
+      </p>
     
   </header>
-  
-  <div id="blog-archives">
 
 
+<div class="entry-content"><h1>什么是AppleScript</h1>
 
-  
-  <h2>2013</h2>
+<p>AppleScript是Mac系统提供的一个脚本语言，这个脚本语言简单易读，稍微懂一点脚本语言就可以快速学会了。AppleScript可以让我们的日常工作流程化，简化繁琐的固定输入，自动化完成一般的日常工作。
+AppleScript提供了很多很多强大的功能，本文就只简单的介绍一下如何用它来实现类似Windows下按键精灵的功能。</p>
 
-<article>
-  
-<h1><a href="/blog/2013/08/15/auto-key-press-using-appscript/">用AppleScript在Mac系统下实现按键精灵的功能以及在游戏中的运用</a></h1>
-<time datetime="2013-08-15T01:11:00+08:00" pubdate><span class='month'>Aug</span> <span class='day'>15</span> <span class='year'>2013</span></time>
+<h1>前提工作</h1>
 
+<p>如果想要让AppleScript自动帮我们按键，点击鼠标。首先还是要在设置里“启用辅助设备的控制”，否则AppleScript就没有权限控制我们的键盘、鼠标这些辅助设备。
+打开“系统偏好设置”->“辅助功能”页面，然后勾选“启用辅助设备的控制”。</p>
 
-</article>
-
-
-
-  
-  <h2>2011</h2>
-
-<article>
-  
-<h1><a href="/blog/2011/03/01/a-profile-event/">简历风波</a></h1>
-<time datetime="2011-03-01T08:29:00+08:00" pubdate><span class='month'>Mar</span> <span class='day'>01</span> <span class='year'>2011</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/ge-ren-jing-li/'>个人经历</a></span>
-</footer>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="/blog/2011/03/01/my-first-blog/">博客开通第一天</a></h1>
-<time datetime="2011-03-01T07:48:00+08:00" pubdate><span class='month'>Mar</span> <span class='day'>01</span> <span class='year'>2011</span></time>
-
-
-</article>
-
+<p><img src="./images/post/enable-assist-device-control.png" alt="image" /></p>
 </div>
 
+
+  <footer>
+    <p class="meta">
+      
   
+
+<span class="byline author vcard">Posted by <span class="fn">Your Name</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-08-15T01:11:00+08:00" pubdate data-updated="true">Aug 15<span>th</span>, 2013</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://shenqiliang.github.io/blog/2013/08/15/auto-key-press-using-appscript/" data-via="" data-counturl="http://shenqiliang.github.io/blog/2013/08/15/auto-key-press-using-appscript/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2011/03/01/a-profile-event/" title="Previous Post: 简历风波">&laquo; 简历风波</a>
+      
+      
+    </p>
+  </footer>
 </article>
 
 </div>

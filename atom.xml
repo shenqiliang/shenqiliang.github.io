@@ -4,7 +4,7 @@
   <title><![CDATA[My Octopress Blog]]></title>
   <link href="http://shenqiliang.github.io/atom.xml" rel="self"/>
   <link href="http://shenqiliang.github.io/"/>
-  <updated>2013-10-14T03:30:05+08:00</updated>
+  <updated>2013-10-14T14:07:51+08:00</updated>
   <id>http://shenqiliang.github.io/</id>
   <author>
     <name><![CDATA[Your Name]]></name>
@@ -14,11 +14,30 @@
 
   
   <entry>
-    <title type="html"><![CDATA[title]]></title>
-    <link href="http://shenqiliang.github.io/blog/2013/10/14/title/"/>
-    <updated>2013-10-14T02:25:00+08:00</updated>
-    <id>http://shenqiliang.github.io/blog/2013/10/14/title</id>
-    <content type="html"><![CDATA[
+    <title type="html"><![CDATA[用AppleScript在Mac系统下实现按键精灵的功能以及在游戏中的运用]]></title>
+    <link href="http://shenqiliang.github.io/blog/2013/08/15/auto-key-press-using-appscript/"/>
+    <updated>2013-08-15T01:11:00+08:00</updated>
+    <id>http://shenqiliang.github.io/blog/2013/08/15/auto-key-press-using-appscript</id>
+    <content type="html"><![CDATA[<h1>什么是AppleScript</h1>
+
+<p>AppleScript是Mac系统提供的一个脚本语言，这个脚本语言简单易读，稍微懂一点脚本语言就可以快速学会了。AppleScript可以让我们的日常工作流程化，简化繁琐的固定输入，自动化完成一般的日常工作。
+AppleScript提供了很多很多强大的功能，本文就只简单的介绍一下如何用它来实现类似Windows下按键精灵的功能。</p>
+
+<h1>前提工作</h1>
+
+<p>如果想要让AppleScript自动帮我们按键，点击鼠标。首先还是要在设置里“启用辅助设备的控制”，否则AppleScript就没有权限控制我们的键盘、鼠标这些辅助设备。
+打开“系统偏好设置”->“辅助功能”页面，然后勾选“启用辅助设备的控制”。</p>
+
+<p><img src="./images/post/enable-assist-device-control.png" alt="image" /></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[简历风波]]></title>
+    <link href="http://shenqiliang.github.io/blog/2011/03/01/a-profile-event/"/>
+    <updated>2011-03-01T08:29:00+08:00</updated>
+    <id>http://shenqiliang.github.io/blog/2011/03/01/a-profile-event</id>
+    <content type="html"><![CDATA[<p>前几天我把我的简历整理一下。正好看到苹果在招系统工程师，就投了个简历试试。没想到今天苹果公司竟然真的打电话过来了，不过我现在正在创业，并不想放弃，没办法就只能拒绝了。搞得打电话的那个人肯定很郁闷。</p>
 ]]></content>
   </entry>
   
