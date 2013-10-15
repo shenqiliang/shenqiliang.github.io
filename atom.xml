@@ -4,7 +4,7 @@
   <title><![CDATA[Xcode Dev]]></title>
   <link href="http://shenqiliang.github.io/atom.xml" rel="self"/>
   <link href="http://shenqiliang.github.io/"/>
-  <updated>2013-10-15T14:05:15+08:00</updated>
+  <updated>2013-10-15T21:35:05+08:00</updated>
   <id>http://shenqiliang.github.io/</id>
   <author>
     <name><![CDATA[谌启亮]]></name>
@@ -633,6 +633,9 @@ ARC下会根据方法签名中的返回值进行retain/release等操作
 <p>仔细观察UIAlertView的动画你就会发现：这个动画是由几部分组成，它带一个视图大小抖动的效果。先是由小变大，再由大变小，最后变成本来的大小。但是这个大小的具体参数值和动画的速度恐怕是肉眼所不能看出来的。
 本篇文章会使用一些objc runtime和CAAnimation的一些知识，通过本文你可以了解到如何研究一些objc中内部调用机制和动画基础。</p>
 
+<!--more-->
+
+
 <p>要想知道这些动画的组成，我们就要从比较低层次的API：CALayer的一些调用开始。iOS动画最终都是加到Layer中的，加入Layer就要调用Layer对象这个方法：</p>
 
 <pre><code>- (void)addAnimation:(CAAnimation *)anim forKey:(NSString *)key;
@@ -768,6 +771,9 @@ popAnimation.timingFunctions = @[[CAMediaTimingFunction functionWithName:kCAMedi
 }
 </code></pre>
 
+<!--more-->
+
+
 <h2>使用vImage API进行模糊</h2>
 
 <p>iOS5.0中新增了vImage API可以使用，它属于Accelerate.Framework，所以如果你要使用它要在工程中加入这个Framework。模糊算法使用的是vImageBoxConvolve_ARGB8888这个函数。</p>
@@ -863,6 +869,9 @@ s = [s stringByReplacingOccurrencesOfString:@"市" withString:@""];
 NSLog(@"%@",s);
 return YES;
 </code></pre>
+
+<!--more-->
+
 
 <p>我在最后设置的一个断点，看看运行后的情况：</p>
 
@@ -1003,6 +1012,9 @@ Thread 0 Crashed:
 
 <p>Pass目前有5种：Boarding pass、Coupon、Event ticket、Generic、Store card。每种种类都有各自的应用场景的展现布局。展现布局是固定的，但你可以自定义一些效果，如图标、背景和相关文本等。</p>
 
+<!--more-->
+
+
 <h2>Pass的安全性</h2>
 
 <p>Pass包中的每一个文件都经过签名，任何篡改的Pass都无法添加成功的。</p>
@@ -1026,6 +1038,9 @@ Thread 0 Crashed:
 我取了一个图片，不进行任何处理，然后让它旋转0.1弧度：</p>
 
 <p><img src="http://shenqiliang.github.io/images/post/image-without-anti-alise.png" alt="image" /></p>
+
+<!--more-->
+
 
 <p>可见确实出现了很多锯齿。
 我在图片边缘加了一个像素的透明区域，代码如下：</p>
@@ -1062,6 +1077,9 @@ Thread 0 Crashed:
 
 <p>打开项目配置，选择合适的target，在右侧选择“Build Phases”。然后在下方点击“Add Build Phases”－“Add Run Script”。如下图：</p>
 
+<!--more-->
+
+
 <p><img src="http://shenqiliang.github.io/images/post/add-occheck-to-runscript-step-one.png" alt="image" /></p>
 
 <h4>2、输入相应的运行脚本</h4>
@@ -1097,6 +1115,9 @@ NSData还有一个API：</p>
 </code></pre>
 
 <p>其中NSDataReadingOptions可以附加一个参数NSDataReadingMappedIfSafe参数。使用这个参数后，iOS就不会把整个文件全部读取的内存了，而是将文件映射到进程的地址空间中，这么做并不会占用实际内存。这样就可以解决内存满的问题。</p>
+
+<!--more-->
+
 
 <h2>实际测试效果</h2>
 
@@ -1183,6 +1204,9 @@ a.delegate = self;
 
 <p>安装occheck(有些同学反馈command not fond的解决方法):
 occheck是个二进制命令行工具，拷贝到/usr/bin目录下才可以直接在终端中输入使用。</p>
+
+<!--more-->
+
 
 <pre><code>sudo cp /path/to/occheck /usr/bin/occheck
 sudo chmod -R 755 /usr/bin/occheck

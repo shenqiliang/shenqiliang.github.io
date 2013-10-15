@@ -28,6 +28,18 @@
   <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
   
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-20391902-4']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
 
 </head>
 
@@ -144,19 +156,12 @@
 
 <p>Pass目前有5种：Boarding pass、Coupon、Event ticket、Generic、Store card。每种种类都有各自的应用场景的展现布局。展现布局是固定的，但你可以自定义一些效果，如图标、背景和相关文本等。</p>
 
-<h2>Pass的安全性</h2>
-
-<p>Pass包中的每一个文件都经过签名，任何篡改的Pass都无法添加成功的。</p>
-
-<h2>Pass的更新</h2>
-
-<p>Pass可以通过Push进行更新，这需要一系列的服务器接口。需要注意的是Push所用的证书和签名证书是一样的。</p>
-
-<h2>结论</h2>
-
-<p>由于Pass只是一个zip包，客户端需要做的事情就是下载和调用api添加。一些复杂的签名和更新逻辑则需要服务器端完成。</p>
 </div>
   
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/11/16/passbook-in-ios6/">更多 &rarr;</a>
+    </footer>
   
 
 
@@ -195,29 +200,12 @@
 
 <p><img src="/images/post/image-without-anti-alise.png" alt="image" /></p>
 
-<p>可见确实出现了很多锯齿。
-我在图片边缘加了一个像素的透明区域，代码如下：</p>
-
-<pre><code>- (UIImage*)antialiasedImageOfSize:(CGSize)size scale:(CGFloat)scale{
-    UIGraphicsBeginImageContextWithOptions(size, NO, scale);
-    [self drawInRect:CGRectMake(1, 1, size.width-2, size.height-2)];
-    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    return image;
-}
-</code></pre>
-
-<p>结果完全实现了抗锯齿效果：</p>
-
-<p><img src="/images/post/image-with-anti-alise.png" alt="image" /></p>
-
-<h2>结论</h2>
-
-<p>Layer的edgeAntialiasingMask属性并不能有效抗锯齿，只需要在图片边缘加入1个像素的透明区域就可以完美实现图片抗锯齿了。</p>
-
-<p>我把这些代码发布在我的开源项目中了，里面有Demo。项目地址是：<a href="https://github.com/shenqiliang/ImageAntialiase">ImageAntialiase</a></p>
 </div>
   
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/10/25/anti-alise-for-image-ios/">更多 &rarr;</a>
+    </footer>
   
 
 
@@ -257,28 +245,12 @@
 
 <p>打开项目配置，选择合适的target，在右侧选择“Build Phases”。然后在下方点击“Add Build Phases”－“Add Run Script”。如下图：</p>
 
-<p><img src="/images/post/add-occheck-to-runscript-step-one.png" alt="image" /></p>
-
-<h4>2、输入相应的运行脚本</h4>
-
-<p>点击“Add Run Script”菜单后，将会在中间添加“Run Script”项，在此项的第二个文本框里输入脚本：</p>
-
-<p>/path/to/occheck /path/to/class目录
-如下图：</p>
-
-<p><img src="/images/post/add-occheck-to-runscript-step-two.png" alt="image" /></p>
-
-<h4>3、运行</h4>
-
-<p>Build&amp;Run吧，如果检查到内存信息或高危函数，将无法运行。同时，在build日志里会显示那个类或文件出错了。如：</p>
-
-<pre><code>ERROR: QHTTPCacheManager cacheRootPath 没有在dealloc中release.
-ERROR: CategoryView buttons 没有在dealloc中release.
-ERROR: TodayDealListViewController dealInfosThisRounds 没有在dealloc中release.
-ERROR: TodayDealListViewController dealInfosThisRound 没有在dealloc中release.
-</code></pre>
 </div>
   
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/10/24/add-occheck-to-project-when-run/">更多 &rarr;</a>
+    </footer>
   
 
 
@@ -320,20 +292,12 @@ NSData还有一个API：</p>
 
 <p>其中NSDataReadingOptions可以附加一个参数NSDataReadingMappedIfSafe参数。使用这个参数后，iOS就不会把整个文件全部读取的内存了，而是将文件映射到进程的地址空间中，这么做并不会占用实际内存。这样就可以解决内存满的问题。</p>
 
-<h2>实际测试效果</h2>
-
-<p>不带参数时内存占用：
-<img src="/images/post/mem-of-gps-data-not-mmap.png" alt="image" /></p>
-
-<p>使用NSDataReadingMappedIfSafe参数后内存占用：
-<img src="/images/post/mem-of-gps-data-mmap.png" alt="image" /></p>
-
-<p>由此可见，对于体积很大文件，使用内存映射方式读取将会减少大量内存占用。
-什么是文件内存映射呢</p>
-
-<p>文件内存映射是指把一个文件的内容映射到进程的内存虚拟地址空间中，这个实际上并没有为文件内容分配物理内存。实际上就相当于将内存地址值指向文件的磁盘地址。如果对这些内存进行读写，实际上就是对文件在磁盘上内容进行读写。</p>
 </div>
   
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/10/23/ios-mmap-api/">更多 &rarr;</a>
+    </footer>
   
 
 
@@ -514,67 +478,12 @@ a.delegate = self;
 <p>安装occheck(有些同学反馈command not fond的解决方法):
 occheck是个二进制命令行工具，拷贝到/usr/bin目录下才可以直接在终端中输入使用。</p>
 
-<pre><code>sudo cp /path/to/occheck /usr/bin/occheck
-sudo chmod -R 755 /usr/bin/occheck
-</code></pre>
-
-<p>使用方法：</p>
-
-<pre><code>occheck [-arc] [path] ...
-</code></pre>
-
-<p>[path]是要检查代码所在的目录，可以是你的工程目录。运行之后会自动检查path目录下的所有objc文件。自动检测类的retain成员，如果忘记在dealloc中release相关成员就会输出错误。
-如果你的项目使用ARC，可以不检查内存泄漏，指定”-arc”参数将只检查高危函数。</p>
-
-<p>如：</p>
-
-<pre><code>occheck /Users/brightshen/Documents/elife/trunk/ios/QQGroupon
-</code></pre>
-
-<p>输出：</p>
-
-<pre><code>ERROR: QHTTPCacheManager cacheRootPath 没有在dealloc中release.
-ERROR: CategoryView buttons 没有在dealloc中release.
-ERROR: TodayDealListViewController dealInfosThisRounds 没有在dealloc中release.
-ERROR: TodayDealListViewController dealInfosThisRound 没有在dealloc中release.
-</code></pre>
-
-<p>可以强制指定一个类成员为assign而不是retain
-只需要在变量类型前面加入ASSIGN
-比如：</p>
-
-<pre><code>#define ASSIGN
-@interface QPicker : UIView{
-   NSArray *items;
-   UIPickerView *pickerView;
-   UIToolbar *toolBar;
-   UIView *coverView;
-   ASSIGN id&lt;QPickerDelegate&gt;delegate;
-   id userInfo;
-}
-@end
-</code></pre>
-
-<p>这样就不会把delegate作为一个retain的成员来处理。如果delegate在属性中定义为assign，那么前面的ASSIGN可以不加，会自动检测。</p>
-
-<p>也可以设置一个类是单例的，这样就不会检查dealloc了，只需要在类的名字前面加上SINGLETON</p>
-
-<pre><code>#define SINGLETON
-@interface SINGLETON QQTicketAppDelegate : NSObject &lt;UIApplicationDelegate,UIAlertViewDelegate&gt; {
-    QTTabBarController *tabBarController;
-    UIViewController *movieViewController;
-    UIViewController *cinemaViewController;
-    UIViewController *myViewController;
-    UIViewController *moreViewController;
-    UIWindow *window;
-    UILocalNotification *movieNotification;
-}
-@end
-</code></pre>
-
-<p>项目地址：<a href="https://github.com/shenqiliang/occheck">https://github.com/shenqiliang/occheck</a></p>
 </div>
   
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/10/15/an-objc-static-check-tool-occheck/">更多 &rarr;</a>
+    </footer>
   
 
 
@@ -669,6 +578,35 @@ ERROR: TodayDealListViewController dealInfosThisRound 没有在dealloc中release
       </li>
     
   </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/shenqiliang">@shenqiliang</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'shenqiliang',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
 </section>
 
 

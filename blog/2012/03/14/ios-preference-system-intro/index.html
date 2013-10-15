@@ -28,6 +28,18 @@
   <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
   
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-20391902-4']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
 
 </head>
 
@@ -89,6 +101,9 @@
 
 
 <div class="entry-content"><p>偏好设置（Preference）系统是大部分App的一个重要部分，它给你的App提供了长期保存相关配置数据的功能，即使你的App退出了，数据依然在下次启动是可以获取到。在偏好设置中我们会常常保存控制App特性的变量，而这些变量应该是property list类型的，即它们要么是NSString、NSNumber、NSDate、NSData这些简单类型，要么只是由这些简单类型组成的NSArray或NSDictionary。这些数据的设置和获取都是通过NSUserDefaults这个类来进行的，可以调用standardUserDefaults这个类消息获取App全局静态的NSUserDefaults对象，然后就可以调用这个对象的相关方法访问配置。</p>
+
+<!--more-->
+
 
 <h2>偏好设置的域</h2>
 
@@ -286,6 +301,35 @@
       </li>
     
   </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/shenqiliang">@shenqiliang</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'shenqiliang',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
 </section>
 
 

@@ -29,6 +29,18 @@ AppleScript提供了很多很多强大的功能， &hellip;">
   <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
   
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-20391902-4']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
 
 </head>
 
@@ -398,113 +410,12 @@ id objc_getAssociatedObject(id object, const void *key);
 <p>仔细观察UIAlertView的动画你就会发现：这个动画是由几部分组成，它带一个视图大小抖动的效果。先是由小变大，再由大变小，最后变成本来的大小。但是这个大小的具体参数值和动画的速度恐怕是肉眼所不能看出来的。
 本篇文章会使用一些objc runtime和CAAnimation的一些知识，通过本文你可以了解到如何研究一些objc中内部调用机制和动画基础。</p>
 
-<p>要想知道这些动画的组成，我们就要从比较低层次的API：CALayer的一些调用开始。iOS动画最终都是加到Layer中的，加入Layer就要调用Layer对象这个方法：</p>
-
-<pre><code>- (void)addAnimation:(CAAnimation *)anim forKey:(NSString *)key;
-</code></pre>
-
-<p>所以只要我们知道了anim参数，并把anim动画对象的属性揪出来，就可以知道到底是什么动画了，但是这个方法是系统Framework中的，通常我们是无法能知道anim到底是什么。这时我们就需要用一些objc的一些底层API：Objc Runtime来解决了。</p>
-
-<h2>Objc Runtime</h2>
-
-<p>Objc Runtime是由一组处理Objctive-C动态语言运行时的API函数组成，这些函数都是一些比较底层的C函数。它有很多实用功能比如查看对象的成员，类/对象方法签名等等。这次我们要用的就是其中把对象方法调用替换的API。</p>
-
-<pre><code>void method_exchangeImplementations(Method m1, Method m2) 
-</code></pre>
-
-<p>这个函数的功能就是把类/对象的方法m1和m2进行调换。如果执行了这个函数，那么在App运行过程中所有调用方法m1的指令，最终都会执行成了方法m2。</p>
-
-<h2>方法调换</h2>
-
-<p>有了Objc Rumtime的API，就可以很方便的将调用系统库中方法的代码，执行成我们自己的代码了。所以我们想要知道Layer中加入了什么方法，只要把addAnimation:forKey:这个方法调换成我们自己的方法就行了。下面的这段代码就实现了这个功能。</p>
-
-<pre><code>@implementation CALayer(Hacked)
-
-+ (void)load{
-    method_exchangeImplementations(class_getInstanceMethod([CALayer class], @selector(addAnimation:forKey:)), class_getInstanceMethod([CALayer class], @selector(hackedAddAnimation:forKey:)));
-}
-
-- (void)hackedAddAnimation:(CABasicAnimation *)anim forKey:(NSString *)key{
-    [self hackedAddAnimation:anim forKey:key];
-    if ([anim isKindOfClass:[CABasicAnimation class]]) {
-        if ([anim.keyPath isEqualToString:@"transform"]) {
-            if (anim.fromValue) {
-                CATransform3D fromValue = [anim.fromValue CATransform3DValue];
-                NSLog(@"From:%@",NSStringFromCGAffineTransform(CATransform3DGetAffineTransform(fromValue)));
-            }
-            if (anim.toValue) {
-                CATransform3D toValue = [anim.toValue CATransform3DValue];
-                NSLog(@"To:%@",NSStringFromCGAffineTransform(CATransform3DGetAffineTransform(toValue)));
-            }
-            if (anim.byValue) {
-                CATransform3D byValue = [anim.byValue CATransform3DValue];
-                NSLog(@"By:%@",NSStringFromCGAffineTransform(CATransform3DGetAffineTransform(byValue)));
-            }
-            NSLog(@"Duration:%.2f",anim.duration);
-            NSLog(@"TimingFunction:%@",anim.timingFunction);
-        }
-    }
-}
-
-@end
-</code></pre>
-
-<p>下面来说明一下上面的代码，这段代码是CALayer做了一个Catalog处理。其中initialize是一个类的方法，是进程开始时初始化类时调用，一般只有类有加载这个方法就会第一个调用了。hackedAddAnimation:forKey:是要被调换的代码。在类的初始化方法initialize中（代码中的第5行）实现了CALayer的addAnimation:forKey:和hackedAddAnimation:forKey:方法的调换。在hackedAddAnimation:forKey:中首先直接调用了[self hackedAddAnimation:forKey:]，也许你会问：这不死循环递归了么？其实不是，应为method_exchangeImplementations实现的是调换而不是替换，所以代码中调用addAnimation:forKey:运行时就成了调用hackedAddAnimation:forKey:。而代码中调用hackedAddAnimation:forKey:运行时成了调用addAnimation:forKey:。所以这里虽然写的是hackedAddAnimation:forKey:，实际上会调用系统Framework中的addAnimation:forKey:。这样做的目的是保证虽然我们把系统的方法改变了，我们还是调用系统的一次，以保持系统功能运行是正常的。在hackedAddAnimation:forKey:剩下的代码就只是把anim动画对象的各个属性的值打印出来了。</p>
-
-<p>好了，把上面的这段代码粘贴到你的代码文件中。然后简单的写个UIAlertView弹出动画代码。</p>
-
-<pre><code>UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Title" message:@"Message" delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil];
-[alert show];
-</code></pre>
-
-<p>编译并运行上面这段代码，你就会在控制台中看到下面这些日志：</p>
-
-<pre><code>2013-04-10 19:13:11.795 Test[10952:c07] From:[0.01, 0, 0, 0.01, 0, 0]
-2013-04-10 19:13:11.796 Test[10952:c07] Duration:0.20
-2013-04-10 19:13:11.796 Test[10952:c07] TimingFunction:easeInEaseOut
-2013-04-10 19:13:11.999 Test[10952:c07] From:[1.1, 0, 0, 1.1, 0, 0]
-2013-04-10 19:13:12.000 Test[10952:c07] Duration:0.10
-2013-04-10 19:13:12.000 Test[10952:c07] TimingFunction:easeInEaseOut
-2013-04-10 19:13:12.101 Test[10952:c07] From:[0.9, 0, 0, 0.9, 0, 0]
-2013-04-10 19:13:12.101 Test[10952:c07] Duration:0.10
-2013-04-10 19:13:12.101 Test[10952:c07] TimingFunction:easeInEaseOut
-</code></pre>
-
-<p>查看CGAffineTransformMakeScale函数的头文件你会看到：</p>
-
-<pre><code>/* Return a transform which scales by `(sx, sy)':
-     t' = [ sx 0 0 sy 0 0 ] */
-
-CG_EXTERN CGAffineTransform CGAffineTransformMakeScale(CGFloat sx, CGFloat sy)
-  CG_AVAILABLE_STARTING(__MAC_10_0, __IPHONE_2_0);
-</code></pre>
-
-<p>所以根据日志我们会发现这其实是3个关键帧动画，首先scale(缩放比例)从0.01放大到1.1，历时0.2秒；然后从1.1到0.9，历时0.1秒；那么最后就是从0.9到1.0（正常缩放比例），历时0.1秒。哈哈，那我们就简单的写个关键帧动画对象就可以表示UIAlertView的弹出动画效果了。</p>
-
-<pre><code>CAKeyframeAnimation *popAnimation = [CAKeyframeAnimation animationWithKeyPath:@"transform"];
-popAnimation.duration = 0.4;
-popAnimation.values = @[[NSValue valueWithCATransform3D:CATransform3DMakeScale(0.01f, 0.01f, 1.0f)],
-                        [NSValue valueWithCATransform3D:CATransform3DMakeScale(1.1f, 1.1f, 1.0f)],
-                        [NSValue valueWithCATransform3D:CATransform3DMakeScale(0.9f, 0.9f, 1.0f)],
-                        [NSValue valueWithCATransform3D:CATransform3DIdentity]];
-popAnimation.keyTimes = @[@0.0f, @0.5f, @0.75f, @1.0f];
-popAnimation.timingFunctions = @[[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut],
-                                 [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut],
-                                 [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut]];
-[anAlertAnimationView.layer addAnimation:popAnimation forKey:nil];
-</code></pre>
-
-<p>你可以把popAnimation加入到你想进行动画的任何View中的layer中这样就实现了UIAlertView一样的弹出动画效果。</p>
-
-<h2>结论</h2>
-
-<ol>
-<li>UIAlertView动画其实是由三部分动画组成：缩放比例变化0.01->1.1->0.9->1.0。每次变化的时间函数（控制加速度）都是EaseInEaseOut。</li>
-<li>在研究系统中调用函数的参数是我们可以用method_exchangeImplementations来hack到系统调用中去，但不要忘记调用系统本身的方法。否则容易导致App异常。当然，如果你是研究测试不怕crash，那随便。</li>
-</ol>
-
 </div>
   
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/04/10/uialertview-animation/">更多 &rarr;</a>
+    </footer>
   
 
 
@@ -560,88 +471,12 @@ popAnimation.timingFunctions = @[[CAMediaTimingFunction functionWithName:kCAMedi
 }
 </code></pre>
 
-<h2>使用vImage API进行模糊</h2>
-
-<p>iOS5.0中新增了vImage API可以使用，它属于Accelerate.Framework，所以如果你要使用它要在工程中加入这个Framework。模糊算法使用的是vImageBoxConvolve_ARGB8888这个函数。</p>
-
-<pre><code>- (UIImage *)blurryImage:(UIImage *)image withBlurLevel:(CGFloat)blur {
-    if (blur &lt; 0.f || blur &gt; 1.f) {
-        blur = 0.5f;
-    }
-    int boxSize = (int)(blur * 100);
-    boxSize = boxSize - (boxSize % 2) + 1;
-
-    CGImageRef img = image.CGImage;
-
-    vImage_Buffer inBuffer, outBuffer;
-    vImage_Error error;
-
-    void *pixelBuffer;
-
-    CGDataProviderRef inProvider = CGImageGetDataProvider(img);
-    CFDataRef inBitmapData = CGDataProviderCopyData(inProvider);
-
-    inBuffer.width = CGImageGetWidth(img);
-    inBuffer.height = CGImageGetHeight(img);
-    inBuffer.rowBytes = CGImageGetBytesPerRow(img);
-
-    inBuffer.data = (void*)CFDataGetBytePtr(inBitmapData);
-
-    pixelBuffer = malloc(CGImageGetBytesPerRow(img) * 
-                         CGImageGetHeight(img));
-
-    if(pixelBuffer == NULL)
-        NSLog(@"No pixelbuffer");
-
-    outBuffer.data = pixelBuffer;
-    outBuffer.width = CGImageGetWidth(img);
-    outBuffer.height = CGImageGetHeight(img);
-    outBuffer.rowBytes = CGImageGetBytesPerRow(img);
-
-    error = vImageBoxConvolve_ARGB8888(&amp;inBuffer, 
-                                       &amp;outBuffer, 
-                                       NULL, 
-                                       0, 
-                                       0, 
-                                       boxSize, 
-                                       boxSize, 
-                                       NULL, 
-                                       kvImageEdgeExtend);
-
-
-    if (error) {
-        NSLog(@"error from convolution %ld", error);
-    }
-
-    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-    CGContextRef ctx = CGBitmapContextCreate(
-                                    outBuffer.data,
-                                    outBuffer.width,
-                                    outBuffer.height,
-                                    8,
-                                    outBuffer.rowBytes,
-                                    colorSpace,
-                                    kCGImageAlphaNoneSkipLast);
-    CGImageRef imageRef = CGBitmapContextCreateImage (ctx);
-    UIImage *returnImage = [UIImage imageWithCGImage:imageRef];
-
-    //clean up
-    CGContextRelease(ctx);
-    CGColorSpaceRelease(colorSpace);
-
-    free(pixelBuffer);
-    CFRelease(inBitmapData);
-
-    CGColorSpaceRelease(colorSpace);
-    CGImageRelease(imageRef);
-
-    return returnImage;
-}
-</code></pre>
-
-<p>参考：<a href="http://blog.denivip.ru/index.php/2013/01/blur-effect-in-ios-applications/?lang=en">Blur effect in iOS application</a></p>
 </div>
   
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/04/01/blur-effect-in-ios/">更多 &rarr;</a>
+    </footer>
   
 
 
@@ -683,25 +518,12 @@ NSLog(@"%@",s);
 return YES;
 </code></pre>
 
-<p>我在最后设置的一个断点，看看运行后的情况：</p>
-
-<p><img src="/images/post/xcode-string-show-breakpoint.png" alt="image" /></p>
-
-<p>可以看出左侧的s中显示并不是“深圳”，而是“深圳市 ”，貌似并没有替换掉。但右侧Log输出却是深圳。那么究竟那个是对的呢？</p>
-
-<p>其实在系统中NSString对象主要有两个属性：一个unichar(2个字节)数组, 另一个是长度。如果仅仅是把字符串末位的一些字去掉的话，unichar数组的内容并没有修改，而仅仅修改了长度属性。</p>
-
-<p>我们在看看控制台左侧的显示格式，就会更明白了。</p>
-
-<p><img src="/images/post/xcode-string-show-summary.png" alt="image" /></p>
-
-<p>可以看出实际显示的是unichar*，由于replace后unichar*指针地址并没有改变，变的只是length属性，所以显示也没有变。</p>
-
-<h2>结论</h2>
-
-<p>有时候我们在看字符串的内容时，特别时仅仅进行了尾部替换为空这些操作时，我们不能仅仅看控制台变量的显示，我们要Print Descripton。</p>
 </div>
   
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/01/25/xcode-debug-string-show/">更多 &rarr;</a>
+    </footer>
   
 
 
@@ -742,6 +564,35 @@ return YES;
       </li>
     
   </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/shenqiliang">@shenqiliang</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'shenqiliang',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
 </section>
 
 

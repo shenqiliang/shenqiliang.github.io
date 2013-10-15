@@ -4,7 +4,7 @@
   <title><![CDATA[分类：iOS开发 | Xcode Dev]]></title>
   <link href="http://shenqiliang.github.io/blog/categories/ioskai-fa/atom.xml" rel="self"/>
   <link href="http://shenqiliang.github.io/"/>
-  <updated>2013-10-15T14:05:15+08:00</updated>
+  <updated>2013-10-15T21:35:05+08:00</updated>
   <id>http://shenqiliang.github.io/</id>
   <author>
     <name><![CDATA[谌启亮]]></name>
@@ -68,6 +68,9 @@ UIWindow *anotherWindow = [UIWindow new];
 
 <p>仔细观察UIAlertView的动画你就会发现：这个动画是由几部分组成，它带一个视图大小抖动的效果。先是由小变大，再由大变小，最后变成本来的大小。但是这个大小的具体参数值和动画的速度恐怕是肉眼所不能看出来的。
 本篇文章会使用一些objc runtime和CAAnimation的一些知识，通过本文你可以了解到如何研究一些objc中内部调用机制和动画基础。</p>
+
+<!--more-->
+
 
 <p>要想知道这些动画的组成，我们就要从比较低层次的API：CALayer的一些调用开始。iOS动画最终都是加到Layer中的，加入Layer就要调用Layer对象这个方法：</p>
 
@@ -204,6 +207,9 @@ popAnimation.timingFunctions = @[[CAMediaTimingFunction functionWithName:kCAMedi
 }
 </code></pre>
 
+<!--more-->
+
+
 <h2>使用vImage API进行模糊</h2>
 
 <p>iOS5.0中新增了vImage API可以使用，它属于Accelerate.Framework，所以如果你要使用它要在工程中加入这个Framework。模糊算法使用的是vImageBoxConvolve_ARGB8888这个函数。</p>
@@ -299,6 +305,9 @@ s = [s stringByReplacingOccurrencesOfString:@"市" withString:@""];
 NSLog(@"%@",s);
 return YES;
 </code></pre>
+
+<!--more-->
+
 
 <p>我在最后设置的一个断点，看看运行后的情况：</p>
 
