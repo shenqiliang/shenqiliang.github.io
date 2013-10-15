@@ -135,7 +135,7 @@ tell application "System Events"
     key up shift
     keystroke "e"
     keystroke return
-end tell
+end tell    
 </code></pre>
 
 <p>1-3行脚本用来运行系统自带App“文本编辑器”，第6-8行是将文本编辑器设置为前台App，这样我们的键盘鼠标消息才可以发到“文本编辑器”的进程上去。key down是按下某个按键不放，key up是松开某个按键，keystroke是点按一下某个按键。第10-13行相当与按shift+e，这样在文本编辑器中就输入的大写的“E”，然后14行就是又按了一下“e”，就紧接着输入了一个小写的“e”。15行按了一下回车，那么“文本编辑器”会换行。</p>
@@ -144,15 +144,13 @@ end tell
 
 <p>点击鼠标脚本和按键脚本类似，不同的是用了click at命令。如：</p>
 
-<p>tell application &ldquo;System Events&rdquo;</p>
-
-<pre><code>tell process "xxx"
-    set frontmost to true
+<pre><code>tell application "System Events"
+    tell process "xxx"
+        set frontmost to true
+    end tell
+    click at {100,200}
 end tell
-click at {100,200}
 </code></pre>
-
-<p>end tell</p>
 
 <p>这个脚本运行后就是在屏幕坐标点为{100,200}的地方点击一下鼠标左健。</p>
 
