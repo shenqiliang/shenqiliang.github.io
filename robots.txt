@@ -1,4 +1,4 @@
 User-agent: *
 Disallow: 
 
-Sitemap: http://shenqiliang.github.io/sitemap.xml 
+Sitemap: http://blog.xcodev.com/sitemap.xml 

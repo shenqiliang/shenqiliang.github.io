@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[分类：Unix开发 | Xcode Dev]]></title>
-  <link href="http://shenqiliang.github.io/blog/categories/unixkai-fa/atom.xml" rel="self"/>
-  <link href="http://shenqiliang.github.io/"/>
-  <updated>2013-10-15T22:29:34+08:00</updated>
-  <id>http://shenqiliang.github.io/</id>
+  <link href="http://blog.xcodev.com/blog/categories/unixkai-fa/atom.xml" rel="self"/>
+  <link href="http://blog.xcodev.com/"/>
+  <updated>2013-10-15T22:46:52+08:00</updated>
+  <id>http://blog.xcodev.com/</id>
   <author>
     <name><![CDATA[谌启亮]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Unix系统中设置文件的扩展属性]]></title>
-    <link href="http://shenqiliang.github.io/blog/2013/06/05/extented-file-property-in-unix/"/>
+    <link href="http://blog.xcodev.com/blog/2013/06/05/extented-file-property-in-unix/"/>
     <updated>2013-06-05T10:03:00+08:00</updated>
-    <id>http://shenqiliang.github.io/blog/2013/06/05/extented-file-property-in-unix</id>
+    <id>http://blog.xcodev.com/blog/2013/06/05/extented-file-property-in-unix</id>
     <content type="html"><![CDATA[<p>Unix文件系统中对单个文件提供了很多属性，比如创建时间、文件大小、修改时间等，这些信息都保存在文件系统中的inode节点中，获取这些属性并不需要读取文件，所以获取速度是很快的。在开发过程中常常会使用这些属性，但更多的时候我们需要一个自定义的属性，来保存我们需要的一些值。比如我们给文件定义一个有效期，或者给文件加一个特殊标记等。</p>
 
 <!--more-->

@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[分类：iOS开发 | Xcode Dev]]></title>
-  <link href="http://shenqiliang.github.io/blog/categories/ioskai-fa/atom.xml" rel="self"/>
-  <link href="http://shenqiliang.github.io/"/>
-  <updated>2013-10-15T22:29:34+08:00</updated>
-  <id>http://shenqiliang.github.io/</id>
+  <link href="http://blog.xcodev.com/blog/categories/ioskai-fa/atom.xml" rel="self"/>
+  <link href="http://blog.xcodev.com/"/>
+  <updated>2013-10-15T22:46:52+08:00</updated>
+  <id>http://blog.xcodev.com/</id>
   <author>
     <name><![CDATA[谌启亮]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[iOS5网页视图（UIWebView）中的输入框不能弹出键盘的问题]]></title>
-    <link href="http://shenqiliang.github.io/blog/2013/07/30/no-keyboard-in-webview-of-ios5/"/>
+    <link href="http://blog.xcodev.com/blog/2013/07/30/no-keyboard-in-webview-of-ios5/"/>
     <updated>2013-07-30T10:32:00+08:00</updated>
-    <id>http://shenqiliang.github.io/blog/2013/07/30/no-keyboard-in-webview-of-ios5</id>
+    <id>http://blog.xcodev.com/blog/2013/07/30/no-keyboard-in-webview-of-ios5</id>
     <content type="html"><![CDATA[<p>项目开发时，发现有时候在网页视图中的输入框获得焦点后，却不能弹出键盘。而且全部都是在iOS5的系统中出现了这个问题，iOS6中运行完全是正常的，而且即使是在iOS5中，其他的UITextView和UITextField仍然可以正常地弹出键盘。我仔细了看了一下代码，发现对UIWebView的一些操作和键盘弹出并没有什么关系。我看了一些UIWebView的一些资料，然后发现了这个问题：UIWebView要能弹出键盘，那么它所在的window必须是key window。</p>
 
 <!--more-->
@@ -61,9 +61,9 @@ UIWindow *anotherWindow = [UIWindow new];
   
   <entry>
     <title type="html"><![CDATA[UIAlertView弹出视图动画效果]]></title>
-    <link href="http://shenqiliang.github.io/blog/2013/04/10/uialertview-animation/"/>
+    <link href="http://blog.xcodev.com/blog/2013/04/10/uialertview-animation/"/>
     <updated>2013-04-10T22:01:00+08:00</updated>
-    <id>http://shenqiliang.github.io/blog/2013/04/10/uialertview-animation</id>
+    <id>http://blog.xcodev.com/blog/2013/04/10/uialertview-animation</id>
     <content type="html"><![CDATA[<p>在App设计中为了加强用户体验，我们会常常加入一些友好的动画效果。比如类似UIAlertView弹出的动画效果，由于系统中并没有直接提供类似的动画API，如果我们想要做出一样的效果，那就得深入的研究一下系统中的UIAlertView了。</p>
 
 <p>仔细观察UIAlertView的动画你就会发现：这个动画是由几部分组成，它带一个视图大小抖动的效果。先是由小变大，再由大变小，最后变成本来的大小。但是这个大小的具体参数值和动画的速度恐怕是肉眼所不能看出来的。
@@ -182,9 +182,9 @@ popAnimation.timingFunctions = @[[CAMediaTimingFunction functionWithName:kCAMedi
   
   <entry>
     <title type="html"><![CDATA[iOS中的模糊效果]]></title>
-    <link href="http://shenqiliang.github.io/blog/2013/04/01/blur-effect-in-ios/"/>
+    <link href="http://blog.xcodev.com/blog/2013/04/01/blur-effect-in-ios/"/>
     <updated>2013-04-01T21:58:00+08:00</updated>
-    <id>http://shenqiliang.github.io/blog/2013/04/01/blur-effect-in-ios</id>
+    <id>http://blog.xcodev.com/blog/2013/04/01/blur-effect-in-ios</id>
     <content type="html"><![CDATA[<p>App设计时往往会用到一些模糊效果。iOS目前已提供一些模糊API可以让我们方便是使用。一种是使用Core Image，另一种是使用Accelerate.Framework中的vImage API。</p>
 
 <h2>使用Core Image进行模糊</h2>
@@ -295,9 +295,9 @@ popAnimation.timingFunctions = @[[CAMediaTimingFunction functionWithName:kCAMedi
   
   <entry>
     <title type="html"><![CDATA[Xcode字符串调试时显示问题]]></title>
-    <link href="http://shenqiliang.github.io/blog/2013/01/25/xcode-debug-string-show/"/>
+    <link href="http://blog.xcodev.com/blog/2013/01/25/xcode-debug-string-show/"/>
     <updated>2013-01-25T01:52:00+08:00</updated>
-    <id>http://shenqiliang.github.io/blog/2013/01/25/xcode-debug-string-show</id>
+    <id>http://blog.xcodev.com/blog/2013/01/25/xcode-debug-string-show</id>
     <content type="html"><![CDATA[<p>今天一位同事调试时发现了一个问题：一个字符串在被replace后，调试时并没有被replace。代码如下：</p>
 
 <pre><code>NSString *s = @"深圳市";
@@ -331,9 +331,9 @@ return YES;
   
   <entry>
     <title type="html"><![CDATA[iOS崩溃日志分析]]></title>
-    <link href="http://shenqiliang.github.io/blog/2012/12/07/ios-crash-log-analycis/"/>
+    <link href="http://blog.xcodev.com/blog/2012/12/07/ios-crash-log-analycis/"/>
     <updated>2012-12-07T01:44:00+08:00</updated>
-    <id>http://shenqiliang.github.io/blog/2012/12/07/ios-crash-log-analycis</id>
+    <id>http://blog.xcodev.com/blog/2012/12/07/ios-crash-log-analycis</id>
     <content type="html"><![CDATA[<h2>崩溃日志的产生</h2>
 
 <p>iOS中运行App过程中如果发生程序崩溃，会生成一个崩溃日志文件。这个文件会保存的特定系统目录下，扩展名是crash。当手机连接到iTunes时，会将该文件同步到电脑上。</p>

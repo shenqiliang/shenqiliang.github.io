@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[分类：项目经验 | Xcode Dev]]></title>
-  <link href="http://shenqiliang.github.io/blog/categories/xiang-mu-jing-yan/atom.xml" rel="self"/>
-  <link href="http://shenqiliang.github.io/"/>
-  <updated>2013-10-15T22:29:34+08:00</updated>
-  <id>http://shenqiliang.github.io/</id>
+  <link href="http://blog.xcodev.com/blog/categories/xiang-mu-jing-yan/atom.xml" rel="self"/>
+  <link href="http://blog.xcodev.com/"/>
+  <updated>2013-10-15T22:46:52+08:00</updated>
+  <id>http://blog.xcodev.com/</id>
   <author>
     <name><![CDATA[谌启亮]]></name>
     
@@ -15,27 +15,27 @@
   
   <entry>
     <title type="html"><![CDATA[顺势：91农场]]></title>
-    <link href="http://shenqiliang.github.io/blog/2011/04/28/ios-app-91-farm/"/>
+    <link href="http://blog.xcodev.com/blog/2011/04/28/ios-app-91-farm/"/>
     <updated>2011-04-28T22:30:00+08:00</updated>
-    <id>http://shenqiliang.github.io/blog/2011/04/28/ios-app-91-farm</id>
+    <id>http://blog.xcodev.com/blog/2011/04/28/ios-app-91-farm</id>
     <content type="html"><![CDATA[<p>在开心农场火爆的阶段，公司准备顺势开发一款在iphone上运行的偷菜程序，同时3D版91牧场已经在Android上开发的不错了。我在这个项目中主要负责服务器通讯接口以及其他的一些模块，如好友列表界面、好友搜索界面、好友管理、商店、仓库、留言等模块。</p>
 ]]></content>
   </entry>
   
   <entry>
     <title type="html"><![CDATA[又一个大项目：移动MM（Mobile Market）]]></title>
-    <link href="http://shenqiliang.github.io/blog/2011/04/21/new-project-china-mobile-market/"/>
+    <link href="http://blog.xcodev.com/blog/2011/04/21/new-project-china-mobile-market/"/>
     <updated>2011-04-21T18:12:00+08:00</updated>
-    <id>http://shenqiliang.github.io/blog/2011/04/21/new-project-china-mobile-market</id>
+    <id>http://blog.xcodev.com/blog/2011/04/21/new-project-china-mobile-market</id>
     <content type="html"><![CDATA[<p>完成91拨号后，轻松了一阵子，这时公司和中国移动合作了一个大项目：移动MM（Mobile Market）for iPhone。移动MM是个复杂的项目，在其他平台已经有相关开发应用。由于功能比较多，很多业务也涉及到其他公司，一些功能需要以插件的形式提供，我们要为他们提供托座服务接口。我当时就主要任务就是搞这个，插件一个实现方案就是其他公司提供一个动态库，我们在需要时动态加载他们的功能模块。后来又做了部分客户端变更主题皮肤功能与轮播广告的功能。</p>
 ]]></content>
   </entry>
   
   <entry>
     <title type="html"><![CDATA[小工具：91拨号]]></title>
-    <link href="http://shenqiliang.github.io/blog/2011/04/16/an-utility-91-call/"/>
+    <link href="http://blog.xcodev.com/blog/2011/04/16/an-utility-91-call/"/>
     <updated>2011-04-16T16:07:00+08:00</updated>
-    <id>http://shenqiliang.github.io/blog/2011/04/16/an-utility-91-call</id>
+    <id>http://blog.xcodev.com/blog/2011/04/16/an-utility-91-call</id>
     <content type="html"><![CDATA[<p>91来电秀开发3个月后，主要功能都已经完成，我被指派和另外一个同事L一起开发91拨号。那时L正在做拨号的横屏界面，我就负责开发了91拨号的竖屏界面。</p>
 
 <p>这个软件功能比较简单，就是一个辅助的iPhone拨号程序，主要功能是选择头像拨号，并支持ip拨号，同时提供一个比较好的UI效果。</p>
@@ -44,9 +44,9 @@
   
   <entry>
     <title type="html"><![CDATA[初来乍到，来电秀]]></title>
-    <link href="http://shenqiliang.github.io/blog/2011/04/10/firt-app-at-91-callshow/"/>
+    <link href="http://blog.xcodev.com/blog/2011/04/10/firt-app-at-91-callshow/"/>
     <updated>2011-04-10T16:05:00+08:00</updated>
-    <id>http://shenqiliang.github.io/blog/2011/04/10/firt-app-at-91-callshow</id>
+    <id>http://blog.xcodev.com/blog/2011/04/10/firt-app-at-91-callshow</id>
     <content type="html"><![CDATA[<p>到网龙后，正好赶上来电秀项目的开发。来电秀是基于地址簿的关系网络对好友的手机的头像进行设置，后来又加上了私聊等SNS功能，其基于手机通讯录的SNS概念比我现在做的友趣、以及Kik、米聊、QQ通讯录等软件要早1年多。我后来想想，网龙的这个产品还是非常具有前瞻性的。用户数现在应该不算少，不过不知为何还没有达到火爆程度。可能是公司策略的局限使其只能安装在破解系统上，主要支持通过91手机助手安装，或者是软件功能太复杂，体验不明确。</p>
 
 <p>我主要负责的是这个项目当时的大部分界面以及破解SDK的短信发送功能</p>
@@ -55,9 +55,9 @@
   
   <entry>
     <title type="html"><![CDATA[IBE多功能计算器（IBE Calc）]]></title>
-    <link href="http://shenqiliang.github.io/blog/2011/03/15/ibe-calc/"/>
+    <link href="http://blog.xcodev.com/blog/2011/03/15/ibe-calc/"/>
     <updated>2011-03-15T13:55:00+08:00</updated>
-    <id>http://shenqiliang.github.io/blog/2011/03/15/ibe-calc</id>
+    <id>http://blog.xcodev.com/blog/2011/03/15/ibe-calc</id>
     <content type="html"><![CDATA[<p>这是我在IBE做的最后一个项目。</p>
 
 <p>这个项目是模仿一个当时在手机平台上卖的比较好的程序：HiCalc。基于HiCalc增加部分实用功能。IBE Calc为iPhone用户提供功能强大的表达式计算功能。它包括15个计算功能：</p>
