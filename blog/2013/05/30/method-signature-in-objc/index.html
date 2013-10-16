@@ -30,7 +30,7 @@
   
   <script type="text/javascript">
     var _gaq = _gaq || [];
-    _gaq.push(['_setAccount', 'UA-20391902-4']);
+    _gaq.push(['_setAccount', 'UA-20391902-6']);
     _gaq.push(['_trackPageview']);
 
     (function() {
@@ -122,118 +122,124 @@
 
 <p>消息由消息的名字和参数组成，可以有返回值，用于发送给某个对象。大部分我们写的代码都是向一个对象发送消息。比如：</p>
 
-<p>[receiver message];
-方法
-方法对应一段可执行代码，是implementation的一部分。当我们向某个对象发送消息时，系统会分析我们所发送的消息，动态地调用响应的方法。对应ObjC中的IMP类型。</p>
+<pre><code>[receiver message];
+</code></pre>
 
-<p>Selector
-ObjC中有个SEL类型，这个类型就是Selector的类型。我们可以用@selector操作符来获取一个Selector。Selector可理解为方法的名字，但这并不包含参数和返回值，仅仅是名字。你还需注意，Selector不和任何类关联，你不能说某个Selector属于一个类，它仅仅是名字。</p>
+<h3>方法</h3>
 
-<p>NSMethodSignature类</p>
+<p>方法对应一段可执行代码，是implementation的一部分。当我们向某个对象发送消息时，系统会分析我们所发送的消息，动态地调用响应的方法。对应ObjC中的IMP类型。</p>
+
+<h3>Selector</h3>
+
+<p>ObjC中有个SEL类型，这个类型就是Selector的类型。我们可以用@selector操作符来获取一个Selector。Selector可理解为方法的名字，但这并不包含参数和返回值，仅仅是名字。你还需注意，Selector不和任何类关联，你不能说某个Selector属于一个类，它仅仅是名字。</p>
+
+<h2>NSMethodSignature类</h2>
 
 <p>ObjC中有一个NSMethodSignature类，这个类很好的帮助我们来分析一下ObjC中的方法签名机制，这个类中定义了以下几个方法</p>
 
-<ul>
-<li>(NSUInteger)numberOfArguments;//参数的数量</li>
-<li>(const char *)getArgumentTypeAtIndex:(NSUInteger)idx;//第idx个参数的类型</li>
-<li>(const char *)methodReturnType;//返回值类型</li>
-<li><p>(NSUInteger)methodReturnLength;//返回值长度，单位字节
-从这些定义中我们可以看出，方法签名中会包含方法的参数个数，每个参数的类型，返回值类型，以及返回值占用的空间大小。
-NSObject基类中提供了获取这个对象的方法</p></li>
-<li><p>(NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector
-所以，只要知道一个对象，和一个SEL（selector），那么就可以动态的获取这个方法签名了。</p></li>
-</ul>
+<pre><code>- (NSUInteger)numberOfArguments;//参数的数量
+- (const char *)getArgumentTypeAtIndex:(NSUInteger)idx;//第idx个参数的类型
+- (const char *)methodReturnType;//返回值类型
+- (NSUInteger)methodReturnLength;//返回值长度，单位字节
+</code></pre>
 
+<p>从这些定义中我们可以看出，方法签名中会包含方法的参数个数，每个参数的类型，返回值类型，以及返回值占用的空间大小。
+NSObject基类中提供了获取这个对象的方法</p>
 
-<p>参数类型签名不同导致的一个奇怪现象</p>
+<pre><code>- (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector
+</code></pre>
+
+<p>所以，只要知道一个对象，和一个SEL（selector），那么就可以动态的获取这个方法签名了。</p>
+
+<h2>参数类型签名不同导致的一个奇怪现象</h2>
 
 <p>下面先举个例子，来看看参数类型签名不同导致的一个奇怪现象。
 首先我们定义两个类，两个类是继承关系，但定义了同名的方法，但方法的参数类型不同。（所以它们的方法签名是不同的。）</p>
 
-<p>//基类
+<pre><code>//基类
 @interface ParamBase : NSObject
-&ndash; (void)doSomeThing:(int)i;
-@end</p>
-
-<p>@implementation ParamBase
-&ndash; (void)doSomeThing:(int)i{</p>
-
-<pre><code>NSLog(@"Base doSomeThing called with int: %d",i);
-</code></pre>
-
-<p>}
-@end</p>
-
-<p>//子类
-@interface ParamSub : ParamBase
-&ndash; (void)doSomeThing:(double)d;
-@end</p>
-
-<p>@implementation ParamSub
-&ndash; (void)doSomeThing:(double)d{</p>
-
-<pre><code>NSLog(@"Sub doSomeThing called with double: %f",d);
-</code></pre>
-
-<p>}
+- (void)doSomeThing:(int)i;
 @end
-然后，我们创建个子类对象，然后分别在不同情况下执行doSomeThing，我们都传递相同的参数。</p>
 
-<p>ParamBase <em>a = [ParamSub new];
+@implementation ParamBase
+- (void)doSomeThing:(int)i{
+    NSLog(@"Base doSomeThing called with int: %d",i);
+}
+@end
+
+//子类
+@interface ParamSub : ParamBase
+- (void)doSomeThing:(double)d;
+@end
+
+@implementation ParamSub
+- (void)doSomeThing:(double)d{
+    NSLog(@"Sub doSomeThing called with double: %f",d);
+}
+@end
+</code></pre>
+
+<p>然后，我们创建个子类对象，然后分别在不同情况下执行doSomeThing，我们都传递相同的参数。</p>
+
+<pre><code>ParamBase *a = [ParamSub new];
 [a doSomeThing:1.0];
-[(ParamSub</em>)a doSomeThing:1.0];
-然后运行，你会得到如下结果。</p>
+[(ParamSub*)a doSomeThing:1.0];
+</code></pre>
 
-<p>2013-05-30 14:25:03.242 MethodSignTest[2144:c07] Sub doSomeThing called with double: 0.000000
+<p>然后运行，你会得到如下结果。</p>
+
+<pre><code>2013-05-30 14:25:03.242 MethodSignTest[2144:c07] Sub doSomeThing called with double: 0.000000
 2013-05-30 14:25:03.244 MethodSignTest[2144:c07] Sub doSomeThing called with double: 1.000000
-向一个对象发送了相同的消息，并且参数相同，为什么两次得到的结果不同。明明发送了1，为什么确变成0了。这其实是方法签名在编译阶段时捣鬼。当编译第二行代码时，编译器发现ParamBase对象的doSomeThing方法签名中的第一个参数是int类型，虽然代码了写的是1.0，但编译后就转换整数1了。运行时在子类的doSomeThing把整数1强制以double类型打印出来就是0了。而第3行代码就没有问题。应为编译器已经知道a已强制为ParamSub类型，而ParamSub对象doSomeThing方法签名中的第一个参数是double类型，而不是int类型，所以就没问题了。</p>
+</code></pre>
 
-<p>在ARC（自动引用计数机制）下返回值类型签名不同导致Crash</p>
+<p>向一个对象发送了相同的消息，并且参数相同，为什么两次得到的结果不同。明明发送了1，为什么确变成0了。这其实是方法签名在编译阶段时捣鬼。当编译第二行代码时，编译器发现ParamBase对象的doSomeThing方法签名中的第一个参数是int类型，虽然代码了写的是1.0，但编译后就转换整数1了。运行时在子类的doSomeThing把整数1强制以double类型打印出来就是0了。而第3行代码就没有问题。应为编译器已经知道a已强制为ParamSub类型，而ParamSub对象doSomeThing方法签名中的第一个参数是double类型，而不是int类型，所以就没问题了。</p>
+
+<h2>在ARC（自动引用计数机制）下返回值类型签名不同导致Crash</h2>
 
 <p>我们再定义两个类，两个类还是继承关系，定义了同名的方法，但方法的返回值类型不同。（所以它们的方法签名也是不同的。）</p>
 
-<p>//基类
+<pre><code>//基类
 @interface ReturnBase : NSObject
-&ndash; (id)getSomeThing;
-@end</p>
-
-<p>@implementation ReturnBase
-&ndash; (id)getSomeThing{</p>
-
-<pre><code>NSLog(@"Return Base called");
-return [NSArray new];
-</code></pre>
-
-<p>}
-@end</p>
-
-<p>//子类
-@interface ReturnSub : ReturnBase
-&ndash; (void)getSomeThing;
-@end</p>
-
-<p>@implementation ReturnSub
-&ndash; (void)getSomeThing{</p>
-
-<pre><code>NSLog(@"nothing");
-</code></pre>
-
-<p>}
+- (id)getSomeThing;
 @end
-然后我们执行下面这段代码：</p>
 
-<p>ReturnBase <em>b = [ReturnSub new];
-[(ReturnSub</em>)b getSomeThing];
-[b getSomeThing];
-结果程序在第3行Crash了，Crash类型一般是内存访问（BAD ACCESS）错误。第2行和第3行在ObjC动态绑定的机制下完全是相同的代码啊，为什么第2行没Crash，到第3行就Crash了呢？这是由于ARC和方法签名机制共同作用的结果，ARC下系统会对消息的返回值自动做一些retain或release等操作，而b在运行时ReturnSub类型，getSomeThing是不返回任何对象的。第二行时编译器知道b是ReturnSub类型，所以不会处理返回值了，而在第3行时，编译器认为b是ReturnBase类型，而根据ReturnBase类的方法getSomeThing的签名，是有返回值的，所以第3行编译后会自动对getSomeThing的返回值加一些retain/release等操作，而运行时却是没有返回值的（void类型），那么返回值就是不确定的，对这个不确定的值进行retain/release操作，一般就会导致内存访问（BAD ACCESS）错误。
-也许你会想，我如果把b设为id类型，会怎样。</p>
+@implementation ReturnBase
+- (id)getSomeThing{
+    NSLog(@"Return Base called");
+    return [NSArray new];
+}
+@end
 
-<p>id b = [ReturnSub new];
+//子类
+@interface ReturnSub : ReturnBase
+- (void)getSomeThing;
+@end
+
+@implementation ReturnSub
+- (void)getSomeThing{
+    NSLog(@"nothing");
+}
+@end
+</code></pre>
+
+<p>然后我们执行下面这段代码：</p>
+
+<pre><code>ReturnBase *b = [ReturnSub new];
 [(ReturnSub*)b getSomeThing];
 [b getSomeThing];
-结果是编译不通过，名字为getSomeThing的方法的签名不一致，编译器就不知道有没有返回值了。</p>
+</code></pre>
 
-<p>结论</p>
+<p>结果程序在第3行Crash了，Crash类型一般是内存访问（BAD ACCESS）错误。第2行和第3行在ObjC动态绑定的机制下完全是相同的代码啊，为什么第2行没Crash，到第3行就Crash了呢？这是由于ARC和方法签名机制共同作用的结果，ARC下系统会对消息的返回值自动做一些retain或release等操作，而b在运行时ReturnSub类型，getSomeThing是不返回任何对象的。第二行时编译器知道b是ReturnSub类型，所以不会处理返回值了，而在第3行时，编译器认为b是ReturnBase类型，而根据ReturnBase类的方法getSomeThing的签名，是有返回值的，所以第3行编译后会自动对getSomeThing的返回值加一些retain/release等操作，而运行时却是没有返回值的（void类型），那么返回值就是不确定的，对这个不确定的值进行retain/release操作，一般就会导致内存访问（BAD ACCESS）错误。
+也许你会想，我如果把b设为id类型，会怎样。</p>
+
+<pre><code>id b = [ReturnSub new];
+[(ReturnSub*)b getSomeThing];
+[b getSomeThing];
+</code></pre>
+
+<p>结果是编译不通过，名字为getSomeThing的方法的签名不一致，编译器就不知道有没有返回值了。</p>
+
+<h2>结论</h2>
 
 <p>方法签名在编译时对方法的参数进行一定的转换。
 ARC下会根据方法签名中的返回值进行retain/release等操作
@@ -312,6 +318,10 @@ ARC下会根据方法签名中的返回值进行retain/release等操作
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/10/16/start-using-octopress/">博客搬家到Octopress</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/08/15/auto-key-press-using-appscript/">用AppleScript在Mac系统下实现按键精灵的功能以及在游戏中的运用</a>
       </li>
     
@@ -325,10 +335,6 @@ ARC下会根据方法签名中的返回值进行retain/release等操作
     
       <li class="post">
         <a href="/blog/2013/07/17/cant-scroll-in-tableview/">TableView中嵌套一个ScrollView有时导致ScrollView无法滚动</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/06/12/custom-ui-using-uiappearance/">iOS 5中使用UIAppearance来自定义应用的外观</a>
       </li>
     
   </ul>

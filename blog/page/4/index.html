@@ -9,7 +9,7 @@
   <meta name="author" content="谌启亮">
 
   
-  <meta name="description" content="NSUbiquitousKeyValueStore是iOS5中新增的类，它提供对iCloud进行Key－Value方式的存储。一般用于保存跨设备的用户配置，如阅读软件保存当前用户阅读的位置，如果用户更换其他设备，可以使用户无缝地从上次的位置继续阅读。 &hellip;">
+  <meta name="description" content="在iOS5中新增了一个数字输入控件UIStepper，它可以递进式输入数量。UIStepper继承自UIControl，它主要的事件是UIControlEventValueChanged，每当它的值改变了就会触发这个事件。它的显示效果如下： ">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -30,7 +30,7 @@
   
   <script type="text/javascript">
     var _gaq = _gaq || [];
-    _gaq.push(['_setAccount', 'UA-20391902-4']);
+    _gaq.push(['_setAccount', 'UA-20391902-6']);
     _gaq.push(['_trackPageview']);
 
     (function() {
@@ -75,6 +75,49 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/03/17/new-to-ios5-uistepper/">iOS5新增内容之UIStepper控件详解</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-17T23:56:00+08:00" pubdate data-updated="true">2012-03-17 23:56</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>在iOS5中新增了一个数字输入控件UIStepper，它可以递进式输入数量。UIStepper继承自UIControl，它主要的事件是UIControlEventValueChanged，每当它的值改变了就会触发这个事件。它的显示效果如下：</p>
+
+<p><img src="/images/post/ios5-uistepper.png" alt="image" /></p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/03/17/new-to-ios5-uistepper/">阅读更多 &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -505,51 +548,6 @@ ViewController在响应链中的位于ViewController的view和它的superView之
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/11/09/unix-pipe-and-io-redirect/">iOS中后台运行</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-11-09T23:00:00+08:00" pubdate data-updated="true">2011-11-09 23:00</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>iOS在升级到4.0以后就支持了多任务了。下文将详细介绍一下这个特性。</p>
-
-<h2>1、检查设备是否支持多任务</h2>
-
-<p>Apple出于性能的考虑，并不是所有的iOS设备升级到iOS4以后都支持多任务，比如iPhone 3G。如果你的应用在没有多任务特性时会出问题，为了保持应用的健壮性，你应该对此进行判断并处理。你可以通过调用UIDevice对象的multitaskingSupported属性来获取当前设备是否支持多任务。</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2011/11/09/unix-pipe-and-io-redirect/">阅读更多 &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/5/">&larr; 以往文章</a>
@@ -567,6 +565,10 @@ ViewController在响应链中的位于ViewController的view和它的superView之
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/10/16/start-using-octopress/">博客搬家到Octopress</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/08/15/auto-key-press-using-appscript/">用AppleScript在Mac系统下实现按键精灵的功能以及在游戏中的运用</a>
       </li>
     
@@ -580,10 +582,6 @@ ViewController在响应链中的位于ViewController的view和它的superView之
     
       <li class="post">
         <a href="/blog/2013/07/17/cant-scroll-in-tableview/">TableView中嵌套一个ScrollView有时导致ScrollView无法滚动</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/06/12/custom-ui-using-uiappearance/">iOS 5中使用UIAppearance来自定义应用的外观</a>
       </li>
     
   </ul>

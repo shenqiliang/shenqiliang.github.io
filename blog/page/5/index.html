@@ -9,7 +9,7 @@
   <meta name="author" content="谌启亮">
 
   
-  <meta name="description" content="工作过程中，我们可能会需要将一个命令或程序的输出导出到一个文件，比如“svn diff”，或者将一个命令或程序的输出作为另一个命令或程序的输入，这是我们就需要Unix命令行下的管道和I/O重定位功能。 1、命令行下的管道用于将一个命令或程序的输出作为另一个命令或程序的输入。两个命令用管道符“｜” &hellip;">
+  <meta name="description" content="iOS在升级到4.0以后就支持了多任务了。下文将详细介绍一下这个特性。 1、检查设备是否支持多任务 Apple出于性能的考虑，并不是所有的iOS设备升级到iOS4以后都支持多任务，比如iPhone 3G。如果你的应用在没有多任务特性时会出问题，为了保持应用的健壮性，你应该对此进行判断并处理。 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -30,7 +30,7 @@
   
   <script type="text/javascript">
     var _gaq = _gaq || [];
-    _gaq.push(['_setAccount', 'UA-20391902-4']);
+    _gaq.push(['_setAccount', 'UA-20391902-6']);
     _gaq.push(['_trackPageview']);
 
     (function() {
@@ -75,6 +75,51 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/11/09/unix-pipe-and-io-redirect/">iOS中后台运行</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-11-09T23:00:00+08:00" pubdate data-updated="true">2011-11-09 23:00</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>iOS在升级到4.0以后就支持了多任务了。下文将详细介绍一下这个特性。</p>
+
+<h2>1、检查设备是否支持多任务</h2>
+
+<p>Apple出于性能的考虑，并不是所有的iOS设备升级到iOS4以后都支持多任务，比如iPhone 3G。如果你的应用在没有多任务特性时会出问题，为了保持应用的健壮性，你应该对此进行判断并处理。你可以通过调用UIDevice对象的multitaskingSupported属性来获取当前设备是否支持多任务。</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2011/11/09/unix-pipe-and-io-redirect/">阅读更多 &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -449,42 +494,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/04/05/join-91-at-netdragon/">加入网龙</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-04-05T15:02:00+08:00" pubdate data-updated="true">2011-04-05 15:02</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>2009年2月，我离开了IBE，来到了91手机助手的开发公司－－网龙。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/6/">&larr; 以往文章</a>
@@ -502,6 +511,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/10/16/start-using-octopress/">博客搬家到Octopress</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/08/15/auto-key-press-using-appscript/">用AppleScript在Mac系统下实现按键精灵的功能以及在游戏中的运用</a>
       </li>
     
@@ -515,10 +528,6 @@
     
       <li class="post">
         <a href="/blog/2013/07/17/cant-scroll-in-tableview/">TableView中嵌套一个ScrollView有时导致ScrollView无法滚动</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/06/12/custom-ui-using-uiappearance/">iOS 5中使用UIAppearance来自定义应用的外观</a>
       </li>
     
   </ul>

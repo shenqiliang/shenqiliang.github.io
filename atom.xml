@@ -4,7 +4,7 @@
   <title><![CDATA[Xcode Dev]]></title>
   <link href="http://blog.xcodev.com/atom.xml" rel="self"/>
   <link href="http://blog.xcodev.com/"/>
-  <updated>2013-10-15T23:11:35+08:00</updated>
+  <updated>2013-10-16T23:05:03+08:00</updated>
   <id>http://blog.xcodev.com/</id>
   <author>
     <name><![CDATA[谌启亮]]></name>
@@ -12,6 +12,152 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[博客搬家到Octopress]]></title>
+    <link href="http://blog.xcodev.com/blog/2013/10/16/start-using-octopress/"/>
+    <updated>2013-10-16T22:26:00+08:00</updated>
+    <id>http://blog.xcodev.com/blog/2013/10/16/start-using-octopress</id>
+    <content type="html"><![CDATA[<p>之前一直在用Wordpress博客框架来写博客，一直没换过。但最近发现很多开发朋友都在使用Octopress，据说是一个面向黑客和开发者的博客，所以也跟风用上了Octopress。几经折腾终于把以前Wordpress的内容搬到了Octopress。</p>
+
+<!--more-->
+
+
+<h2>为什么用Octopress？</h2>
+
+<p>Octopress同样也是一个开源的博客框架，它主要面向黑客和开发者。相比Wordpress，它具备以下优点。</p>
+
+<ul>
+<li>界面非常清晰简洁，更加突出内容而非风格。</li>
+<li>它是一个静态的网页框架，运行加载速度更快。</li>
+<li>使用Markdown语法来高效写文章，而无需关注一些杂乱的html格式</li>
+<li>可以免费部署到github page</li>
+<li>博客使用git进行版本控制</li>
+</ul>
+
+
+<p>但Octopress也有一些局限和不足。</p>
+
+<ul>
+<li>安装过程繁琐，比较麻烦</li>
+<li>没有汉化（需要手动汉化）</li>
+<li>评论需要外部支持</li>
+</ul>
+
+
+<p>但这些并不是黑客和开发者的困难，目前有很多社会化评论和分享系统，稍微修改一下代码就可以很不错的支持Octopress。</p>
+
+<h2>在Mac OS X下安装Octopress</h2>
+
+<p>Octopress需要ruby开发环境，需要ruby 1.9.3版本，虽然Mac OS X自带的ruby（10.8带ruby 1.8，1.9自带ruby 2.0），但自带的ruby是给系统使用的，并不适合安装Octopress。所以我们要手动安装ruby 1.9.3版本。这就要我们使用rbenv或rvm来管理ruby的多版本。开始时我尝试使用rvm来管理，安装ruby 1.9.3版时它却自动给我安装macport。而macport安装超慢，我就放弃而采用rbenv。下面来看看我的安装步骤。安装rbenv我使用了brew工具来快速安装。</p>
+
+<h4>1. 安装brew</h4>
+
+<p>下载并安装brew。在终端输入并执行以下命令稍等片刻就好了。</p>
+
+<pre><code>ruby -e "$(curl -fsSL https://raw.github.com/mxcl/homebrew/go)"
+</code></pre>
+
+<h4>2. 安装rbenv</h4>
+
+<p>安装rbenv需要配置一些环境变量，然后使用brew来安装。具体命令如下。</p>
+
+<pre><code>cd
+echo 'export PATH="$HOME/.rbenv/bin:$PATH"' &gt;&gt; ~/.bash_profile
+echo 'eval "$(rbenv init -)"' &gt;&gt; ~/.bash_profile
+source ~/.bash_profile
+brew update
+brew install rbenv
+brew install ruby-build
+</code></pre>
+
+<h4>3. 安装ruby 1.9.3</h4>
+
+<p>接着用rbenv来安装ruby 1.9.3-p125版（这个版本开始支持llvm编译器）。</p>
+
+<pre><code>rbenv install 1.9.3-p125
+rbenv rehash
+</code></pre>
+
+<h4>4. 建立Octopress</h4>
+
+<p>从github上clone下来Octopress。</p>
+
+<pre><code>git clone git://github.com/imathis/octopress.git octopress
+cd octopress
+</code></pre>
+
+<h4>5. 将当前ruby版本设置为1.9.3</h4>
+
+<p>请确保当前目录是octopress目录，然后执行以下命令，将当前ruby版本设置为<code>1.9.3</code>。</p>
+
+<pre><code>rbenv local 1.9.3-p125
+</code></pre>
+
+<p>查看当前本地ruby版本</p>
+
+<pre><code>rbenv local
+</code></pre>
+
+<p>如果显示为<code>1.9.3-p125</code>，那么就是正确的。</p>
+
+<h4>6. 安装依赖软件</h4>
+
+<p>运行以下命令安装必须的gem。</p>
+
+<pre><code>gem install bundler
+rbenv rehash
+bundle install
+</code></pre>
+
+<p>安装Octopress默认主题</p>
+
+<pre><code>rake install
+</code></pre>
+
+<h4>7. 设置Github</h4>
+
+<p>Octopress本身生成的是静态网页，是可以发布到很多网站的，支持自动发布Github Page。首先要在Github上申请一个名为<code>username.github.io</code>的代码仓库（<code>username</code>请替换为你的用户名）。</p>
+
+<p>然后运行以下命令：</p>
+
+<pre><code>rake setup_github_pages
+</code></pre>
+
+<p>输入必要的用户名密码信息就设置完成。</p>
+
+<h4>8. 预览和发布</h4>
+
+<p>你可以在本地生成网页并实时预览，执行以下命令：</p>
+
+<pre><code>rake generate
+rake preview
+</code></pre>
+
+<p>这会打开本地的4000端口，你可以在浏览器打开url: <code>http://localhost:4000/</code>来预览Octopress网站了。</p>
+
+<p>要发布到github上，执行以下命令即可。</p>
+
+<pre><code>rake generate
+rake deploy
+</code></pre>
+
+<p>然后在浏览器中输入<code>http://username.github.io</code>就可以查看你的Octopress了。</p>
+
+<h2>写文章</h2>
+
+<p>执行以下命令可以生成一个简单的文章框架。</p>
+
+<pre><code>rake new_post[your-english-article-name]
+</code></pre>
+
+<p>其中<code>your-english-article-name</code>将会作为文章url地址的一部分，请使用英文单词或拼音连接起来的字符串。这就在source/_posts目录下一个同名的markdown文件，编辑这个文件即可。写完后执行步骤8中的相关命令就可以查看和发布了。</p>
+
+<h2>绑定域名</h2>
+
+<p>在soure文件夹下建立一个名字为<code>CNAME</code>文件，文件的内容是你的域名地址，如<code>www.example.com</code>。然后将你的域名的CNAME指向<code>username.github.io</code>。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[用AppleScript在Mac系统下实现按键精灵的功能以及在游戏中的运用]]></title>
@@ -501,118 +647,124 @@ setxattr(cfilePath, attrBackup, &amp;attrValue, sizeof(attrValue), 0, 0);
 
 <p>消息由消息的名字和参数组成，可以有返回值，用于发送给某个对象。大部分我们写的代码都是向一个对象发送消息。比如：</p>
 
-<p>[receiver message];
-方法
-方法对应一段可执行代码，是implementation的一部分。当我们向某个对象发送消息时，系统会分析我们所发送的消息，动态地调用响应的方法。对应ObjC中的IMP类型。</p>
+<pre><code>[receiver message];
+</code></pre>
 
-<p>Selector
-ObjC中有个SEL类型，这个类型就是Selector的类型。我们可以用@selector操作符来获取一个Selector。Selector可理解为方法的名字，但这并不包含参数和返回值，仅仅是名字。你还需注意，Selector不和任何类关联，你不能说某个Selector属于一个类，它仅仅是名字。</p>
+<h3>方法</h3>
 
-<p>NSMethodSignature类</p>
+<p>方法对应一段可执行代码，是implementation的一部分。当我们向某个对象发送消息时，系统会分析我们所发送的消息，动态地调用响应的方法。对应ObjC中的IMP类型。</p>
+
+<h3>Selector</h3>
+
+<p>ObjC中有个SEL类型，这个类型就是Selector的类型。我们可以用@selector操作符来获取一个Selector。Selector可理解为方法的名字，但这并不包含参数和返回值，仅仅是名字。你还需注意，Selector不和任何类关联，你不能说某个Selector属于一个类，它仅仅是名字。</p>
+
+<h2>NSMethodSignature类</h2>
 
 <p>ObjC中有一个NSMethodSignature类，这个类很好的帮助我们来分析一下ObjC中的方法签名机制，这个类中定义了以下几个方法</p>
 
-<ul>
-<li>(NSUInteger)numberOfArguments;//参数的数量</li>
-<li>(const char *)getArgumentTypeAtIndex:(NSUInteger)idx;//第idx个参数的类型</li>
-<li>(const char *)methodReturnType;//返回值类型</li>
-<li><p>(NSUInteger)methodReturnLength;//返回值长度，单位字节
-从这些定义中我们可以看出，方法签名中会包含方法的参数个数，每个参数的类型，返回值类型，以及返回值占用的空间大小。
-NSObject基类中提供了获取这个对象的方法</p></li>
-<li><p>(NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector
-所以，只要知道一个对象，和一个SEL（selector），那么就可以动态的获取这个方法签名了。</p></li>
-</ul>
+<pre><code>- (NSUInteger)numberOfArguments;//参数的数量
+- (const char *)getArgumentTypeAtIndex:(NSUInteger)idx;//第idx个参数的类型
+- (const char *)methodReturnType;//返回值类型
+- (NSUInteger)methodReturnLength;//返回值长度，单位字节
+</code></pre>
 
+<p>从这些定义中我们可以看出，方法签名中会包含方法的参数个数，每个参数的类型，返回值类型，以及返回值占用的空间大小。
+NSObject基类中提供了获取这个对象的方法</p>
 
-<p>参数类型签名不同导致的一个奇怪现象</p>
+<pre><code>- (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector
+</code></pre>
+
+<p>所以，只要知道一个对象，和一个SEL（selector），那么就可以动态的获取这个方法签名了。</p>
+
+<h2>参数类型签名不同导致的一个奇怪现象</h2>
 
 <p>下面先举个例子，来看看参数类型签名不同导致的一个奇怪现象。
 首先我们定义两个类，两个类是继承关系，但定义了同名的方法，但方法的参数类型不同。（所以它们的方法签名是不同的。）</p>
 
-<p>//基类
+<pre><code>//基类
 @interface ParamBase : NSObject
-&ndash; (void)doSomeThing:(int)i;
-@end</p>
-
-<p>@implementation ParamBase
-&ndash; (void)doSomeThing:(int)i{</p>
-
-<pre><code>NSLog(@"Base doSomeThing called with int: %d",i);
-</code></pre>
-
-<p>}
-@end</p>
-
-<p>//子类
-@interface ParamSub : ParamBase
-&ndash; (void)doSomeThing:(double)d;
-@end</p>
-
-<p>@implementation ParamSub
-&ndash; (void)doSomeThing:(double)d{</p>
-
-<pre><code>NSLog(@"Sub doSomeThing called with double: %f",d);
-</code></pre>
-
-<p>}
+- (void)doSomeThing:(int)i;
 @end
-然后，我们创建个子类对象，然后分别在不同情况下执行doSomeThing，我们都传递相同的参数。</p>
 
-<p>ParamBase <em>a = [ParamSub new];
+@implementation ParamBase
+- (void)doSomeThing:(int)i{
+    NSLog(@"Base doSomeThing called with int: %d",i);
+}
+@end
+
+//子类
+@interface ParamSub : ParamBase
+- (void)doSomeThing:(double)d;
+@end
+
+@implementation ParamSub
+- (void)doSomeThing:(double)d{
+    NSLog(@"Sub doSomeThing called with double: %f",d);
+}
+@end
+</code></pre>
+
+<p>然后，我们创建个子类对象，然后分别在不同情况下执行doSomeThing，我们都传递相同的参数。</p>
+
+<pre><code>ParamBase *a = [ParamSub new];
 [a doSomeThing:1.0];
-[(ParamSub</em>)a doSomeThing:1.0];
-然后运行，你会得到如下结果。</p>
+[(ParamSub*)a doSomeThing:1.0];
+</code></pre>
 
-<p>2013-05-30 14:25:03.242 MethodSignTest[2144:c07] Sub doSomeThing called with double: 0.000000
+<p>然后运行，你会得到如下结果。</p>
+
+<pre><code>2013-05-30 14:25:03.242 MethodSignTest[2144:c07] Sub doSomeThing called with double: 0.000000
 2013-05-30 14:25:03.244 MethodSignTest[2144:c07] Sub doSomeThing called with double: 1.000000
-向一个对象发送了相同的消息，并且参数相同，为什么两次得到的结果不同。明明发送了1，为什么确变成0了。这其实是方法签名在编译阶段时捣鬼。当编译第二行代码时，编译器发现ParamBase对象的doSomeThing方法签名中的第一个参数是int类型，虽然代码了写的是1.0，但编译后就转换整数1了。运行时在子类的doSomeThing把整数1强制以double类型打印出来就是0了。而第3行代码就没有问题。应为编译器已经知道a已强制为ParamSub类型，而ParamSub对象doSomeThing方法签名中的第一个参数是double类型，而不是int类型，所以就没问题了。</p>
+</code></pre>
 
-<p>在ARC（自动引用计数机制）下返回值类型签名不同导致Crash</p>
+<p>向一个对象发送了相同的消息，并且参数相同，为什么两次得到的结果不同。明明发送了1，为什么确变成0了。这其实是方法签名在编译阶段时捣鬼。当编译第二行代码时，编译器发现ParamBase对象的doSomeThing方法签名中的第一个参数是int类型，虽然代码了写的是1.0，但编译后就转换整数1了。运行时在子类的doSomeThing把整数1强制以double类型打印出来就是0了。而第3行代码就没有问题。应为编译器已经知道a已强制为ParamSub类型，而ParamSub对象doSomeThing方法签名中的第一个参数是double类型，而不是int类型，所以就没问题了。</p>
+
+<h2>在ARC（自动引用计数机制）下返回值类型签名不同导致Crash</h2>
 
 <p>我们再定义两个类，两个类还是继承关系，定义了同名的方法，但方法的返回值类型不同。（所以它们的方法签名也是不同的。）</p>
 
-<p>//基类
+<pre><code>//基类
 @interface ReturnBase : NSObject
-&ndash; (id)getSomeThing;
-@end</p>
-
-<p>@implementation ReturnBase
-&ndash; (id)getSomeThing{</p>
-
-<pre><code>NSLog(@"Return Base called");
-return [NSArray new];
-</code></pre>
-
-<p>}
-@end</p>
-
-<p>//子类
-@interface ReturnSub : ReturnBase
-&ndash; (void)getSomeThing;
-@end</p>
-
-<p>@implementation ReturnSub
-&ndash; (void)getSomeThing{</p>
-
-<pre><code>NSLog(@"nothing");
-</code></pre>
-
-<p>}
+- (id)getSomeThing;
 @end
-然后我们执行下面这段代码：</p>
 
-<p>ReturnBase <em>b = [ReturnSub new];
-[(ReturnSub</em>)b getSomeThing];
-[b getSomeThing];
-结果程序在第3行Crash了，Crash类型一般是内存访问（BAD ACCESS）错误。第2行和第3行在ObjC动态绑定的机制下完全是相同的代码啊，为什么第2行没Crash，到第3行就Crash了呢？这是由于ARC和方法签名机制共同作用的结果，ARC下系统会对消息的返回值自动做一些retain或release等操作，而b在运行时ReturnSub类型，getSomeThing是不返回任何对象的。第二行时编译器知道b是ReturnSub类型，所以不会处理返回值了，而在第3行时，编译器认为b是ReturnBase类型，而根据ReturnBase类的方法getSomeThing的签名，是有返回值的，所以第3行编译后会自动对getSomeThing的返回值加一些retain/release等操作，而运行时却是没有返回值的（void类型），那么返回值就是不确定的，对这个不确定的值进行retain/release操作，一般就会导致内存访问（BAD ACCESS）错误。
-也许你会想，我如果把b设为id类型，会怎样。</p>
+@implementation ReturnBase
+- (id)getSomeThing{
+    NSLog(@"Return Base called");
+    return [NSArray new];
+}
+@end
 
-<p>id b = [ReturnSub new];
+//子类
+@interface ReturnSub : ReturnBase
+- (void)getSomeThing;
+@end
+
+@implementation ReturnSub
+- (void)getSomeThing{
+    NSLog(@"nothing");
+}
+@end
+</code></pre>
+
+<p>然后我们执行下面这段代码：</p>
+
+<pre><code>ReturnBase *b = [ReturnSub new];
 [(ReturnSub*)b getSomeThing];
 [b getSomeThing];
-结果是编译不通过，名字为getSomeThing的方法的签名不一致，编译器就不知道有没有返回值了。</p>
+</code></pre>
 
-<p>结论</p>
+<p>结果程序在第3行Crash了，Crash类型一般是内存访问（BAD ACCESS）错误。第2行和第3行在ObjC动态绑定的机制下完全是相同的代码啊，为什么第2行没Crash，到第3行就Crash了呢？这是由于ARC和方法签名机制共同作用的结果，ARC下系统会对消息的返回值自动做一些retain或release等操作，而b在运行时ReturnSub类型，getSomeThing是不返回任何对象的。第二行时编译器知道b是ReturnSub类型，所以不会处理返回值了，而在第3行时，编译器认为b是ReturnBase类型，而根据ReturnBase类的方法getSomeThing的签名，是有返回值的，所以第3行编译后会自动对getSomeThing的返回值加一些retain/release等操作，而运行时却是没有返回值的（void类型），那么返回值就是不确定的，对这个不确定的值进行retain/release操作，一般就会导致内存访问（BAD ACCESS）错误。
+也许你会想，我如果把b设为id类型，会怎样。</p>
+
+<pre><code>id b = [ReturnSub new];
+[(ReturnSub*)b getSomeThing];
+[b getSomeThing];
+</code></pre>
+
+<p>结果是编译不通过，名字为getSomeThing的方法的签名不一致，编译器就不知道有没有返回值了。</p>
+
+<h2>结论</h2>
 
 <p>方法签名在编译时对方法的参数进行一定的转换。
 ARC下会根据方法签名中的返回值进行retain/release等操作
@@ -1265,31 +1417,6 @@ ERROR: TodayDealListViewController dealInfosThisRound 没有在dealloc中release
 </code></pre>
 
 <p>项目地址：<a href="https://github.com/shenqiliang/occheck">https://github.com/shenqiliang/occheck</a></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[解决Xcode中Code sense无效问题]]></title>
-    <link href="http://blog.xcodev.com/blog/2012/04/18/xcode-codesense-no-effect/"/>
-    <updated>2012-04-18T00:45:00+08:00</updated>
-    <id>http://blog.xcodev.com/blog/2012/04/18/xcode-codesense-no-effect</id>
-    <content type="html"><![CDATA[<p>Code sense是Xcode中一项重要功能，它给代码加入高亮色彩，方便我们进行辨识，同时在写代码时自动提示出相关备选项，极大地提高我们的开发效率。</p>
-
-<p>当我们写代码时，Xcode的Code sense会经常失效，严重影响开发。下面这几个步骤可以很轻松的解决这个问题。</p>
-
-<p>首先关闭工程，点击Xcode的菜单“Window”－“Organizer”，在“Organizer”窗口中选择“Projects”标签。在左侧列表中选择你的工程或Workspace，在右侧的Derived Data行中，点击此行右边“Delete…”按钮，弹出提示时选择“Delete”。</p>
-
-<p><img src="http://blog.xcodev.com/images/post/code-sense-step-one.png" alt="image" /></p>
-
-<p>经过这一步，一般再打开你的工程或Workspace，Code sense就有效了。如果仍然无效请继续以下步骤。</p>
-
-<p>关闭Xcode，然后找到工程的目录，再工程文件上点击右键选择“显示包内容”。</p>
-
-<p><img src="http://blog.xcodev.com/images/post/code-sense-step-two.png" alt="image" /></p>
-
-<p>只留下“project.pbxproj”文件，其他全部删除。</p>
-
-<p><img src="http://blog.xcodev.com/images/post/code-sense-step-three.png" alt="image" /></p>
 ]]></content>
   </entry>
   

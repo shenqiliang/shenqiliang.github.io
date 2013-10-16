@@ -9,7 +9,7 @@
   <meta name="author" content="谌启亮">
 
   
-  <meta name="description" content="iOS开始时经常会在键盘显示时调整界面布局，iOS 5中当切换为中文输入法时，键盘高度会增加，同时给iPad的键盘增加了分割功能，使得键盘处理情况更加多样化。键盘的消息通知有： 通知 描述 UIKeyboardWillShowNotification 键盘即将显示 &hellip;">
+  <meta name="description" content="Code sense是Xcode中一项重要功能，它给代码加入高亮色彩，方便我们进行辨识，同时在写代码时自动提示出相关备选项，极大地提高我们的开发效率。 当我们写代码时，Xcode的Code sense会经常失效，严重影响开发。下面这几个步骤可以很轻松的解决这个问题。 首先关闭工程， &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -30,7 +30,7 @@
   
   <script type="text/javascript">
     var _gaq = _gaq || [];
-    _gaq.push(['_setAccount', 'UA-20391902-4']);
+    _gaq.push(['_setAccount', 'UA-20391902-6']);
     _gaq.push(['_trackPageview']);
 
     (function() {
@@ -75,6 +75,58 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/04/18/xcode-codesense-no-effect/">解决Xcode中Code Sense无效问题</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-04-18T00:45:00+08:00" pubdate data-updated="true">2012-04-18 00:45</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Code sense是Xcode中一项重要功能，它给代码加入高亮色彩，方便我们进行辨识，同时在写代码时自动提示出相关备选项，极大地提高我们的开发效率。</p>
+
+<p>当我们写代码时，Xcode的Code sense会经常失效，严重影响开发。下面这几个步骤可以很轻松的解决这个问题。</p>
+
+<p>首先关闭工程，点击Xcode的菜单“Window”－“Organizer”，在“Organizer”窗口中选择“Projects”标签。在左侧列表中选择你的工程或Workspace，在右侧的Derived Data行中，点击此行右边“Delete…”按钮，弹出提示时选择“Delete”。</p>
+
+<p><img src="/images/post/code-sense-step-one.png" alt="image" /></p>
+
+<p>经过这一步，一般再打开你的工程或Workspace，Code sense就有效了。如果仍然无效请继续以下步骤。</p>
+
+<p>关闭Xcode，然后找到工程的目录，再工程文件上点击右键选择“显示包内容”。</p>
+
+<p><img src="/images/post/code-sense-step-two.png" alt="image" /></p>
+
+<p>只留下“project.pbxproj”文件，其他全部删除。</p>
+
+<p><img src="/images/post/code-sense-step-three.png" alt="image" /></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -591,49 +643,6 @@ if (string1==string2) {
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/03/17/new-to-ios5-uistepper/">iOS5新增内容之UIStepper控件详解</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-03-17T23:56:00+08:00" pubdate data-updated="true">2012-03-17 23:56</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>在iOS5中新增了一个数字输入控件UIStepper，它可以递进式输入数量。UIStepper继承自UIControl，它主要的事件是UIControlEventValueChanged，每当它的值改变了就会触发这个事件。它的显示效果如下：</p>
-
-<p><img src="/images/post/ios5-uistepper.png" alt="image" /></p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2012/03/17/new-to-ios5-uistepper/">阅读更多 &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/4/">&larr; 以往文章</a>
@@ -651,6 +660,10 @@ if (string1==string2) {
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/10/16/start-using-octopress/">博客搬家到Octopress</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/08/15/auto-key-press-using-appscript/">用AppleScript在Mac系统下实现按键精灵的功能以及在游戏中的运用</a>
       </li>
     
@@ -664,10 +677,6 @@ if (string1==string2) {
     
       <li class="post">
         <a href="/blog/2013/07/17/cant-scroll-in-tableview/">TableView中嵌套一个ScrollView有时导致ScrollView无法滚动</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/06/12/custom-ui-using-uiappearance/">iOS 5中使用UIAppearance来自定义应用的外观</a>
       </li>
     
   </ul>

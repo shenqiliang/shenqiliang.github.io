@@ -9,7 +9,9 @@
   <meta name="author" content="谌启亮">
 
   
-  <meta name="description" content="崩溃日志的产生 iOS中运行App过程中如果发生程序崩溃，会生成一个崩溃日志文件。这个文件会保存的特定系统目录下，扩展名是crash。当手机连接到iTunes时，会将该文件同步到电脑上。 在Mac系统中这些文件会同步到“~/Library/Logs/CrashReporter/ &hellip;">
+  <meta name="description" content="今天一位同事调试时发现了一个问题：一个字符串在被replace后，调试时并没有被replace。代码如下： NSString *s = @"深圳市";
+s = [s stringByReplacingOccurrencesOfString:@"市" withString:@""];
+NSLog &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -30,7 +32,7 @@
   
   <script type="text/javascript">
     var _gaq = _gaq || [];
-    _gaq.push(['_setAccount', 'UA-20391902-4']);
+    _gaq.push(['_setAccount', 'UA-20391902-6']);
     _gaq.push(['_trackPageview']);
 
     (function() {
@@ -75,6 +77,53 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/01/25/xcode-debug-string-show/">Xcode字符串调试时显示问题</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-01-25T01:52:00+08:00" pubdate data-updated="true">2013-01-25 01:52</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>今天一位同事调试时发现了一个问题：一个字符串在被replace后，调试时并没有被replace。代码如下：</p>
+
+<pre><code>NSString *s = @"深圳市";
+s = [s stringByReplacingOccurrencesOfString:@"市" withString:@""];
+NSLog(@"%@",s);
+return YES;
+</code></pre>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/01/25/xcode-debug-string-show/">阅读更多 &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -490,58 +539,6 @@ occheck是个二进制命令行工具，拷贝到/usr/bin目录下才可以直�
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/04/18/xcode-codesense-no-effect/">解决Xcode中Code Sense无效问题</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-04-18T00:45:00+08:00" pubdate data-updated="true">2012-04-18 00:45</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Code sense是Xcode中一项重要功能，它给代码加入高亮色彩，方便我们进行辨识，同时在写代码时自动提示出相关备选项，极大地提高我们的开发效率。</p>
-
-<p>当我们写代码时，Xcode的Code sense会经常失效，严重影响开发。下面这几个步骤可以很轻松的解决这个问题。</p>
-
-<p>首先关闭工程，点击Xcode的菜单“Window”－“Organizer”，在“Organizer”窗口中选择“Projects”标签。在左侧列表中选择你的工程或Workspace，在右侧的Derived Data行中，点击此行右边“Delete…”按钮，弹出提示时选择“Delete”。</p>
-
-<p><img src="/images/post/code-sense-step-one.png" alt="image" /></p>
-
-<p>经过这一步，一般再打开你的工程或Workspace，Code sense就有效了。如果仍然无效请继续以下步骤。</p>
-
-<p>关闭Xcode，然后找到工程的目录，再工程文件上点击右键选择“显示包内容”。</p>
-
-<p><img src="/images/post/code-sense-step-two.png" alt="image" /></p>
-
-<p>只留下“project.pbxproj”文件，其他全部删除。</p>
-
-<p><img src="/images/post/code-sense-step-three.png" alt="image" /></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/3/">&larr; 以往文章</a>
@@ -559,6 +556,10 @@ occheck是个二进制命令行工具，拷贝到/usr/bin目录下才可以直�
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/10/16/start-using-octopress/">博客搬家到Octopress</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/08/15/auto-key-press-using-appscript/">用AppleScript在Mac系统下实现按键精灵的功能以及在游戏中的运用</a>
       </li>
     
@@ -572,10 +573,6 @@ occheck是个二进制命令行工具，拷贝到/usr/bin目录下才可以直�
     
       <li class="post">
         <a href="/blog/2013/07/17/cant-scroll-in-tableview/">TableView中嵌套一个ScrollView有时导致ScrollView无法滚动</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/06/12/custom-ui-using-uiappearance/">iOS 5中使用UIAppearance来自定义应用的外观</a>
       </li>
     
   </ul>

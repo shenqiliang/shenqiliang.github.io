@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>iOS 5中使用UIAppearance来自定义应用的外观 - Xcode Dev</title>
+  <title>博客搬家到Octopress - Xcode Dev</title>
   <meta name="author" content="谌启亮">
 
   
-  <meta name="description" content="做App时，我们经常需要自定义一些界面展现，来适合我们App的内容，或来使App看起来更漂亮，有时我们不得不写大量的自定义控件来达到这个目的。iOS 5新增了UIAppearance协议，使得自定义风格简单方便了很多，通过UIAppearance协议，我们快速的修改系统内置的控件的外观， &hellip;">
+  <meta name="description" content="之前一直在用Wordpress博客框架来写博客，一直没换过。但最近发现很多开发朋友都在使用Octopress，据说是一个面向黑客和开发者的博客，所以也跟风用上了Octopress。几经折腾终于把以前Wordpress的内容搬到了Octopress。 为什么用Octopress？ &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://blog.xcodev.com/blog/2013/06/12/custom-ui-using-uiappearance">
+  <link rel="canonical" href="http://blog.xcodev.com/blog/2013/10/16/start-using-octopress">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="Xcode Dev" type="application/atom+xml">
@@ -78,7 +78,7 @@
   
   <header>
     
-      <h1 class="entry-title">iOS 5中使用UIAppearance来自定义应用的外观</h1>
+      <h1 class="entry-title">博客搬家到Octopress</h1>
     
     
       <p class="meta">
@@ -94,83 +94,151 @@
   
 
 
-<time datetime="2013-06-12T16:31:00+08:00" pubdate data-updated="true">2013-06-12 16:31</time>
+<time datetime="2013-10-16T22:26:00+08:00" pubdate data-updated="true">2013-10-16 22:26</time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><p>做App时，我们经常需要自定义一些界面展现，来适合我们App的内容，或来使App看起来更漂亮，有时我们不得不写大量的自定义控件来达到这个目的。iOS 5新增了UIAppearance协议，使得自定义风格简单方便了很多，通过UIAppearance协议，我们快速的修改系统内置的控件的外观，也可以自己定义一些可自定义外观的控件。</p>
+<div class="entry-content"><p>之前一直在用Wordpress博客框架来写博客，一直没换过。但最近发现很多开发朋友都在使用Octopress，据说是一个面向黑客和开发者的博客，所以也跟风用上了Octopress。几经折腾终于把以前Wordpress的内容搬到了Octopress。</p>
 
 <!--more-->
 
 
-<h2>系统框架控件的一些自定义方法</h2>
+<h2>为什么用Octopress？</h2>
 
-<h4>自定义导航条背景</h4>
+<p>Octopress同样也是一个开源的博客框架，它主要面向黑客和开发者。相比Wordpress，它具备以下优点。</p>
 
-<pre><code>[[UINavigationBar appearance] setBackgroundImage:[UIImage imageNamed:@"background"] forBarMetrics:UIBarMetricsDefault];
+<ul>
+<li>界面非常清晰简洁，更加突出内容而非风格。</li>
+<li>它是一个静态的网页框架，运行加载速度更快。</li>
+<li>使用Markdown语法来高效写文章，而无需关注一些杂乱的html格式</li>
+<li>可以免费部署到github page</li>
+<li>博客使用git进行版本控制</li>
+</ul>
+
+
+<p>但Octopress也有一些局限和不足。</p>
+
+<ul>
+<li>安装过程繁琐，比较麻烦</li>
+<li>没有汉化（需要手动汉化）</li>
+<li>评论需要外部支持</li>
+</ul>
+
+
+<p>但这些并不是黑客和开发者的困难，目前有很多社会化评论和分享系统，稍微修改一下代码就可以很不错的支持Octopress。</p>
+
+<h2>在Mac OS X下安装Octopress</h2>
+
+<p>Octopress需要ruby开发环境，需要ruby 1.9.3版本，虽然Mac OS X自带的ruby（10.8带ruby 1.8，1.9自带ruby 2.0），但自带的ruby是给系统使用的，并不适合安装Octopress。所以我们要手动安装ruby 1.9.3版本。这就要我们使用rbenv或rvm来管理ruby的多版本。开始时我尝试使用rvm来管理，安装ruby 1.9.3版时它却自动给我安装macport。而macport安装超慢，我就放弃而采用rbenv。下面来看看我的安装步骤。安装rbenv我使用了brew工具来快速安装。</p>
+
+<h4>1. 安装brew</h4>
+
+<p>下载并安装brew。在终端输入并执行以下命令稍等片刻就好了。</p>
+
+<pre><code>ruby -e "$(curl -fsSL https://raw.github.com/mxcl/homebrew/go)"
 </code></pre>
 
-<h4>自定义导航标题文字属性</h4>
+<h4>2. 安装rbenv</h4>
 
-<pre><code>[[UINavigationBar appearance] setTitleTextAttributes:@{UITextAttributeTextColor:[UIColor darkGrayColor],UITextAttributeTextShadowColor:[UIColor clearColor]}];
+<p>安装rbenv需要配置一些环境变量，然后使用brew来安装。具体命令如下。</p>
+
+<pre><code>cd
+echo 'export PATH="$HOME/.rbenv/bin:$PATH"' &gt;&gt; ~/.bash_profile
+echo 'eval "$(rbenv init -)"' &gt;&gt; ~/.bash_profile
+source ~/.bash_profile
+brew update
+brew install rbenv
+brew install ruby-build
 </code></pre>
 
-<p>可自定义标题字体，颜色，阴影。</p>
+<h4>3. 安装ruby 1.9.3</h4>
 
-<h4>自定义导航条返回和左右按钮按钮背景</h4>
+<p>接着用rbenv来安装ruby 1.9.3-p125版（这个版本开始支持llvm编译器）。</p>
 
-<pre><code>[[UIBarButtonItem appearanceWhenContainedIn:[UINavigationBar class], nil] setBackButtonBackgroundImage:[UIImage imageNamed:@"back_button_background"] forState:UIControlStateNormal barMetrics:UIBarMetricsDefault];
-[[UIBarButtonItem appearanceWhenContainedIn:[UINavigationBar class], nil] setBackgroundImage:[UIImage imageNamed:@"button_background"] forState:UIControlStateNormal barMetrics:UIBarMetricsDefault];
+<pre><code>rbenv install 1.9.3-p125
+rbenv rehash
 </code></pre>
 
-<h4>自定义底部Tab条的背景</h4>
+<h4>4. 建立Octopress</h4>
 
-<pre><code>[[UITabBar appearance] setBackgroundImage:[UIImage imageNamed:@"background"]];
+<p>从github上clone下来Octopress。</p>
+
+<pre><code>git clone git://github.com/imathis/octopress.git octopress
+cd octopress
 </code></pre>
 
-<h4>自定义底部条标题文字属性</h4>
+<h4>5. 将当前ruby版本设置为1.9.3</h4>
 
-<pre><code>[[UITabBarItem appearance] setTitleTextAttributes:@{UITextAttributeTextColor:[UIColor grayColor]} forState:UIControlStateNormal];
-[[UITabBarItem appearance] setTitleTextAttributes:@{UITextAttributeTextColor:[UIColor orangeColor]} forState:UIControlStateSelected];
+<p>请确保当前目录是octopress目录，然后执行以下命令，将当前ruby版本设置为<code>1.9.3</code>。</p>
+
+<pre><code>rbenv local 1.9.3-p125
 </code></pre>
 
-<p>这里列举的都是一些最常用的自定义方法，只要是头文件中有“UI_APPEARANCE_SELECTOR”标记的方法都是可以用UIAppearance协议对象去调的。注意这些自定义方法都要在相应的对象显示之前调用，可以放到App启动后立刻配置，以后只要这个对象显示之前，就会设置相应的属性。</p>
+<p>查看当前本地ruby版本</p>
 
-<h2>自己创建一个可自定义外观的控件</h2>
-
-<p>对于我们自己定义的控件，也可以支持UIAppearance协议，这样我们的控件也能支持自定义了。你只需要写一个设置外观的settor，然后在settor方法后面加上“UI_APPEARANCE_SELECTOR”标记就可以，其他什么都不需要做。比如一个可以自定义选择状态背景颜色的TableViewCell。</p>
-
-<pre><code>@interface CustomCell : UITableViewCell
-- (void)setSelectedBackgroundColor:(UIColor*)color UI_APPEARANCE_SELECTOR;
-@end
-
-@implementation CustomCell
-- (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
-{
-    self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
-    if (self) {
-        self.selectedBackgroundView = [UIView new];
-        self.selectedBackgroundView.backgroundColor = [UIColor lightGrayColor];
-    }
-    return self;
-}
-- (void)setSelectedBackgroundColor:(UIColor*)color{
-    self.selectedBackgroundView.backgroundColor = color;
-}
-@end
+<pre><code>rbenv local
 </code></pre>
 
-<p>注意，官方文档中强调Appearance的setter定义格式应为：</p>
+<p>如果显示为<code>1.9.3-p125</code>，那么就是正确的。</p>
 
-<pre><code>- (void)setProperty:(PropertyType)property forAxis1:(IntegerType)axis1 axis2:(IntegerType)axis2 axisN:(IntegerType)axisN;
-- (PropertyType)propertyForAxis1:(IntegerType)axis1 axis2:(IntegerType)axis2 axisN:(IntegerType)axisN;
-UIAppearance实现原理
+<h4>6. 安装依赖软件</h4>
+
+<p>运行以下命令安装必须的gem。</p>
+
+<pre><code>gem install bundler
+rbenv rehash
+bundle install
 </code></pre>
 
-<p>在通过UIAppearance调用“UI_APPEARANCE_SELECTOR”标记的方法来配置外观时，UIAppearance实际上没有进行任何实际调用，而是把这个调用保存起来（在Objc中可以用NSInvocation对象来保存一个调用）。当实际的对象显示之前（添加到窗口上，drawRect:之前），就会对这个对象调用之前保存的调用。当这个setter调用后，你的界面风格自定义就完成了。</p>
+<p>安装Octopress默认主题</p>
+
+<pre><code>rake install
+</code></pre>
+
+<h4>7. 设置Github</h4>
+
+<p>Octopress本身生成的是静态网页，是可以发布到很多网站的，支持自动发布Github Page。首先要在Github上申请一个名为<code>username.github.io</code>的代码仓库（<code>username</code>请替换为你的用户名）。</p>
+
+<p>然后运行以下命令：</p>
+
+<pre><code>rake setup_github_pages
+</code></pre>
+
+<p>输入必要的用户名密码信息就设置完成。</p>
+
+<h4>8. 预览和发布</h4>
+
+<p>你可以在本地生成网页并实时预览，执行以下命令：</p>
+
+<pre><code>rake generate
+rake preview
+</code></pre>
+
+<p>这会打开本地的4000端口，你可以在浏览器打开url: <code>http://localhost:4000/</code>来预览Octopress网站了。</p>
+
+<p>要发布到github上，执行以下命令即可。</p>
+
+<pre><code>rake generate
+rake deploy
+</code></pre>
+
+<p>然后在浏览器中输入<code>http://username.github.io</code>就可以查看你的Octopress了。</p>
+
+<h2>写文章</h2>
+
+<p>执行以下命令可以生成一个简单的文章框架。</p>
+
+<pre><code>rake new_post[your-english-article-name]
+</code></pre>
+
+<p>其中<code>your-english-article-name</code>将会作为文章url地址的一部分，请使用英文单词或拼音连接起来的字符串。这就在source/_posts目录下一个同名的markdown文件，编辑这个文件即可。写完后执行步骤8中的相关命令就可以查看和发布了。</p>
+
+<h2>绑定域名</h2>
+
+<p>在soure文件夹下建立一个名字为<code>CNAME</code>文件，文件的内容是你的域名地址，如<code>www.example.com</code>。然后将你的域名的CNAME指向<code>username.github.io</code>。</p>
 </div>
 
 
@@ -193,7 +261,7 @@ UIAppearance实现原理
   
 
 
-<time datetime="2013-06-12T16:31:00+08:00" pubdate data-updated="true">2013-06-12 16:31</time>
+<time datetime="2013-10-16T22:26:00+08:00" pubdate data-updated="true">2013-10-16 22:26</time>
       
 
 
@@ -220,10 +288,8 @@ UIAppearance实现原理
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2013/06/05/extented-file-property-in-unix/" title="Previous Post: Unix系统中设置文件的扩展属性">&laquo; Unix系统中设置文件的扩展属性</a>
+        <a class="basic-alignment left" href="/blog/2013/08/15/auto-key-press-using-appscript/" title="Previous Post: 用AppleScript在Mac系统下实现按键精灵的功能以及在游戏中的运用">&laquo; 用AppleScript在Mac系统下实现按键精灵的功能以及在游戏中的运用</a>
       
-      
-        <a class="basic-alignment right" href="/blog/2013/07/17/cant-scroll-in-tableview/" title="Next Post: TableView中嵌套一个ScrollView有时导致ScrollView无法滚动">TableView中嵌套一个ScrollView有时导致ScrollView无法滚动 &raquo;</a>
       
     </p>
   </footer>
@@ -304,8 +370,8 @@ UIAppearance实现原理
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://blog.xcodev.com/blog/2013/06/12/custom-ui-using-uiappearance/';
-        var disqus_url = 'http://blog.xcodev.com/blog/2013/06/12/custom-ui-using-uiappearance/';
+        var disqus_identifier = 'http://blog.xcodev.com/blog/2013/10/16/start-using-octopress/';
+        var disqus_url = 'http://blog.xcodev.com/blog/2013/10/16/start-using-octopress/';
         var disqus_script = 'embed.js';
       
     (function () {
