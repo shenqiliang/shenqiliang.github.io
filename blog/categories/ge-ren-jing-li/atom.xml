@@ -4,7 +4,7 @@
   <title><![CDATA[分类：个人经历 | Xcode Dev]]></title>
   <link href="http://blog.xcodev.com/blog/categories/ge-ren-jing-li/atom.xml" rel="self"/>
   <link href="http://blog.xcodev.com/"/>
-  <updated>2013-10-17T12:11:42+08:00</updated>
+  <updated>2013-10-18T17:42:36+08:00</updated>
   <id>http://blog.xcodev.com/</id>
   <author>
     <name><![CDATA[谌启亮]]></name>
@@ -12,6 +12,170 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[博客搬家到Octopress]]></title>
+    <link href="http://blog.xcodev.com/blog/2013/10/16/start-using-octopress/"/>
+    <updated>2013-10-16T22:26:00+08:00</updated>
+    <id>http://blog.xcodev.com/blog/2013/10/16/start-using-octopress</id>
+    <content type="html"><![CDATA[<p>之前一直在用Wordpress博客框架来写博客，一直没换过。但最近发现很多开发朋友都在使用Octopress，据说是一个面向黑客和开发者的博客，所以也跟风用上了Octopress。几经折腾终于把以前Wordpress的内容搬到了Octopress。</p>
+
+<!--more-->
+
+
+<h2>为什么用Octopress？</h2>
+
+<p>Octopress同样也是一个开源的博客框架，它主要面向黑客和开发者。相比Wordpress，它具备以下优点。</p>
+
+<ul>
+<li>界面非常清晰简洁，更加突出内容而非风格。</li>
+<li>它是一个静态的网页框架，运行加载速度更快。</li>
+<li>使用Markdown语法来高效写文章，而无需关注一些杂乱的html格式</li>
+<li>可以免费部署到github page</li>
+<li>博客使用git进行版本控制</li>
+</ul>
+
+
+<p>但Octopress也有一些局限和不足。</p>
+
+<ul>
+<li>安装过程繁琐，比较麻烦</li>
+<li>没有汉化（需要手动汉化）</li>
+<li>评论需要外部支持</li>
+</ul>
+
+
+<p>但这些并不是黑客和开发者的困难，目前有很多社会化评论和分享系统，稍微修改一下代码就可以很不错的支持Octopress。</p>
+
+<h2>在Mac OS X下安装Octopress</h2>
+
+<p>Octopress需要ruby开发环境，需要ruby 1.9.3版本，虽然Mac OS X自带的ruby（10.8带ruby 1.8，1.9自带ruby 2.0），但自带的ruby是给系统使用的，并不适合安装Octopress。所以我们要手动安装ruby 1.9.3版本。这就要我们使用rbenv或rvm来管理ruby的多版本。开始时我尝试使用rvm来管理，安装ruby 1.9.3版时它却自动给我安装macport。而macport安装超慢，我就放弃而采用rbenv。下面来看看我的安装步骤。安装rbenv我使用了brew工具来快速安装。</p>
+
+<h4>1. 安装brew</h4>
+
+<p>下载并安装brew。在终端输入并执行以下命令稍等片刻就好了。</p>
+
+<pre><code>ruby -e "$(curl -fsSL https://raw.github.com/mxcl/homebrew/go)"
+</code></pre>
+
+<h4>2. 安装rbenv</h4>
+
+<p>安装rbenv需要配置一些环境变量，然后使用brew来安装。具体命令如下。</p>
+
+<pre><code>cd
+echo 'export PATH="$HOME/.rbenv/bin:$PATH"' &gt;&gt; ~/.bash_profile
+echo 'eval "$(rbenv init -)"' &gt;&gt; ~/.bash_profile
+source ~/.bash_profile
+brew update
+brew install rbenv
+brew install ruby-build
+</code></pre>
+
+<h4>3. 安装ruby 1.9.3</h4>
+
+<p>接着用rbenv来安装ruby 1.9.3-p125版（这个版本开始支持llvm编译器）。</p>
+
+<pre><code>rbenv install 1.9.3-p125
+rbenv rehash
+</code></pre>
+
+<h4>4. 建立Octopress</h4>
+
+<p>从github上clone下来Octopress。</p>
+
+<pre><code>git clone git://github.com/imathis/octopress.git octopress
+cd octopress
+</code></pre>
+
+<h4>5. 将当前ruby版本设置为1.9.3</h4>
+
+<p>请确保当前目录是octopress目录，然后执行以下命令，将当前ruby版本设置为<code>1.9.3</code>。</p>
+
+<pre><code>rbenv local 1.9.3-p125
+</code></pre>
+
+<p>查看当前本地ruby版本</p>
+
+<pre><code>rbenv local
+</code></pre>
+
+<p>如果显示为<code>1.9.3-p125</code>，那么就是正确的。</p>
+
+<h4>6. 安装依赖软件</h4>
+
+<p>运行以下命令安装必须的gem。</p>
+
+<pre><code>gem install bundler
+rbenv rehash
+bundle install
+</code></pre>
+
+<p>安装Octopress默认主题</p>
+
+<pre><code>rake install
+</code></pre>
+
+<h4>7. 设置Github</h4>
+
+<p>Octopress本身生成的是静态网页，是可以发布到很多网站的，支持自动发布Github Page。首先要在Github上申请一个名为<code>username.github.io</code>的代码仓库（<code>username</code>请替换为你的用户名）。</p>
+
+<p>然后运行以下命令：</p>
+
+<pre><code>rake setup_github_pages
+</code></pre>
+
+<p>输入必要的用户名密码信息就设置完成。</p>
+
+<h4>8. 预览和发布</h4>
+
+<p>你可以在本地生成网页并实时预览，执行以下命令：</p>
+
+<pre><code>rake generate
+rake preview
+</code></pre>
+
+<p>这会打开本地的4000端口，你可以在浏览器打开url: <code>http://localhost:4000/</code>来预览Octopress网站了。</p>
+
+<p>要发布到github上，执行以下命令即可。</p>
+
+<pre><code>rake generate
+rake deploy
+</code></pre>
+
+<p>然后在浏览器中输入<code>http://username.github.io</code>就可以查看你的Octopress了。</p>
+
+<h2>写文章</h2>
+
+<p>执行以下命令可以生成一个简单的文章框架。</p>
+
+<pre><code>rake new_post[your-english-article-name]
+</code></pre>
+
+<p>其中<code>your-english-article-name</code>将会作为文章url地址的一部分，请使用英文单词或拼音连接起来的字符串。这就在source/_posts目录下一个同名的markdown文件，编辑这个文件即可。写完后执行步骤8中的相关命令就可以查看和发布了。</p>
+
+<h2>绑定域名</h2>
+
+<p>在soure文件夹下建立一个名字为<code>CNAME</code>文件，文件的内容是你的域名地址，如<code>www.example.com</code>。然后将你的域名的CNAME指向<code>username.github.io</code>。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[老MacBook升级内存记]]></title>
+    <link href="http://blog.xcodev.com/blog/2012/03/30/old-macbook-upgrade-mem/"/>
+    <updated>2012-03-30T00:31:00+08:00</updated>
+    <id>http://blog.xcodev.com/blog/2012/03/30/old-macbook-upgrade-mem</id>
+    <content type="html"><![CDATA[<p>我的MacBook是2008年末期的一款，当时手头不是很宽裕，但是看到这么顺眼的本本，再加上自己本身搞这一行，忍痛透支信用卡买了一个。它是最后一款铝合金外壳的MacBook了，后来铝合金的都是MacBook Pro了，160G硬盘，Core2 2G，2G内存。2年前感觉硬盘实在太小，换了一个320G的，撑到现在。</p>
+
+<!--more-->
+
+
+<p>现在做iOS开发的时候，发现使用一小会儿就开始狂卡，我心理想这台老MacBook是不是该下岗了。我打开“活动监视器”经过研究发现，总是在可用内存很低时候开始变卡。一般Xcode要占用个几百兆内存，GDB也要占用几百兆，再加上iOS模拟器，2G内存肯定被瓜分的寥寥无几。卡一段时间后，发现内存有些许调整，经分析原来是系统在进行交换分区。交换分区意思就是系统在内存不足时，将部分不太活跃物理内存的内容转移到硬盘，由于硬盘I/O速度比较慢，再加入这台机器的CPU比较慢，交换分区时会非常慢，而导致整台机器卡起。</p>
+
+<p>了解到这些，那么我们就可以增加物理内存来解决这个问题。一般的笔记本内存卡都可以插到MacBook，但频率要对。我的MacBook时之前的内存是DDR3 1066的，我从网上买了2个4G DDR3 1333兼容DDR3 1066的内存卡，内存卡现在很便宜，大概140左右。把MacBook拆了，装入这2个内存卡，开机一看内存成功升级为8G，而且频率也升级1333，虽然官网上说只支持一共4G DDR3 1066，但这个MacBook也是支持一共8G DDR3 1333的内存，苹果的硬件质量果然不错。</p>
+
+<p>升级后，运行了几天，现在丝毫没有卡的现象了。开机后运行一段时间，内存的使用一般都在3－4G之间，开发工具果然相当吃内存啊，2G不卡才怪了。如果你也有遇到性能问题，看看是否是内存不足导致，如果是那你就该考虑升级内存了。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[再见，上海！]]></title>
@@ -37,28 +201,6 @@
     <updated>2011-04-03T21:59:00+08:00</updated>
     <id>http://blog.xcodev.com/blog/2011/04/03/summery-work-at-ibe</id>
     <content type="html"><![CDATA[<p>毕业时，学习不怎么好。寻工作烦恼之际，IBE收留了我，它给了我一个很好起点。虽然据我了解，那时大部分从IBE出来的，都对它有很多的抱怨，工资低啊、克扣工资啊、还加班啊等等。但是它给了很多刚毕业的学生一个很好的起点，可以说已经很幸运了。对于刚毕业的学生来说，最重要的不是赚钱，而是学习技能和知识。如果没有什么技能和知识，又不是什么领导子弟，那又凭什么去拿很高的工资吗。再过几年，对于一个从事IT工作的人来说，毕业时拿的那点工资或许都是浮云了。我在IBE不是为了赚钱，是为了学习。那时钱不多，但消费很低，差不多够花，这就行了。但我所学的知识的价值远远超过了工资，这也是一种收获。</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[简历风波]]></title>
-    <link href="http://blog.xcodev.com/blog/2011/03/02/a-profile-event/"/>
-    <updated>2011-03-02T08:29:00+08:00</updated>
-    <id>http://blog.xcodev.com/blog/2011/03/02/a-profile-event</id>
-    <content type="html"><![CDATA[<p>前几天我把我的简历整理一下。正好看到苹果在招系统工程师，就投了个简历试试。没想到今天苹果公司竟然真的打电话过来了，不过我现在正在创业，并不想放弃，没办法就只能拒绝了。搞得打电话的那个人肯定很郁闷。</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[博客开通第一天]]></title>
-    <link href="http://blog.xcodev.com/blog/2011/03/01/my-first-blog/"/>
-    <updated>2011-03-01T07:48:00+08:00</updated>
-    <id>http://blog.xcodev.com/blog/2011/03/01/my-first-blog</id>
-    <content type="html"><![CDATA[<p>本博客今日起开通！</p>
-
-<p>我做过接近3年的iPhone开发，从已经被人们遗忘的toolchain到今天的iOS4.2。对iOS开发充满的浓厚的兴趣，希望和大家一起分享iOS开发经验，提供开发技术，并讨论移动互联网业界动态。</p>
-
-<p>不积跬步，无以至千里；不积小流，无以成江海。学习永无止境！</p>
 ]]></content>
   </entry>
   

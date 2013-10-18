@@ -4,7 +4,7 @@
   <title><![CDATA[分类：Unix开发 | Xcode Dev]]></title>
   <link href="http://blog.xcodev.com/blog/categories/unixkai-fa/atom.xml" rel="self"/>
   <link href="http://blog.xcodev.com/"/>
-  <updated>2013-10-17T12:11:42+08:00</updated>
+  <updated>2013-10-18T17:42:36+08:00</updated>
   <id>http://blog.xcodev.com/</id>
   <author>
     <name><![CDATA[谌启亮]]></name>
@@ -89,6 +89,41 @@ setxattr(cfilePath, attrBackup, &amp;attrValue, sizeof(attrValue), 0, 0);
 </code></pre>
 
 <p>把“com.apple.MobileBackup”的值设置为1后，iCloud就不再去备份这个文件了。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Unix命令行下的管道和I/O重定位]]></title>
+    <link href="http://blog.xcodev.com/blog/2011/11/06/unix-pipe-and-io-redirect/"/>
+    <updated>2011-11-06T22:57:00+08:00</updated>
+    <id>http://blog.xcodev.com/blog/2011/11/06/unix-pipe-and-io-redirect</id>
+    <content type="html"><![CDATA[<p>工作过程中，我们可能会需要将一个命令或程序的输出导出到一个文件，比如“svn diff”，或者将一个命令或程序的输出作为另一个命令或程序的输入，这是我们就需要Unix命令行下的管道和I/O重定位功能。</p>
+
+<p>1、命令行下的管道用于将一个命令或程序的输出作为另一个命令或程序的输入。两个命令用管道符“｜”隔开。比如：我们可能会用到在某个目录下查找名称中包含某个字段的文件或目录，这时就可以用管道：</p>
+
+<pre><code>ls -l | grep test
+</code></pre>
+
+<p>此命令会列出当前目录下所有名称中包含“test”的文件和目录。它由两个命令组成“ls -l”和“grep test”。“ls -l”会列出当前目录的所有文件并输出，而“grep test”会分析输入中包含“test”的行并显示。因此如果将“ls -l”的输出用于“grep test”的输入就会显示当前目录下所有名称中包含“test”的文件和目录。</p>
+
+<!--more-->
+
+
+<p>2、I/O的重定位</p>
+
+<p>我们可以在命令行下直接将一个程序标准输入或输出重新定位到一个文件或设备中。“&lt;”号用于将命令或程序的标准输入重定位到某个文件，“>”用于将命令或程序的标准输出重定位到某个文件。比如</p>
+
+<pre><code>cat &gt; test.txt
+</code></pre>
+
+<p>此命令会读取用户输入，并保存到“test.txt”文件中。输入此命令后，会进入用户输入状态，输入一些字符后按Control+D和Control+C结束输入，输入的内容将保存到“test.txt”文件中。</p>
+
+<p>又比如：</p>
+
+<pre><code>cat &lt; test.txt &gt; test2.txt
+</code></pre>
+
+<p>此命令将cat命令的标准输入重定位到“test.txt”文件，而标准输出重定位到“test2.txt”文件。这行命令的作用就是把“test.txt”文件拷贝为“test2.txt”文件。</p>
 ]]></content>
   </entry>
   

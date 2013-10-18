@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[分类：iOS开发 | Xcode Dev]]></title>
-  <link href="http://blog.xcodev.com/blog/categories/ioskai-fa/atom.xml" rel="self"/>
+  <title><![CDATA[分类：Mac开发 | Xcode Dev]]></title>
+  <link href="http://blog.xcodev.com/blog/categories/mackai-fa/atom.xml" rel="self"/>
   <link href="http://blog.xcodev.com/"/>
   <updated>2013-10-18T17:42:36+08:00</updated>
   <id>http://blog.xcodev.com/</id>
@@ -101,174 +101,6 @@ SYNTHESIZE_CATEGORY_OBJ_PROPERTY(userInfo, setUserInfo:)
 SYNTHESIZE_CATEGORY_VALUE_PROPERTY(CGRect, customArea, setCustomArea:)
 @end
 </code></pre>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[iOS5网页视图（UIWebView）中的输入框不能弹出键盘的问题]]></title>
-    <link href="http://blog.xcodev.com/blog/2013/07/30/no-keyboard-in-webview-of-ios5/"/>
-    <updated>2013-07-30T10:32:00+08:00</updated>
-    <id>http://blog.xcodev.com/blog/2013/07/30/no-keyboard-in-webview-of-ios5</id>
-    <content type="html"><![CDATA[<p>项目开发时，发现有时候在网页视图中的输入框获得焦点后，却不能弹出键盘。而且全部都是在iOS5的系统中出现了这个问题，iOS6中运行完全是正常的，而且即使是在iOS5中，其他的UITextView和UITextField仍然可以正常地弹出键盘。我仔细了看了一下代码，发现对UIWebView的一些操作和键盘弹出并没有什么关系。我看了一些UIWebView的一些资料，然后发现了这个问题：UIWebView要能弹出键盘，那么它所在的window必须是key window。</p>
-
-<!--more-->
-
-
-<h2>什么是key window？</h2>
-
-<p>key window就是接收键盘消息的window。键盘消息都会发送到key window上。而这个key window往往是系统自动设置的，但web view获得焦点并没有自动设置（也许是Apple开发偷了个懒），然而我们也可以用一个方法手动设置。</p>
-
-<pre><code>[window makeKeyAndVisiable]
-</code></pre>
-
-<h2>一个演示例子</h2>
-
-<p>为了验证这个问题我也写了一段简短的代码：</p>
-
-<pre><code>UIWebView *webView = [[UIWebView alloc] initWithFrame:self.window.bounds];
-[webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"http://www.google.com"]]];
-[self.window addSubview:webView];
-
-UIWindow *anotherWindow = [UIWindow new];
-[anotherWindow makeKeyAndVisible];
-</code></pre>
-
-<p>这段代码在iOS5中运行的话，即使输入框获得了焦点也不能弹出键盘。
-<img src="/images/post/no-keyboard-in-webview.jpg" alt="image" /></p>
-
-<h2>解决方案</h2>
-
-<p>如果在UIWebView被添加的window上时，将window设置为key window就好了。</p>
-
-<pre><code>[self.window makeKeyAndVisiable]
-[self.window addSubview:webView];
-</code></pre>
-
-<h2>小结</h2>
-
-<p>UIWebView要能弹出键盘，那么它所在的window必须是key window。如果你的App可能存在多个Window（如弹出自定义的Alert，状态条等），而且这些window有可能被设置为key window，一定要在web view显示时将它所在的window设置为key window。</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[TableView中嵌套一个ScrollView有时导致ScrollView无法滚动]]></title>
-    <link href="http://blog.xcodev.com/blog/2013/07/17/cant-scroll-in-tableview/"/>
-    <updated>2013-07-17T15:34:00+08:00</updated>
-    <id>http://blog.xcodev.com/blog/2013/07/17/cant-scroll-in-tableview</id>
-    <content type="html"><![CDATA[<h2>TableView中嵌套ScrollView导致ScrollView无法滚动</h2>
-
-<p>开发时，经常会在一个TableView中嵌套一个横向滚动ScrollView，当ScrollView进行滑动时，TableView中展示的信息也会需要相应的改变，那么有时就需要重新载入TableView的数据（reloadData）。这时当ScrollView连续滚动多次，经常会出现ScrollView滚动不了。在控制台上同时会出现以下日志信息：</p>
-
-<pre><code>Ignoring call to [UIPanGestureRecognizer setTranslation:inView:] since gesture recognizer is not active.
-</code></pre>
-
-<!--more-->
-
-
-<p>在QQ电影票新版开发过程中就遇到了这个问题。</p>
-
-<p><img src="/images/post/scrollView_in_tableView.jpg" alt="image" /></p>
-
-<p>中间显示电影列表的是一个ScrollView。滑动过程中，如果中间箭头所指向的电影发生变化，整个界面信息就会刷新，调用TableView的reloadData。经过几次连续不间断的滑动电影列表后，就会导致ScrollView卡住，然后控制台就会出现“Ignoring call to [UIPanGestureRecognizer setTranslation:inView:] since gesture recognizer is not active.”的错误日志。</p>
-
-<h2>原因分析</h2>
-
-<p>开始时我以为是我自定义的ScrollView控件有问题，尝试各种屏蔽代码的方法，结果只有屏蔽的delegate的方法才不会出现问题，应该是delegate中的某些调用出现了问题。我仔细的检查了一下delegate方法，发现和TableView有关的一句代码：</p>
-
-<pre><code>[self.tableView reloadData];
-</code></pre>
-
-<p>当我把reloadData注释调时，发现滑动起来很流畅，也没有出现这个问题了。可以断定时滑动过程中reloadData导致。结合错误日志，所以应该是滑动时同时reloadData，导致ScrollView的滑动手势失效。</p>
-
-<h2>解决办法</h2>
-
-<p>因为是在ScrollView的delegate消息中去调tableView的reloadData，可能在ScrollView的delegate消息处理完成之后，系统还会做一些其他的处理，这是你突然reloadData会导致ScrollView移出superView，然后导致滑动手势失效，所以我尝试异步调用一下TableView的reloadData：</p>
-
-<pre><code>dispatch_async(dispatch_get_main_queue(), ^{
-     [self.tableView reloadData];
-});
-</code></pre>
-
-<p>结果果然没有问题了。其实我觉得更好的做法是直接将delegate消息调用写成异步调用会更好一些。</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[iOS 5中使用UIAppearance来自定义应用的外观]]></title>
-    <link href="http://blog.xcodev.com/blog/2013/06/12/custom-ui-using-uiappearance/"/>
-    <updated>2013-06-12T16:31:00+08:00</updated>
-    <id>http://blog.xcodev.com/blog/2013/06/12/custom-ui-using-uiappearance</id>
-    <content type="html"><![CDATA[<p>做App时，我们经常需要自定义一些界面展现，来适合我们App的内容，或来使App看起来更漂亮，有时我们不得不写大量的自定义控件来达到这个目的。iOS 5新增了UIAppearance协议，使得自定义风格简单方便了很多，通过UIAppearance协议，我们快速的修改系统内置的控件的外观，也可以自己定义一些可自定义外观的控件。</p>
-
-<!--more-->
-
-
-<h2>系统框架控件的一些自定义方法</h2>
-
-<h4>自定义导航条背景</h4>
-
-<pre><code>[[UINavigationBar appearance] setBackgroundImage:[UIImage imageNamed:@"background"] forBarMetrics:UIBarMetricsDefault];
-</code></pre>
-
-<h4>自定义导航标题文字属性</h4>
-
-<pre><code>[[UINavigationBar appearance] setTitleTextAttributes:@{UITextAttributeTextColor:[UIColor darkGrayColor],UITextAttributeTextShadowColor:[UIColor clearColor]}];
-</code></pre>
-
-<p>可自定义标题字体，颜色，阴影。</p>
-
-<h4>自定义导航条返回和左右按钮按钮背景</h4>
-
-<pre><code>[[UIBarButtonItem appearanceWhenContainedIn:[UINavigationBar class], nil] setBackButtonBackgroundImage:[UIImage imageNamed:@"back_button_background"] forState:UIControlStateNormal barMetrics:UIBarMetricsDefault];
-[[UIBarButtonItem appearanceWhenContainedIn:[UINavigationBar class], nil] setBackgroundImage:[UIImage imageNamed:@"button_background"] forState:UIControlStateNormal barMetrics:UIBarMetricsDefault];
-</code></pre>
-
-<h4>自定义底部Tab条的背景</h4>
-
-<pre><code>[[UITabBar appearance] setBackgroundImage:[UIImage imageNamed:@"background"]];
-</code></pre>
-
-<h4>自定义底部条标题文字属性</h4>
-
-<pre><code>[[UITabBarItem appearance] setTitleTextAttributes:@{UITextAttributeTextColor:[UIColor grayColor]} forState:UIControlStateNormal];
-[[UITabBarItem appearance] setTitleTextAttributes:@{UITextAttributeTextColor:[UIColor orangeColor]} forState:UIControlStateSelected];
-</code></pre>
-
-<p>这里列举的都是一些最常用的自定义方法，只要是头文件中有“UI_APPEARANCE_SELECTOR”标记的方法都是可以用UIAppearance协议对象去调的。注意这些自定义方法都要在相应的对象显示之前调用，可以放到App启动后立刻配置，以后只要这个对象显示之前，就会设置相应的属性。</p>
-
-<h2>自己创建一个可自定义外观的控件</h2>
-
-<p>对于我们自己定义的控件，也可以支持UIAppearance协议，这样我们的控件也能支持自定义了。你只需要写一个设置外观的settor，然后在settor方法后面加上“UI_APPEARANCE_SELECTOR”标记就可以，其他什么都不需要做。比如一个可以自定义选择状态背景颜色的TableViewCell。</p>
-
-<pre><code>@interface CustomCell : UITableViewCell
-- (void)setSelectedBackgroundColor:(UIColor*)color UI_APPEARANCE_SELECTOR;
-@end
-
-@implementation CustomCell
-- (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
-{
-    self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
-    if (self) {
-        self.selectedBackgroundView = [UIView new];
-        self.selectedBackgroundView.backgroundColor = [UIColor lightGrayColor];
-    }
-    return self;
-}
-- (void)setSelectedBackgroundColor:(UIColor*)color{
-    self.selectedBackgroundView.backgroundColor = color;
-}
-@end
-</code></pre>
-
-<p>注意，官方文档中强调Appearance的setter定义格式应为：</p>
-
-<pre><code>- (void)setProperty:(PropertyType)property forAxis1:(IntegerType)axis1 axis2:(IntegerType)axis2 axisN:(IntegerType)axisN;
-- (PropertyType)propertyForAxis1:(IntegerType)axis1 axis2:(IntegerType)axis2 axisN:(IntegerType)axisN;
-</code></pre>
-
-<h2>UIAppearance实现原理</h2>
-
-<p>在通过UIAppearance调用“UI_APPEARANCE_SELECTOR”标记的方法来配置外观时，UIAppearance实际上没有进行任何实际调用，而是把这个调用保存起来（在Objc中可以用NSInvocation对象来保存一个调用）。当实际的对象显示之前（添加到窗口上，drawRect:之前），就会对这个对象调用之前保存的调用。当这个setter调用后，你的界面风格自定义就完成了。</p>
 ]]></content>
   </entry>
   
@@ -421,6 +253,108 @@ NSObject基类中提供了获取这个对象的方法</p>
 ARC下会根据方法签名中的返回值进行retain/release等操作
 最好不要写方法名字相同，当方法签名不同的方法，以免出现怪异现象。
 有时我们改变了一个基类的参数类型或返回值类型，不要忘记了在子类中进行相应的修改。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[解决Xcode中Code sense无效问题]]></title>
+    <link href="http://blog.xcodev.com/blog/2012/04/18/xcode-codesense-no-effect/"/>
+    <updated>2012-04-18T00:45:00+08:00</updated>
+    <id>http://blog.xcodev.com/blog/2012/04/18/xcode-codesense-no-effect</id>
+    <content type="html"><![CDATA[<p>Code sense是Xcode中一项重要功能，它给代码加入高亮色彩，方便我们进行辨识，同时在写代码时自动提示出相关备选项，极大地提高我们的开发效率。</p>
+
+<p>当我们写代码时，Xcode的Code sense会经常失效，严重影响开发。下面这几个步骤可以很轻松的解决这个问题。</p>
+
+<p>首先关闭工程，点击Xcode的菜单“Window”－“Organizer”，在“Organizer”窗口中选择“Projects”标签。在左侧列表中选择你的工程或Workspace，在右侧的Derived Data行中，点击此行右边“Delete…”按钮，弹出提示时选择“Delete”。</p>
+
+<p><img src="/images/post/code-sense-step-one.png" alt="image" /></p>
+
+<p>经过这一步，一般再打开你的工程或Workspace，Code sense就有效了。如果仍然无效请继续以下步骤。</p>
+
+<p>关闭Xcode，然后找到工程的目录，再工程文件上点击右键选择“显示包内容”。</p>
+
+<p><img src="/images/post/code-sense-step-two.png" alt="image" /></p>
+
+<p>只留下“project.pbxproj”文件，其他全部删除。</p>
+
+<p><img src="/images/post/code-sense-step-three.png" alt="image" /></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[深入理解Objective-C中字符串常量]]></title>
+    <link href="http://blog.xcodev.com/blog/2012/03/27/deep-in-objc-string/"/>
+    <updated>2012-03-27T19:23:00+08:00</updated>
+    <id>http://blog.xcodev.com/blog/2012/03/27/deep-in-objc-string</id>
+    <content type="html"><![CDATA[<p>在Objective-C中我们常常会用到常量字符串，常量字符串和一般的字符串还是有一定区别，本文将介绍一些常量字符串的特性，加强你的常量字符串的认识。请看下面一段代码。</p>
+
+<pre><code>NSString *string1 = @"Hello";
+NSString *string2 = @"Hello";
+if (string1==string2) {
+    NSLog(@"They are same address");
+}
+</code></pre>
+
+<!--more-->
+
+
+<p>你将会得到string1和string2的地址值竟然是相等的，这是编译器优化的结果。由于常量会占用一块特殊的代码段，加载到内存时会映射到一块常量存储区，以加快访问速度，编译器在编译时发现string1和string2的内容是相同常量字符串，会把它们都指向一个相同的区域，而不是再开辟出一块额外的空间。因此它们是相同的地址值。</p>
+
+<p>再看看这段代码：</p>
+
+<pre><code>NSString *string1 = @"Hello";
+NSString *string2 = [NSString alloc];
+NSString *string3 = [string2 initWithString:string1];
+if (string2!=string3) {
+    NSLog(@"string2 are not same to string3!");
+}
+if (string1==string3) {
+    NSLog(@"string1 are same to string3!");
+}
+</code></pre>
+
+<p>首先申明这不是一段合法的代码，因为在第2行alloc之后没有立即init，虽然这种做法是非常不推荐的，但这次为了更加清晰地说明问题，不得已而为之。我们首先将看到string2和string3的地址值竟然不相等？而string1和string3竟然相等？这说明如果你使用一个常量字符串来初始化另一个字符串，另一个字符串会直接通过地址赋值为常量字符串，alloc的内存也会立即释放。
+再看看下面这段代码：</p>
+
+<pre><code>NSString *string1 = [[NSString alloc] initWithString:@"Hello"];
+[string1 release];
+[string1 release];
+[string1 release];
+NSLog(@"%@",string1);
+</code></pre>
+
+<p>string1经过多次release竟然还能继续访问？由此说明常量字符串不会release。</p>
+
+<p>综上所述，常量字符串由以下特性：</p>
+
+<ul>
+<li>由于编译器的优化，相同内容常量的地址值是完全相同的。</li>
+<li>如果使用常量字符串来初始化一个字符串，那么这个字符串也将是相同的常量。</li>
+<li>常量字符串永远不会release。</li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Objective-C中消息（Message）和方法（Method）的区别]]></title>
+    <link href="http://blog.xcodev.com/blog/2012/03/22/difference-between-message-and-method/"/>
+    <updated>2012-03-22T00:19:00+08:00</updated>
+    <id>http://blog.xcodev.com/blog/2012/03/22/difference-between-message-and-method</id>
+    <content type="html"><![CDATA[<p>如何描述这段代码：</p>
+
+<pre><code>[window makeKeyAndVisible]
+</code></pre>
+
+<p>你可能想到以下答案：</p>
+
+<ol>
+<li>window调用了makeKeyAndVisible方法</li>
+<li>向window发送makeKeyAndVisible消息</li>
+</ol>
+
+
+<p>不得不说，第2种才是正确的描述。我们可以说UIWindow对象实现了makeKeyAndVisible方法，但调用什么方法是在运行时确定的，所以这里只能说明的是，向window对象发送makeKeyAndVisible消息，会导致在运行时调用window对象的makeKeyAndVisible方法。</p>
 ]]></content>
   </entry>
   
