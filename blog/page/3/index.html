@@ -9,7 +9,7 @@
   <meta name="author" content="谌启亮">
 
   
-  <meta name="description" content="Code sense是Xcode中一项重要功能，它给代码加入高亮色彩，方便我们进行辨识，同时在写代码时自动提示出相关备选项，极大地提高我们的开发效率。 当我们写代码时，Xcode的Code sense会经常失效，严重影响开发。下面这几个步骤可以很轻松的解决这个问题。 首先关闭工程， &hellip;">
+  <meta name="description" content="在ObjC的MRC（手动引用计数）内存管理时, 使用引用计数来维护内存的回收，引用计数的错误常常导致内存泄漏。有一个很常见的错误就是一个retain的属性或成员没有在dealloc中释放。而这种错误用静态代码分析工具检测不出来。当代码写的很多时，一个类一个类的检查很麻烦，而且容易疏露。 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -75,6 +75,50 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/10/15/an-objc-static-check-tool-occheck/">一个用于Objective-C静态检查的工具－occheck</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-10-15T01:01:00+08:00" pubdate data-updated="true">2012-10-15 01:01</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>在ObjC的MRC（手动引用计数）内存管理时, 使用引用计数来维护内存的回收，引用计数的错误常常导致内存泄漏。有一个很常见的错误就是一个retain的属性或成员没有在dealloc中释放。而这种错误用静态代码分析工具检测不出来。当代码写的很多时，一个类一个类的检查很麻烦，而且容易疏露。我写了一个自动检查这种错误的小工具（occheck）。另外这个工具还能检查代码中的高危函数。</p>
+
+<p>安装occheck(有些同学反馈command not fond的解决方法):
+occheck是个二进制命令行工具，拷贝到/usr/bin目录下才可以直接在终端中输入使用。</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/10/15/an-objc-static-check-tool-occheck/">阅读更多 &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -594,55 +638,6 @@ if (string1==string2) {
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/03/19/new-to-ios5-uialertview-password/">iOS5新增内容之支持文本输入的UIAlertView</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-03-19T12:03:00+08:00" pubdate data-updated="true">2012-03-19 12:03</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>iOS5中UIAlertView新增了一个属性alertViewStyle，它的类型是UIAlertViewStyle，是一个枚举值：</p>
-
-<pre><code>typedef enum {
-    UIAlertViewStyleDefault = 0,
-    UIAlertViewStyleSecureTextInput,
-    UIAlertViewStylePlainTextInput,
-    UIAlertViewStyleLoginAndPasswordInput
-} UIAlertViewStyle;
-</code></pre>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2012/03/19/new-to-ios5-uialertview-password/">阅读更多 &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/4/">&larr; 以往文章</a>
@@ -660,6 +655,10 @@ if (string1==string2) {
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/10/21/tagged-pointer-and-64-bit/">64位与Tagged Pointer</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/10/16/start-using-octopress/">博客搬家到Octopress</a>
       </li>
     
@@ -673,10 +672,6 @@ if (string1==string2) {
     
       <li class="post">
         <a href="/blog/2013/07/30/no-keyboard-in-webview-of-ios5/">iOS5网页视图（UIWebView）中的输入框不能弹出键盘的问题</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/07/17/cant-scroll-in-tableview/">TableView中嵌套一个ScrollView有时导致ScrollView无法滚动</a>
       </li>
     
   </ul>

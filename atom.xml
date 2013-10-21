@@ -4,7 +4,7 @@
   <title><![CDATA[Xcode Dev]]></title>
   <link href="http://blog.xcodev.com/atom.xml" rel="self"/>
   <link href="http://blog.xcodev.com/"/>
-  <updated>2013-10-18T17:42:36+08:00</updated>
+  <updated>2013-10-21T16:16:04+08:00</updated>
   <id>http://blog.xcodev.com/</id>
   <author>
     <name><![CDATA[谌启亮]]></name>
@@ -12,6 +12,119 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[64位与Tagged Pointer]]></title>
+    <link href="http://blog.xcodev.com/blog/2013/10/21/tagged-pointer-and-64-bit/"/>
+    <updated>2013-10-21T16:09:00+08:00</updated>
+    <id>http://blog.xcodev.com/blog/2013/10/21/tagged-pointer-and-64-bit</id>
+    <content type="html"><![CDATA[<p>在Mac OS X 10.6（Snow Leopard）中开始支持64位，如今最新版本iPhone 5s也开始采用了Arm64架构。在64位化的过程中，其中一个比较关键的改进就是，Mac OS 10.7（Lion）和iOS 7的64位环境先后引入了Tagged Pointer。下面就简单地来介绍一下Tagged Pointer，在介绍Tagged Pointer之前有必要介绍一下指针地址对齐概念和64位环境的一些变化。</p>
+
+<!--more-->
+
+
+<h2>指针地址对齐</h2>
+
+<p>在32位环境下，如果要读取一个32位整数，如果这个32位整数在内存地址为0x00000002-0x00000006（仅作举例，这个地址一般是被系统保留的）的内存上，读取这个整数会消耗2个CPU周期，而如果这个数在0x00000004-0x00000008的内存上只需要一个CPU周期。为了加快内存的CPU访问，程序都使用了指针地址对齐概念。指针地址对齐就是指在分配堆中的内存时往往采用偶数倍或以2为指数倍的内存地址作为地址边界。几乎所有系统架构，包括Mac OS和iOS，都使用了地址对齐概念。</p>
+
+<pre><code>void *a = malloc(1);
+void *b = malloc(3);
+NSLog(@"a: %p",a);
+NSLog(@"b: %p",b);
+</code></pre>
+
+<p>运行这段代码后，我得到了如下结果：</p>
+
+<pre><code>a: 0x8c11e20
+b: 0x8c11e30
+</code></pre>
+
+<p>可以看到，a和b指针的最后4位都是0，虽然a只占用1个字节，但是a和b的地址却相差16个字节。因为iOS中是以16个字节为内存分配边界的，或者说iOS的指针地址对齐是以16个字节为对齐边界的。进一步说，iOS中分配的内存地址最后4位永远都是0。</p>
+
+<h2>64位地址</h2>
+
+<p>在不久前发布iPhone5s中采用了Arm64的CPU，同时也支持了64位的App。64位App中指针大小也扩大到64位，就是理论上可以支持最大2<sup>64</sup>字节（达千万T字节）的内存地址空间。而对于大多数应用来说，这么大的地址空间完全是浪费的。也就是说64位环境下，内存地址的前面很多位一般都是0。</p>
+
+<h2>Tagged Pointer</h2>
+
+<p>由于指针地址对齐概念和64位超大地址的出现，指针地址仅仅作为内存的地址是比较浪费的，我们可以在指针地址中保存或附加更多的信息。这就引入了Tagged Pointer概念。Tagged Pointer是指那些指针中包含特殊属性或信息的指针。其中指针对齐概念可以让我们来标识一个指针是否是Tagged Pointer以及相关类型，64位的地址指针又为我们提供保存额外信息的足够空间。如今，iOS 7的64位环境和Mac OS 10.7（Lion）中开始引入了Tagged Pointer。</p>
+
+<h2>NSNumber的优化</h2>
+
+<p>Tagged Pointer一个比较典型的应用就是NSNumber，在64位环境下，对于一般的数字，NSNumber不用再分配内存了。我们看看NSNumber是如何运用Tagged Pointer的：</p>
+
+<pre><code>NSNumber *number3 = @3;
+NSNumber *number4 = @4;
+NSNumber *number9 = @9;
+NSLog(@"number3 pointer is %p", number3);
+NSLog(@"number4 pointer is %p", number4);
+NSLog(@"number9 pointer is %p", number9);
+</code></pre>
+
+<p>在64位模拟器中运行后，我得到了如下结果：</p>
+
+<pre><code>number3 pointer is 0xb000000000000032
+number4 pointer is 0xb000000000000042
+number9 pointer is 0xb000000000000092
+</code></pre>
+
+<p>可以看出<code>number3</code>、<code>number4</code>和<code>number9</code>的值前4位都是0xb，后4位都是0x2（指针的Tag），中间就是实际的取值，因此，这些NSNumber已经不需要再分配内存（指堆中内存）了，直接可以把实际的值保存到指针中，而无需再去访问堆中的数据。这无疑提高的内存访问速度和整体运算速度。</p>
+
+<p>也就是说Tagged Pointer本身就可以表示一个NSNumber了，在64位环境下运行这段代码：</p>
+
+<pre><code>NSLog(@"0xb000000000000052's class is %@",[(NSNumber*)0xb000000000000052 class]);
+</code></pre>
+
+<p>会输出下面结果：</p>
+
+<pre><code>0xb000000000000052's class is __NSCFNumber
+</code></pre>
+
+<p>那么如果一个数超过了Tagged Pointer所能表示的范围，系统会怎么处理？看看这段代码：</p>
+
+<pre><code>NSNumber *numberBig = @(0x1234567890ABCDEF);
+NSLog(@"numberBig pointer is %p", numberBig);
+</code></pre>
+
+<p>在64位模拟器中运行后，我得到了如下结果：</p>
+
+<pre><code>numberBig pointer is 0x1094026a0
+</code></pre>
+
+<p>可以看出<code>numberBig</code>指针最后4位都是0，应该是分配在堆中的对象。因此，如果NSNumber超出了Tagged Pointer所能表示的范围，系统会自动采用分配成对象，可以根据指针的最后4位是否为0来区分。</p>
+
+<h2>isa指针优化</h2>
+
+<p>查看NSObject类的头文件，你会发现这段定义：</p>
+
+<pre><code>@interface NSObject &lt;NSObject&gt; {
+    Class isa;
+}
+</code></pre>
+
+<p>所有类都继承自NSObject，因此每个对象都有一个isa<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>指针指向它所属的类。在《<a href="http://www.mikeash.com/pyblog/friday-qa-2013-09-27-arm64-and-you.html">ARM64 and You</a>》文章中指出：</p>
+
+<p>在32位环境下，对象的引用计数都保存在一个外部的表中，而对引用计数的增减操作都要先锁定这个表，操作完成后才解锁。这个效率是非常慢的。</p>
+
+<p>而在64位环境下，isa也是64位，实际作为指针部分只用到的其中33位，剩余的部分会运用到Tagged Pointer的概念，其中19位将保存对象的引用计数，这样对引用计数的操作只需要原子的修改这个指针即可，如果引用计数超出19位，才会将引用计数保存到外部表，而这种情况往往是很少的，因此效率将会大大提高。</p>
+
+<h2>参考文献</h2>
+
+<ul>
+<li>Objective-C对象模型及应用： <a href="http://blog.devtang.com/blog/2013/10/15/objective-c-object-model/">http://blog.devtang.com/blog/2013/10/15/objective-c-object-model/</a></li>
+<li>ARM64 and You：<a href="http://www.mikeash.com/pyblog/friday-qa-2013-09-27-arm64-and-you.html">http://www.mikeash.com/pyblog/friday-qa-2013-09-27-arm64-and-you.html</a></li>
+</ul>
+
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>isa是“is a”，比如“Apple is a company”，表示一种从属关系。<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[博客搬家到Octopress]]></title>
@@ -1343,81 +1456,6 @@ a.delegate = self;
     <updated>2012-10-18T20:53:00+08:00</updated>
     <id>http://blog.xcodev.com/blog/2012/10/18/xcode-compile-problem-ios6</id>
     <content type="html"><![CDATA[<p>iOS6发布的时候，我下载了新的SDK，Xcode也更新到了4.5。那时我们的app正好要提交AppStore，我就尝试用新的Xcode编译开发包。但是在提交时，发现总是验证失败提交不成功。原因是说我的binary里没有armv6的包，但我检查了编译选项发现在Architectures和Valid Architectures里都包含里armv6。折腾了好久，原来我忽略了一个警告。本来我一直都很重视警告，但是我在旧版本的Xcode里编译时1个警告都没有，所以我以为只是新版Xcode环境问题，也没太在意，但问题就是这个警告说明的问题。我用nm命令看了一下包，原来真的没有armv6的binary。查看了相关资料发现原来新版本（4.5以上）的Xcode已经不在armv6处理器了！所以即使你的编译选项里明确指定armv6，也是无效的。所以编译后的包只有armv7。而我的app最低支持版本是4.0。在4.3以下的支持，AppStore会要求必须有armv6的binary，所以提交不了。所以如果app要支持4.3以下就必须用低版本Xcode编译了，否则app就只能支持4.3以上了。</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[一个用于Objective-C静态检查的工具－occheck]]></title>
-    <link href="http://blog.xcodev.com/blog/2012/10/15/an-objc-static-check-tool-occheck/"/>
-    <updated>2012-10-15T01:01:00+08:00</updated>
-    <id>http://blog.xcodev.com/blog/2012/10/15/an-objc-static-check-tool-occheck</id>
-    <content type="html"><![CDATA[<p>在ObjC的MRC（手动引用计数）内存管理时, 使用引用计数来维护内存的回收，引用计数的错误常常导致内存泄漏。有一个很常见的错误就是一个retain的属性或成员没有在dealloc中释放。而这种错误用静态代码分析工具检测不出来。当代码写的很多时，一个类一个类的检查很麻烦，而且容易疏露。我写了一个自动检查这种错误的小工具（occheck）。另外这个工具还能检查代码中的高危函数。</p>
-
-<p>安装occheck(有些同学反馈command not fond的解决方法):
-occheck是个二进制命令行工具，拷贝到/usr/bin目录下才可以直接在终端中输入使用。</p>
-
-<!--more-->
-
-
-<pre><code>sudo cp /path/to/occheck /usr/bin/occheck
-sudo chmod -R 755 /usr/bin/occheck
-</code></pre>
-
-<p>使用方法：</p>
-
-<pre><code>occheck [-arc] [path] ...
-</code></pre>
-
-<p>[path]是要检查代码所在的目录，可以是你的工程目录。运行之后会自动检查path目录下的所有objc文件。自动检测类的retain成员，如果忘记在dealloc中release相关成员就会输出错误。
-如果你的项目使用ARC，可以不检查内存泄漏，指定”-arc”参数将只检查高危函数。</p>
-
-<p>如：</p>
-
-<pre><code>occheck /Users/brightshen/Documents/elife/trunk/ios/QQGroupon
-</code></pre>
-
-<p>输出：</p>
-
-<pre><code>ERROR: QHTTPCacheManager cacheRootPath 没有在dealloc中release.
-ERROR: CategoryView buttons 没有在dealloc中release.
-ERROR: TodayDealListViewController dealInfosThisRounds 没有在dealloc中release.
-ERROR: TodayDealListViewController dealInfosThisRound 没有在dealloc中release.
-</code></pre>
-
-<p>可以强制指定一个类成员为assign而不是retain
-只需要在变量类型前面加入ASSIGN
-比如：</p>
-
-<pre><code>#define ASSIGN
-@interface QPicker : UIView{
-   NSArray *items;
-   UIPickerView *pickerView;
-   UIToolbar *toolBar;
-   UIView *coverView;
-   ASSIGN id&lt;QPickerDelegate&gt;delegate;
-   id userInfo;
-}
-@end
-</code></pre>
-
-<p>这样就不会把delegate作为一个retain的成员来处理。如果delegate在属性中定义为assign，那么前面的ASSIGN可以不加，会自动检测。</p>
-
-<p>也可以设置一个类是单例的，这样就不会检查dealloc了，只需要在类的名字前面加上SINGLETON</p>
-
-<pre><code>#define SINGLETON
-@interface SINGLETON QQTicketAppDelegate : NSObject &lt;UIApplicationDelegate,UIAlertViewDelegate&gt; {
-    QTTabBarController *tabBarController;
-    UIViewController *movieViewController;
-    UIViewController *cinemaViewController;
-    UIViewController *myViewController;
-    UIViewController *moreViewController;
-    UIWindow *window;
-    UILocalNotification *movieNotification;
-}
-@end
-</code></pre>
-
-<p>项目地址：<a href="https://github.com/shenqiliang/occheck">https://github.com/shenqiliang/occheck</a></p>
 ]]></content>
   </entry>
   

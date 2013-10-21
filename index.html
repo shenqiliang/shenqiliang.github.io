@@ -9,7 +9,7 @@
   <meta name="author" content="谌启亮">
 
   
-  <meta name="description" content="之前一直在用Wordpress博客框架来写博客，一直没换过。但最近发现很多开发朋友都在使用Octopress，据说是一个面向黑客和开发者的博客，所以也跟风用上了Octopress。几经折腾终于把以前Wordpress的内容搬到了Octopress。 ">
+  <meta name="description" content="在Mac OS X 10.6（Snow Leopard）中开始支持64位，如今最新版本iPhone 5s也开始采用了Arm64架构。在64位化的过程中，其中一个比较关键的改进就是，Mac OS 10.7（Lion）和iOS 7的64位环境先后引入了Tagged Pointer。 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -75,6 +75,47 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/10/21/tagged-pointer-and-64-bit/">64位与Tagged Pointer</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-10-21T16:09:00+08:00" pubdate data-updated="true">2013-10-21 16:09</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>在Mac OS X 10.6（Snow Leopard）中开始支持64位，如今最新版本iPhone 5s也开始采用了Arm64架构。在64位化的过程中，其中一个比较关键的改进就是，Mac OS 10.7（Lion）和iOS 7的64位环境先后引入了Tagged Pointer。下面就简单地来介绍一下Tagged Pointer，在介绍Tagged Pointer之前有必要介绍一下指针地址对齐概念和64位环境的一些变化。</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/10/21/tagged-pointer-and-64-bit/">阅读更多 &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -462,67 +503,6 @@ id objc_getAssociatedObject(id object, const void *key);
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2013/04/01/blur-effect-in-ios/">iOS中的模糊效果</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-04-01T21:58:00+08:00" pubdate data-updated="true">2013-04-01 21:58</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>App设计时往往会用到一些模糊效果。iOS目前已提供一些模糊API可以让我们方便是使用。一种是使用Core Image，另一种是使用Accelerate.Framework中的vImage API。</p>
-
-<h2>使用Core Image进行模糊</h2>
-
-<p>Core Image很早在Mac系统中得到应用，后来这个Framework也开始应用到iOS，不过直到iOS6.0才开始支持模糊。这个API调用起来很方便简洁。</p>
-
-<pre><code>- (UIImage *)blurryImage:(UIImage *)image 
-           withBlurLevel:(CGFloat)blur {
-    CIImage *inputImage = [CIImage imageWithCGImage:image.CGImage];
-    CIFilter *filter = [CIFilter filterWithName:@"CIGaussianBlur"
-                         keysAndValues:kCIInputImageKey, inputImage,
-                                       @"inputRadius", @(blur), 
-                                       nil];
-
-    CIImage *outputImage = filter.outputImage;
-
-    CGImageRef outImage = [self.context createCGImage:outputImage 
-                                   fromRect:[outputImage extent]];
-    return [UIImage imageWithCGImage:outImage];
-}
-</code></pre>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2013/04/01/blur-effect-in-ios/">阅读更多 &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; 以往文章</a>
@@ -538,6 +518,10 @@ id objc_getAssociatedObject(id object, const void *key);
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/10/21/tagged-pointer-and-64-bit/">64位与Tagged Pointer</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/10/16/start-using-octopress/">博客搬家到Octopress</a>
       </li>
     
@@ -551,10 +535,6 @@ id objc_getAssociatedObject(id object, const void *key);
     
       <li class="post">
         <a href="/blog/2013/07/30/no-keyboard-in-webview-of-ios5/">iOS5网页视图（UIWebView）中的输入框不能弹出键盘的问题</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/07/17/cant-scroll-in-tableview/">TableView中嵌套一个ScrollView有时导致ScrollView无法滚动</a>
       </li>
     
   </ul>

@@ -1,0 +1,362 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>64位与Tagged Pointer - Xcode Dev</title>
+  <meta name="author" content="谌启亮">
+
+  
+  <meta name="description" content="在Mac OS X 10.6（Snow Leopard）中开始支持64位，如今最新版本iPhone 5s也开始采用了Arm64架构。在64位化的过程中，其中一个比较关键的改进就是，Mac OS 10.7（Lion）和iOS 7的64位环境先后引入了Tagged Pointer。 &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://blog.xcodev.com/blog/2013/10/21/tagged-pointer-and-64-bit">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Xcode Dev" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/lib/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-20391902-6']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Xcode Dev</a></h1>
+  
+    <h2>学习、分享、积累 – 亮了的原创开发博客</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:blog.xcodev.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="搜索"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">首页</a></li>
+  <li><a href="/blog/archives">归档</a></li>
+  <li><a href="/opensource">开源项目</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">64位与Tagged Pointer</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-10-21T16:09:00+08:00" pubdate data-updated="true">2013-10-21 16:09</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>在Mac OS X 10.6（Snow Leopard）中开始支持64位，如今最新版本iPhone 5s也开始采用了Arm64架构。在64位化的过程中，其中一个比较关键的改进就是，Mac OS 10.7（Lion）和iOS 7的64位环境先后引入了Tagged Pointer。下面就简单地来介绍一下Tagged Pointer，在介绍Tagged Pointer之前有必要介绍一下指针地址对齐概念和64位环境的一些变化。</p>
+
+<!--more-->
+
+
+<h2>指针地址对齐</h2>
+
+<p>在32位环境下，如果要读取一个32位整数，如果这个32位整数在内存地址为0x00000002-0x00000006（仅作举例，这个地址一般是被系统保留的）的内存上，读取这个整数会消耗2个CPU周期，而如果这个数在0x00000004-0x00000008的内存上只需要一个CPU周期。为了加快内存的CPU访问，程序都使用了指针地址对齐概念。指针地址对齐就是指在分配堆中的内存时往往采用偶数倍或以2为指数倍的内存地址作为地址边界。几乎所有系统架构，包括Mac OS和iOS，都使用了地址对齐概念。</p>
+
+<pre><code>void *a = malloc(1);
+void *b = malloc(3);
+NSLog(@"a: %p",a);
+NSLog(@"b: %p",b);
+</code></pre>
+
+<p>运行这段代码后，我得到了如下结果：</p>
+
+<pre><code>a: 0x8c11e20
+b: 0x8c11e30
+</code></pre>
+
+<p>可以看到，a和b指针的最后4位都是0，虽然a只占用1个字节，但是a和b的地址却相差16个字节。因为iOS中是以16个字节为内存分配边界的，或者说iOS的指针地址对齐是以16个字节为对齐边界的。进一步说，iOS中分配的内存地址最后4位永远都是0。</p>
+
+<h2>64位地址</h2>
+
+<p>在不久前发布iPhone5s中采用了Arm64的CPU，同时也支持了64位的App。64位App中指针大小也扩大到64位，就是理论上可以支持最大2<sup>64</sup>字节（达千万T字节）的内存地址空间。而对于大多数应用来说，这么大的地址空间完全是浪费的。也就是说64位环境下，内存地址的前面很多位一般都是0。</p>
+
+<h2>Tagged Pointer</h2>
+
+<p>由于指针地址对齐概念和64位超大地址的出现，指针地址仅仅作为内存的地址是比较浪费的，我们可以在指针地址中保存或附加更多的信息。这就引入了Tagged Pointer概念。Tagged Pointer是指那些指针中包含特殊属性或信息的指针。其中指针对齐概念可以让我们来标识一个指针是否是Tagged Pointer以及相关类型，64位的地址指针又为我们提供保存额外信息的足够空间。如今，iOS 7的64位环境和Mac OS 10.7（Lion）中开始引入了Tagged Pointer。</p>
+
+<h2>NSNumber的优化</h2>
+
+<p>Tagged Pointer一个比较典型的应用就是NSNumber，在64位环境下，对于一般的数字，NSNumber不用再分配内存了。我们看看NSNumber是如何运用Tagged Pointer的：</p>
+
+<pre><code>NSNumber *number3 = @3;
+NSNumber *number4 = @4;
+NSNumber *number9 = @9;
+NSLog(@"number3 pointer is %p", number3);
+NSLog(@"number4 pointer is %p", number4);
+NSLog(@"number9 pointer is %p", number9);
+</code></pre>
+
+<p>在64位模拟器中运行后，我得到了如下结果：</p>
+
+<pre><code>number3 pointer is 0xb000000000000032
+number4 pointer is 0xb000000000000042
+number9 pointer is 0xb000000000000092
+</code></pre>
+
+<p>可以看出<code>number3</code>、<code>number4</code>和<code>number9</code>的值前4位都是0xb，后4位都是0x2（指针的Tag），中间就是实际的取值，因此，这些NSNumber已经不需要再分配内存（指堆中内存）了，直接可以把实际的值保存到指针中，而无需再去访问堆中的数据。这无疑提高的内存访问速度和整体运算速度。</p>
+
+<p>也就是说Tagged Pointer本身就可以表示一个NSNumber了，在64位环境下运行这段代码：</p>
+
+<pre><code>NSLog(@"0xb000000000000052's class is %@",[(NSNumber*)0xb000000000000052 class]);
+</code></pre>
+
+<p>会输出下面结果：</p>
+
+<pre><code>0xb000000000000052's class is __NSCFNumber
+</code></pre>
+
+<p>那么如果一个数超过了Tagged Pointer所能表示的范围，系统会怎么处理？看看这段代码：</p>
+
+<pre><code>NSNumber *numberBig = @(0x1234567890ABCDEF);
+NSLog(@"numberBig pointer is %p", numberBig);
+</code></pre>
+
+<p>在64位模拟器中运行后，我得到了如下结果：</p>
+
+<pre><code>numberBig pointer is 0x1094026a0
+</code></pre>
+
+<p>可以看出<code>numberBig</code>指针最后4位都是0，应该是分配在堆中的对象。因此，如果NSNumber超出了Tagged Pointer所能表示的范围，系统会自动采用分配成对象，可以根据指针的最后4位是否为0来区分。</p>
+
+<h2>isa指针优化</h2>
+
+<p>查看NSObject类的头文件，你会发现这段定义：</p>
+
+<pre><code>@interface NSObject &lt;NSObject&gt; {
+    Class isa;
+}
+</code></pre>
+
+<p>所有类都继承自NSObject，因此每个对象都有一个isa<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>指针指向它所属的类。在《<a href="http://www.mikeash.com/pyblog/friday-qa-2013-09-27-arm64-and-you.html">ARM64 and You</a>》文章中指出：</p>
+
+<p>在32位环境下，对象的引用计数都保存在一个外部的表中，而对引用计数的增减操作都要先锁定这个表，操作完成后才解锁。这个效率是非常慢的。</p>
+
+<p>而在64位环境下，isa也是64位，实际作为指针部分只用到的其中33位，剩余的部分会运用到Tagged Pointer的概念，其中19位将保存对象的引用计数，这样对引用计数的操作只需要原子的修改这个指针即可，如果引用计数超出19位，才会将引用计数保存到外部表，而这种情况往往是很少的，因此效率将会大大提高。</p>
+
+<h2>参考文献</h2>
+
+<ul>
+<li>Objective-C对象模型及应用： <a href="http://blog.devtang.com/blog/2013/10/15/objective-c-object-model/">http://blog.devtang.com/blog/2013/10/15/objective-c-object-model/</a></li>
+<li>ARM64 and You：<a href="http://www.mikeash.com/pyblog/friday-qa-2013-09-27-arm64-and-you.html">http://www.mikeash.com/pyblog/friday-qa-2013-09-27-arm64-and-you.html</a></li>
+</ul>
+
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>isa是“is a”，比如“Apple is a company”，表示一种从属关系。<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">作者： <span class="fn">谌启亮</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-10-21T16:09:00+08:00" pubdate data-updated="true">2013-10-21 16:09</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  
+  
+<!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+	<span class="jiathis_txt">分享到：</span>
+	<a class="jiathis_button_qzone">QQ空间</a>
+	<a class="jiathis_button_tsina">新浪微博</a>
+	<a class="jiathis_button_tqq">腾讯微博</a>
+	<a class="jiathis_button_renren">人人网</a>
+	<a class="jiathis_button_kaixin001">开心网</a>
+</div>
+<br/><br/>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2013/10/16/start-using-octopress/" title="Previous Post: 博客搬家到Octopress">&laquo; 博客搬家到Octopress</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>评论</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>最新文章</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/10/21/tagged-pointer-and-64-bit/">64位与Tagged Pointer</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/10/16/start-using-octopress/">博客搬家到Octopress</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/08/15/auto-key-press-using-appscript/">用AppleScript在Mac系统下实现按键精灵的功能以及在游戏中的运用</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/08/14/implement-objc-property-in-category/">Objective-C语言在Category中实现属性</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/07/30/no-keyboard-in-webview-of-ios5/">iOS5网页视图（UIWebView）中的输入框不能弹出键盘的问题</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+<section>
+	<h1>联系我</h1>
+	<ul>
+	<li>
+		Email：<a href="mailto:shenqiliang@gmail.com">shenqiliang@gmail.com</a> 
+	</li>
+	<li>
+		<a href="http://sighttp.qq.com/authd?IDKEY=d7abe61cc7dddcc8f4cf5d8fe64b6d219ee48bf1ca823d59" target="_blank"><img title="点击这里给我发消息" src="http://wpa.qq.com/imgd?IDKEY=d7abe61cc7dddcc8f4cf5d8fe64b6d219ee48bf1ca823d59&amp;pic=41" alt="点击这里给我发消息" border="0" /></a> 
+		<a title="点击查看" href="http://t.qq.com/shenqiliang" target="_blank"><img class="alignnone" title="点击查看" src="http://mat1.gtimg.com/app/opent/images/wiki/resource/weiboicon32.png" alt="点击查看" width="32" height="32" /></a> 
+		<a title="点击查看" href="http://weibo.com/u/2135198615" target="_blank"><img class="alignnone" title="点击查看" src="http://www.sinaimg.cn/blog/developer/wiki/32x32.png" alt="" width="32" height="32" /></a> 
+	</li>
+	<li>
+		讨论QQ群：289999423
+	</li>
+	</ul>
+</section>
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - 谌启亮 -
+  <span class="credit">使用 <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'xcodev';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://blog.xcodev.com/blog/2013/10/21/tagged-pointer-and-64-bit/';
+        var disqus_url = 'http://blog.xcodev.com/blog/2013/10/21/tagged-pointer-and-64-bit/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

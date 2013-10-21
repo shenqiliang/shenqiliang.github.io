@@ -9,9 +9,7 @@
   <meta name="author" content="谌启亮">
 
   
-  <meta name="description" content="今天一位同事调试时发现了一个问题：一个字符串在被replace后，调试时并没有被replace。代码如下： NSString *s = @"深圳市";
-s = [s stringByReplacingOccurrencesOfString:@"市" withString:@""];
-NSLog &hellip;">
+  <meta name="description" content="App设计时往往会用到一些模糊效果。iOS目前已提供一些模糊API可以让我们方便是使用。一种是使用Core Image，另一种是使用Accelerate.Framework中的vImage API。 使用Core Image进行模糊 Core Image很早在Mac系统中得到应用， &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -77,6 +75,67 @@ NSLog &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/04/01/blur-effect-in-ios/">iOS中的模糊效果</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-04-01T21:58:00+08:00" pubdate data-updated="true">2013-04-01 21:58</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>App设计时往往会用到一些模糊效果。iOS目前已提供一些模糊API可以让我们方便是使用。一种是使用Core Image，另一种是使用Accelerate.Framework中的vImage API。</p>
+
+<h2>使用Core Image进行模糊</h2>
+
+<p>Core Image很早在Mac系统中得到应用，后来这个Framework也开始应用到iOS，不过直到iOS6.0才开始支持模糊。这个API调用起来很方便简洁。</p>
+
+<pre><code>- (UIImage *)blurryImage:(UIImage *)image 
+           withBlurLevel:(CGFloat)blur {
+    CIImage *inputImage = [CIImage imageWithCGImage:image.CGImage];
+    CIFilter *filter = [CIFilter filterWithName:@"CIGaussianBlur"
+                         keysAndValues:kCIInputImageKey, inputImage,
+                                       @"inputRadius", @(blur), 
+                                       nil];
+
+    CIImage *outputImage = filter.outputImage;
+
+    CGImageRef outImage = [self.context createCGImage:outputImage 
+                                   fromRect:[outputImage extent]];
+    return [UIImage imageWithCGImage:outImage];
+}
+</code></pre>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/04/01/blur-effect-in-ios/">阅读更多 &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -495,50 +554,6 @@ a.delegate = self;
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/10/15/an-objc-static-check-tool-occheck/">一个用于Objective-C静态检查的工具－occheck</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-10-15T01:01:00+08:00" pubdate data-updated="true">2012-10-15 01:01</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>在ObjC的MRC（手动引用计数）内存管理时, 使用引用计数来维护内存的回收，引用计数的错误常常导致内存泄漏。有一个很常见的错误就是一个retain的属性或成员没有在dealloc中释放。而这种错误用静态代码分析工具检测不出来。当代码写的很多时，一个类一个类的检查很麻烦，而且容易疏露。我写了一个自动检查这种错误的小工具（occheck）。另外这个工具还能检查代码中的高危函数。</p>
-
-<p>安装occheck(有些同学反馈command not fond的解决方法):
-occheck是个二进制命令行工具，拷贝到/usr/bin目录下才可以直接在终端中输入使用。</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2012/10/15/an-objc-static-check-tool-occheck/">阅读更多 &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/3/">&larr; 以往文章</a>
@@ -556,6 +571,10 @@ occheck是个二进制命令行工具，拷贝到/usr/bin目录下才可以直�
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/10/21/tagged-pointer-and-64-bit/">64位与Tagged Pointer</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/10/16/start-using-octopress/">博客搬家到Octopress</a>
       </li>
     
@@ -569,10 +588,6 @@ occheck是个二进制命令行工具，拷贝到/usr/bin目录下才可以直�
     
       <li class="post">
         <a href="/blog/2013/07/30/no-keyboard-in-webview-of-ios5/">iOS5网页视图（UIWebView）中的输入框不能弹出键盘的问题</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/07/17/cant-scroll-in-tableview/">TableView中嵌套一个ScrollView有时导致ScrollView无法滚动</a>
       </li>
     
   </ul>

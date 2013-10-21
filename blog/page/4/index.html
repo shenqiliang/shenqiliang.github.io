@@ -9,7 +9,7 @@
   <meta name="author" content="谌启亮">
 
   
-  <meta name="description" content="在iOS5中新增了一个数字输入控件UIStepper，它可以递进式输入数量。UIStepper继承自UIControl，它主要的事件是UIControlEventValueChanged，每当它的值改变了就会触发这个事件。它的显示效果如下： ">
+  <meta name="description" content="iOS5中UIAlertView新增了一个属性alertViewStyle，它的类型是UIAlertViewStyle，是一个枚举值： typedef enum { UIAlertViewStyleDefault = 0, UIAlertViewStyleSecureTextInput, &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -75,6 +75,55 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/03/19/new-to-ios5-uialertview-password/">iOS5新增内容之支持文本输入的UIAlertView</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-19T12:03:00+08:00" pubdate data-updated="true">2012-03-19 12:03</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>iOS5中UIAlertView新增了一个属性alertViewStyle，它的类型是UIAlertViewStyle，是一个枚举值：</p>
+
+<pre><code>typedef enum {
+    UIAlertViewStyleDefault = 0,
+    UIAlertViewStyleSecureTextInput,
+    UIAlertViewStylePlainTextInput,
+    UIAlertViewStyleLoginAndPasswordInput
+} UIAlertViewStyle;
+</code></pre>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/03/19/new-to-ios5-uialertview-password/">阅读更多 &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -512,42 +561,6 @@ ViewController在响应链中的位于ViewController的view和它的superView之
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/02/01/bye-bye-shanghai/">再见，上海！</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-02-01T02:05:00+08:00" pubdate data-updated="true">2012-02-01 02:05</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>刚到深圳，由于工作比较忙，很久没关注自己的博客了。现在正好想写写之前在上海的一些经历。在上海也呆1年多了，由于工作原因得离开这个繁华的城市。在这里我做过外包，创过业，个中艰辛只能自己体会，它给我一个很好的人生经验。想过自己的理想，而现实往往是残酷的，虽然放弃，有些不舍，但我还是梦想能在新的地方闯出自己的一番天地。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/5/">&larr; 以往文章</a>
@@ -565,6 +578,10 @@ ViewController在响应链中的位于ViewController的view和它的superView之
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/10/21/tagged-pointer-and-64-bit/">64位与Tagged Pointer</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/10/16/start-using-octopress/">博客搬家到Octopress</a>
       </li>
     
@@ -578,10 +595,6 @@ ViewController在响应链中的位于ViewController的view和它的superView之
     
       <li class="post">
         <a href="/blog/2013/07/30/no-keyboard-in-webview-of-ios5/">iOS5网页视图（UIWebView）中的输入框不能弹出键盘的问题</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/07/17/cant-scroll-in-tableview/">TableView中嵌套一个ScrollView有时导致ScrollView无法滚动</a>
       </li>
     
   </ul>
