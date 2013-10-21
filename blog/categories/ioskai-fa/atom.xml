@@ -4,7 +4,7 @@
   <title><![CDATA[分类：iOS开发 | Xcode Dev]]></title>
   <link href="http://blog.xcodev.com/blog/categories/ioskai-fa/atom.xml" rel="self"/>
   <link href="http://blog.xcodev.com/"/>
-  <updated>2013-10-21T16:16:04+08:00</updated>
+  <updated>2013-10-21T18:19:31+08:00</updated>
   <id>http://blog.xcodev.com/</id>
   <author>
     <name><![CDATA[谌启亮]]></name>
@@ -12,6 +12,119 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[64位与Tagged Pointer]]></title>
+    <link href="http://blog.xcodev.com/blog/2013/10/21/tagged-pointer-and-64-bit/"/>
+    <updated>2013-10-21T16:09:00+08:00</updated>
+    <id>http://blog.xcodev.com/blog/2013/10/21/tagged-pointer-and-64-bit</id>
+    <content type="html"><![CDATA[<p>在Mac OS X 10.6（Snow Leopard）中开始支持64位，如今最新版本iPhone 5s也开始采用了Arm64架构。在64位化的过程中，其中一个比较关键的改进就是，Mac OS 10.7（Lion）和iOS 7的64位环境先后引入了Tagged Pointer。下面就简单地来介绍一下Tagged Pointer，在介绍Tagged Pointer之前有必要介绍一下指针地址对齐概念和64位环境的一些变化。</p>
+
+<!--more-->
+
+
+<h2>指针地址对齐</h2>
+
+<p>在32位环境下，如果要读取一个32位整数，如果这个32位整数在内存地址为0x00000002-0x00000006（仅作举例，这个地址一般是被系统保留的）的内存上，读取这个整数会消耗2个CPU周期，而如果这个数在0x00000004-0x00000008的内存上只需要一个CPU周期。为了加快内存的CPU访问，程序都使用了指针地址对齐概念。指针地址对齐就是指在分配堆中的内存时往往采用偶数倍或以2为指数倍的内存地址作为地址边界。几乎所有系统架构，包括Mac OS和iOS，都使用了地址对齐概念。</p>
+
+<pre><code>void *a = malloc(1);
+void *b = malloc(3);
+NSLog(@"a: %p",a);
+NSLog(@"b: %p",b);
+</code></pre>
+
+<p>运行这段代码后，我得到了如下结果：</p>
+
+<pre><code>a: 0x8c11e20
+b: 0x8c11e30
+</code></pre>
+
+<p>可以看到，a和b指针的最后4位都是0，虽然a只占用1个字节，但是a和b的地址却相差16个字节。因为iOS中是以16个字节为内存分配边界的，或者说iOS的指针地址对齐是以16个字节为对齐边界的。进一步说，iOS中分配的内存地址最后4位永远都是0。</p>
+
+<h2>64位地址</h2>
+
+<p>在不久前发布iPhone5s中采用了Arm64的CPU，同时也支持了64位的App。64位App中指针大小也扩大到64位，就是理论上可以支持最大2<sup>64</sup>字节（达千万T字节）的内存地址空间。而对于大多数应用来说，这么大的地址空间完全是浪费的。也就是说64位环境下，内存地址的前面很多位一般都是0。</p>
+
+<h2>Tagged Pointer</h2>
+
+<p>由于指针地址对齐概念和64位超大地址的出现，指针地址仅仅作为内存的地址是比较浪费的，我们可以在指针地址中保存或附加更多的信息。这就引入了Tagged Pointer概念。Tagged Pointer是指那些指针中包含特殊属性或信息的指针。其中指针对齐概念可以让我们来标识一个指针是否是Tagged Pointer以及相关类型，64位的地址指针又为我们提供保存额外信息的足够空间。如今，iOS 7的64位环境和Mac OS 10.7（Lion）中开始引入了Tagged Pointer。</p>
+
+<h2>NSNumber的优化</h2>
+
+<p>Tagged Pointer一个比较典型的应用就是NSNumber，在64位环境下，对于一般的数字，NSNumber不用再分配内存了。我们看看NSNumber是如何运用Tagged Pointer的：</p>
+
+<pre><code>NSNumber *number3 = @3;
+NSNumber *number4 = @4;
+NSNumber *number9 = @9;
+NSLog(@"number3 pointer is %p", number3);
+NSLog(@"number4 pointer is %p", number4);
+NSLog(@"number9 pointer is %p", number9);
+</code></pre>
+
+<p>在64位模拟器中运行后，我得到了如下结果：</p>
+
+<pre><code>number3 pointer is 0xb000000000000032
+number4 pointer is 0xb000000000000042
+number9 pointer is 0xb000000000000092
+</code></pre>
+
+<p>可以看出<code>number3</code>、<code>number4</code>和<code>number9</code>的值前4位都是0xb，后4位都是0x2（指针的Tag），中间就是实际的取值，因此，这些NSNumber已经不需要再分配内存（指堆中内存）了，直接可以把实际的值保存到指针中，而无需再去访问堆中的数据。这无疑提高的内存访问速度和整体运算速度。</p>
+
+<p>也就是说Tagged Pointer本身就可以表示一个NSNumber了，在64位环境下运行这段代码：</p>
+
+<pre><code>NSLog(@"0xb000000000000052's class is %@",[(NSNumber*)0xb000000000000052 class]);
+</code></pre>
+
+<p>会输出下面结果：</p>
+
+<pre><code>0xb000000000000052's class is __NSCFNumber
+</code></pre>
+
+<p>那么如果一个数超过了Tagged Pointer所能表示的范围，系统会怎么处理？看看这段代码：</p>
+
+<pre><code>NSNumber *numberBig = @(0x1234567890ABCDEF);
+NSLog(@"numberBig pointer is %p", numberBig);
+</code></pre>
+
+<p>在64位模拟器中运行后，我得到了如下结果：</p>
+
+<pre><code>numberBig pointer is 0x1094026a0
+</code></pre>
+
+<p>可以看出<code>numberBig</code>指针最后4位都是0，应该是分配在堆中的对象。因此，如果NSNumber超出了Tagged Pointer所能表示的范围，系统会自动采用分配成对象，可以根据指针的最后4位是否为0来区分。</p>
+
+<h2>isa指针优化</h2>
+
+<p>查看NSObject类的头文件，你会发现这段定义：</p>
+
+<pre><code>@interface NSObject &lt;NSObject&gt; {
+    Class isa;
+}
+</code></pre>
+
+<p>所有类都继承自NSObject，因此每个对象都有一个isa<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>指针指向它所属的类。在《<a href="http://www.mikeash.com/pyblog/friday-qa-2013-09-27-arm64-and-you.html">ARM64 and You</a>》文章中指出：</p>
+
+<p>在32位环境下，对象的引用计数都保存在一个外部的表中，而对引用计数的增减操作都要先锁定这个表，操作完成后才解锁。这个效率是非常慢的。</p>
+
+<p>而在64位环境下，isa也是64位，实际作为指针部分只用到的其中33位，剩余的部分会运用到Tagged Pointer的概念，其中19位将保存对象的引用计数，这样对引用计数的操作只需要原子的修改这个指针即可，如果引用计数超出19位，才会将引用计数保存到外部表，而这种情况往往是很少的，因此效率将会大大提高。</p>
+
+<h2>参考文献</h2>
+
+<ul>
+<li>Objective-C对象模型及应用： <a href="http://blog.devtang.com/blog/2013/10/15/objective-c-object-model/">http://blog.devtang.com/blog/2013/10/15/objective-c-object-model/</a></li>
+<li>ARM64 and You：<a href="http://www.mikeash.com/pyblog/friday-qa-2013-09-27-arm64-and-you.html">http://www.mikeash.com/pyblog/friday-qa-2013-09-27-arm64-and-you.html</a></li>
+</ul>
+
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>isa是“is a”，比如“Apple is a company”，表示一种从属关系。<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Objective-C语言在Category中实现属性]]></title>
@@ -269,158 +382,6 @@ UIWindow *anotherWindow = [UIWindow new];
 <h2>UIAppearance实现原理</h2>
 
 <p>在通过UIAppearance调用“UI_APPEARANCE_SELECTOR”标记的方法来配置外观时，UIAppearance实际上没有进行任何实际调用，而是把这个调用保存起来（在Objc中可以用NSInvocation对象来保存一个调用）。当实际的对象显示之前（添加到窗口上，drawRect:之前），就会对这个对象调用之前保存的调用。当这个setter调用后，你的界面风格自定义就完成了。</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Objective-C中方法签名(Method Signature)机制]]></title>
-    <link href="http://blog.xcodev.com/blog/2013/05/30/method-signature-in-objc/"/>
-    <updated>2013-05-30T15:23:00+08:00</updated>
-    <id>http://blog.xcodev.com/blog/2013/05/30/method-signature-in-objc</id>
-    <content type="html"><![CDATA[<h2>引言</h2>
-
-<p>在ObjC语言中，我们会自定义各种各样的类，在类定义中，我们又会定义各种方法，当方法达到一定的数量，有时会不可避免的出现一些同名的方法。而同名的方法有时会导致运行时出现很奇怪的问题。比如传递参数不一致时，出现运行时错误。这些都和ObjC中的方法签名（Method Signature）相关。</p>
-
-<!--more-->
-
-
-<h2>什么是方法签名</h2>
-
-<p>方法签名是ObjC中对一个方法的参数类型和返回值类型的一条记录。每个方法都对应一个方法签名。</p>
-
-<h2>一些基本概念</h2>
-
-<p>有几个名词在深入理解方法签名机制之前必须区分清楚：
-部分可参考我之前的一篇博文：
-<a href="/blog/2012/03/22/difference-between-message-and-method/">Objective-C中消息（Message）和方法（Method）的区别</a></p>
-
-<h3>消息</h3>
-
-<p>消息由消息的名字和参数组成，可以有返回值，用于发送给某个对象。大部分我们写的代码都是向一个对象发送消息。比如：</p>
-
-<pre><code>[receiver message];
-</code></pre>
-
-<h3>方法</h3>
-
-<p>方法对应一段可执行代码，是implementation的一部分。当我们向某个对象发送消息时，系统会分析我们所发送的消息，动态地调用响应的方法。对应ObjC中的IMP类型。</p>
-
-<h3>Selector</h3>
-
-<p>ObjC中有个SEL类型，这个类型就是Selector的类型。我们可以用@selector操作符来获取一个Selector。Selector可理解为方法的名字，但这并不包含参数和返回值，仅仅是名字。你还需注意，Selector不和任何类关联，你不能说某个Selector属于一个类，它仅仅是名字。</p>
-
-<h2>NSMethodSignature类</h2>
-
-<p>ObjC中有一个NSMethodSignature类，这个类很好的帮助我们来分析一下ObjC中的方法签名机制，这个类中定义了以下几个方法</p>
-
-<pre><code>- (NSUInteger)numberOfArguments;//参数的数量
-- (const char *)getArgumentTypeAtIndex:(NSUInteger)idx;//第idx个参数的类型
-- (const char *)methodReturnType;//返回值类型
-- (NSUInteger)methodReturnLength;//返回值长度，单位字节
-</code></pre>
-
-<p>从这些定义中我们可以看出，方法签名中会包含方法的参数个数，每个参数的类型，返回值类型，以及返回值占用的空间大小。
-NSObject基类中提供了获取这个对象的方法</p>
-
-<pre><code>- (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector
-</code></pre>
-
-<p>所以，只要知道一个对象，和一个SEL（selector），那么就可以动态的获取这个方法签名了。</p>
-
-<h2>参数类型签名不同导致的一个奇怪现象</h2>
-
-<p>下面先举个例子，来看看参数类型签名不同导致的一个奇怪现象。
-首先我们定义两个类，两个类是继承关系，但定义了同名的方法，但方法的参数类型不同。（所以它们的方法签名是不同的。）</p>
-
-<pre><code>//基类
-@interface ParamBase : NSObject
-- (void)doSomeThing:(int)i;
-@end
-
-@implementation ParamBase
-- (void)doSomeThing:(int)i{
-    NSLog(@"Base doSomeThing called with int: %d",i);
-}
-@end
-
-//子类
-@interface ParamSub : ParamBase
-- (void)doSomeThing:(double)d;
-@end
-
-@implementation ParamSub
-- (void)doSomeThing:(double)d{
-    NSLog(@"Sub doSomeThing called with double: %f",d);
-}
-@end
-</code></pre>
-
-<p>然后，我们创建个子类对象，然后分别在不同情况下执行doSomeThing，我们都传递相同的参数。</p>
-
-<pre><code>ParamBase *a = [ParamSub new];
-[a doSomeThing:1.0];
-[(ParamSub*)a doSomeThing:1.0];
-</code></pre>
-
-<p>然后运行，你会得到如下结果。</p>
-
-<pre><code>2013-05-30 14:25:03.242 MethodSignTest[2144:c07] Sub doSomeThing called with double: 0.000000
-2013-05-30 14:25:03.244 MethodSignTest[2144:c07] Sub doSomeThing called with double: 1.000000
-</code></pre>
-
-<p>向一个对象发送了相同的消息，并且参数相同，为什么两次得到的结果不同。明明发送了1，为什么确变成0了。这其实是方法签名在编译阶段时捣鬼。当编译第二行代码时，编译器发现ParamBase对象的doSomeThing方法签名中的第一个参数是int类型，虽然代码了写的是1.0，但编译后就转换整数1了。运行时在子类的doSomeThing把整数1强制以double类型打印出来就是0了。而第3行代码就没有问题。应为编译器已经知道a已强制为ParamSub类型，而ParamSub对象doSomeThing方法签名中的第一个参数是double类型，而不是int类型，所以就没问题了。</p>
-
-<h2>在ARC（自动引用计数机制）下返回值类型签名不同导致Crash</h2>
-
-<p>我们再定义两个类，两个类还是继承关系，定义了同名的方法，但方法的返回值类型不同。（所以它们的方法签名也是不同的。）</p>
-
-<pre><code>//基类
-@interface ReturnBase : NSObject
-- (id)getSomeThing;
-@end
-
-@implementation ReturnBase
-- (id)getSomeThing{
-    NSLog(@"Return Base called");
-    return [NSArray new];
-}
-@end
-
-//子类
-@interface ReturnSub : ReturnBase
-- (void)getSomeThing;
-@end
-
-@implementation ReturnSub
-- (void)getSomeThing{
-    NSLog(@"nothing");
-}
-@end
-</code></pre>
-
-<p>然后我们执行下面这段代码：</p>
-
-<pre><code>ReturnBase *b = [ReturnSub new];
-[(ReturnSub*)b getSomeThing];
-[b getSomeThing];
-</code></pre>
-
-<p>结果程序在第3行Crash了，Crash类型一般是内存访问（BAD ACCESS）错误。第2行和第3行在ObjC动态绑定的机制下完全是相同的代码啊，为什么第2行没Crash，到第3行就Crash了呢？这是由于ARC和方法签名机制共同作用的结果，ARC下系统会对消息的返回值自动做一些retain或release等操作，而b在运行时ReturnSub类型，getSomeThing是不返回任何对象的。第二行时编译器知道b是ReturnSub类型，所以不会处理返回值了，而在第3行时，编译器认为b是ReturnBase类型，而根据ReturnBase类的方法getSomeThing的签名，是有返回值的，所以第3行编译后会自动对getSomeThing的返回值加一些retain/release等操作，而运行时却是没有返回值的（void类型），那么返回值就是不确定的，对这个不确定的值进行retain/release操作，一般就会导致内存访问（BAD ACCESS）错误。
-也许你会想，我如果把b设为id类型，会怎样。</p>
-
-<pre><code>id b = [ReturnSub new];
-[(ReturnSub*)b getSomeThing];
-[b getSomeThing];
-</code></pre>
-
-<p>结果是编译不通过，名字为getSomeThing的方法的签名不一致，编译器就不知道有没有返回值了。</p>
-
-<h2>结论</h2>
-
-<p>方法签名在编译时对方法的参数进行一定的转换。
-ARC下会根据方法签名中的返回值进行retain/release等操作
-最好不要写方法名字相同，当方法签名不同的方法，以免出现怪异现象。
-有时我们改变了一个基类的参数类型或返回值类型，不要忘记了在子类中进行相应的修改。</p>
 ]]></content>
   </entry>
   
