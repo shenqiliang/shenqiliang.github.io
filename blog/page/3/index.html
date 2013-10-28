@@ -9,7 +9,7 @@
   <meta name="author" content="谌启亮">
 
   
-  <meta name="description" content="在ObjC的MRC（手动引用计数）内存管理时, 使用引用计数来维护内存的回收，引用计数的错误常常导致内存泄漏。有一个很常见的错误就是一个retain的属性或成员没有在dealloc中释放。而这种错误用静态代码分析工具检测不出来。当代码写的很多时，一个类一个类的检查很麻烦，而且容易疏露。 &hellip;">
+  <meta name="description" content="iOS6发布的时候，我下载了新的SDK，Xcode也更新到了4.5。那时我们的app正好要提交AppStore，我就尝试用新的Xcode编译开发包。但是在提交时，发现总是验证失败提交不成功。原因是说我的binary里没有armv6的包，但我检查了编译选项发现在Architectures和Valid &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -75,6 +75,42 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/10/18/xcode-compile-problem-ios6/">最新Xcode编译出现的问题</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-10-18T20:53:00+08:00" pubdate data-updated="true">2012-10-18 20:53</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>iOS6发布的时候，我下载了新的SDK，Xcode也更新到了4.5。那时我们的app正好要提交AppStore，我就尝试用新的Xcode编译开发包。但是在提交时，发现总是验证失败提交不成功。原因是说我的binary里没有armv6的包，但我检查了编译选项发现在Architectures和Valid Architectures里都包含里armv6。折腾了好久，原来我忽略了一个警告。本来我一直都很重视警告，但是我在旧版本的Xcode里编译时1个警告都没有，所以我以为只是新版Xcode环境问题，也没太在意，但问题就是这个警告说明的问题。我用nm命令看了一下包，原来真的没有armv6的binary。查看了相关资料发现原来新版本（4.5以上）的Xcode已经不在armv6处理器了！所以即使你的编译选项里明确指定armv6，也是无效的。所以编译后的包只有armv7。而我的app最低支持版本是4.0。在4.3以下的支持，AppStore会要求必须有armv6的binary，所以提交不了。所以如果app要支持4.3以下就必须用低版本Xcode编译了，否则app就只能支持4.3以上了。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -587,57 +623,6 @@ if (string1==string2) {
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/03/20/view-controller-life-circle/">ViewController的生命周期分析和使用</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-03-20T18:40:00+08:00" pubdate data-updated="true">2012-03-20 18:40</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>iOS的SDK中提供很多原生ViewController，大大提高了我们的开发效率，下面是我的一些经验。</p>
-
-<h2>结构</h2>
-
-<p>按结构可以对iOS的所有ViewController分成两类：</p>
-
-<ol>
-<li>主要用于展示内容的ViewController，这种ViewController主要用于为用户展示内容，并与用户交互，如UITableViewController，UIViewController。</li>
-<li>用于控制和显示其他ViewController的ViewController。这种ViewController一般都是一个ViewController的容器。如UINavigationController，UITabbarController。它们都有一个属性：viewControllers。其中UINavigationController表示一种Stack式结构，push一个ViewController或pop一次，因此后一个ViewController一般会依赖前一个ViewController。而UITabbarController表示一个Array结构，各个ViewController是并列的。</li>
-</ol>
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2012/03/20/view-controller-life-circle/">阅读更多 &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/4/">&larr; 以往文章</a>
@@ -677,6 +662,10 @@ if (string1==string2) {
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/10/28/operation-queue-intro/">并发编程之Operation Queue</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/10/21/tagged-pointer-and-64-bit/">64位与Tagged Pointer</a>
       </li>
     
@@ -690,10 +679,6 @@ if (string1==string2) {
     
       <li class="post">
         <a href="/blog/2013/08/14/implement-objc-property-in-category/">Objective-C语言在Category中实现属性</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/07/30/no-keyboard-in-webview-of-ios5/">iOS5网页视图（UIWebView）中的输入框不能弹出键盘的问题</a>
       </li>
     
   </ul>

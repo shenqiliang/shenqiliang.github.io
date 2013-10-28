@@ -9,7 +9,7 @@
   <meta name="author" content="谌启亮">
 
   
-  <meta name="description" content="iOS5中UIAlertView新增了一个属性alertViewStyle，它的类型是UIAlertViewStyle，是一个枚举值： typedef enum { UIAlertViewStyleDefault = 0, UIAlertViewStyleSecureTextInput, &hellip;">
+  <meta name="description" content="iOS的SDK中提供很多原生ViewController，大大提高了我们的开发效率，下面是我的一些经验。 结构 按结构可以对iOS的所有ViewController分成两类： 主要用于展示内容的ViewController，这种ViewController主要用于为用户展示内容，并与用户交互， &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -75,6 +75,57 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/03/20/view-controller-life-circle/">ViewController的生命周期分析和使用</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-20T18:40:00+08:00" pubdate data-updated="true">2012-03-20 18:40</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>iOS的SDK中提供很多原生ViewController，大大提高了我们的开发效率，下面是我的一些经验。</p>
+
+<h2>结构</h2>
+
+<p>按结构可以对iOS的所有ViewController分成两类：</p>
+
+<ol>
+<li>主要用于展示内容的ViewController，这种ViewController主要用于为用户展示内容，并与用户交互，如UITableViewController，UIViewController。</li>
+<li>用于控制和显示其他ViewController的ViewController。这种ViewController一般都是一个ViewController的容器。如UINavigationController，UITabbarController。它们都有一个属性：viewControllers。其中UINavigationController表示一种Stack式结构，push一个ViewController或pop一次，因此后一个ViewController一般会依赖前一个ViewController。而UITabbarController表示一个Array结构，各个ViewController是并列的。</li>
+</ol>
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/03/20/view-controller-life-circle/">阅读更多 &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -505,62 +556,6 @@ ViewController在响应链中的位于ViewController的view和它的superView之
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/02/02/what-in-the-uiapplicationmain/">UIApplicationMain函数做了什么</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-02-02T21:07:00+08:00" pubdate data-updated="true">2012-02-02 21:07</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>在iOS应用中，每个程序得main函数中都调用了UIApplicationMain函数。</p>
-
-<pre><code>int main(int argc, char *argv[])
-{
-    @autoreleasepool {
-        return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));
-    }
-}
-</code></pre>
-
-<p>先来看看UIApplicationMain函数的原型：</p>
-
-<pre><code>int UIApplicationMain (
-    int argc,
-    char *argv[],
-    NSString *principalClassName,
-    NSString *delegateClassName
-);
-</code></pre>
-
-<p>前面的argc和argv是ISO C标准的main函数的参数，直接传递给UIApplicationMain进行相关处理。principalClassName是应用程序类的名字，该类必须继承自UIApplication类。而delegateClassName是应用程序类的代理类。如果主要nib文件（在info.plist文件中指定，key是NSMainNibFile）存在，就会在nib文件对象里寻找Application对象和连接它的delegate。此函数会根据principalClassName创建UIApplication对象，然后根据delegateClassName创建一个delegate对象，并将UIApplication对象中的delegate属性设置为delegate对象。接着会建立应用的main runloop，进行事件的处理（首先会调用– application:didFinishLaunchingWithOptions:）。程序正常退出时才返回（如今iOS支持后台运行，系统在必要时会强行杀死不用的进程，一般这个函数不等返回进程就终止了）。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/5/">&larr; 以往文章</a>
@@ -600,6 +595,10 @@ ViewController在响应链中的位于ViewController的view和它的superView之
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/10/28/operation-queue-intro/">并发编程之Operation Queue</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/10/21/tagged-pointer-and-64-bit/">64位与Tagged Pointer</a>
       </li>
     
@@ -613,10 +612,6 @@ ViewController在响应链中的位于ViewController的view和它的superView之
     
       <li class="post">
         <a href="/blog/2013/08/14/implement-objc-property-in-category/">Objective-C语言在Category中实现属性</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/07/30/no-keyboard-in-webview-of-ios5/">iOS5网页视图（UIWebView）中的输入框不能弹出键盘的问题</a>
       </li>
     
   </ul>

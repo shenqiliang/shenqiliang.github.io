@@ -9,7 +9,7 @@
   <meta name="author" content="谌启亮">
 
   
-  <meta name="description" content="App设计时往往会用到一些模糊效果。iOS目前已提供一些模糊API可以让我们方便是使用。一种是使用Core Image，另一种是使用Accelerate.Framework中的vImage API。 使用Core Image进行模糊 Core Image很早在Mac系统中得到应用， &hellip;">
+  <meta name="description" content="在App设计中为了加强用户体验，我们会常常加入一些友好的动画效果。比如类似UIAlertView弹出的动画效果，由于系统中并没有直接提供类似的动画API，如果我们想要做出一样的效果，那就得深入的研究一下系统中的UIAlertView了。 仔细观察UIAlertView的动画你就会发现： &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -75,6 +75,50 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/04/10/uialertview-animation/">UIAlertView弹出视图动画效果</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-04-10T22:01:00+08:00" pubdate data-updated="true">2013-04-10 22:01</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>在App设计中为了加强用户体验，我们会常常加入一些友好的动画效果。比如类似UIAlertView弹出的动画效果，由于系统中并没有直接提供类似的动画API，如果我们想要做出一样的效果，那就得深入的研究一下系统中的UIAlertView了。</p>
+
+<p>仔细观察UIAlertView的动画你就会发现：这个动画是由几部分组成，它带一个视图大小抖动的效果。先是由小变大，再由大变小，最后变成本来的大小。但是这个大小的具体参数值和动画的速度恐怕是肉眼所不能看出来的。
+本篇文章会使用一些objc runtime和CAAnimation的一些知识，通过本文你可以了解到如何研究一些objc中内部调用机制和动画基础。</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/04/10/uialertview-animation/">阅读更多 &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -518,42 +562,6 @@ a.delegate = self;
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/10/18/xcode-compile-problem-ios6/">最新Xcode编译出现的问题</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-10-18T20:53:00+08:00" pubdate data-updated="true">2012-10-18 20:53</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>iOS6发布的时候，我下载了新的SDK，Xcode也更新到了4.5。那时我们的app正好要提交AppStore，我就尝试用新的Xcode编译开发包。但是在提交时，发现总是验证失败提交不成功。原因是说我的binary里没有armv6的包，但我检查了编译选项发现在Architectures和Valid Architectures里都包含里armv6。折腾了好久，原来我忽略了一个警告。本来我一直都很重视警告，但是我在旧版本的Xcode里编译时1个警告都没有，所以我以为只是新版Xcode环境问题，也没太在意，但问题就是这个警告说明的问题。我用nm命令看了一下包，原来真的没有armv6的binary。查看了相关资料发现原来新版本（4.5以上）的Xcode已经不在armv6处理器了！所以即使你的编译选项里明确指定armv6，也是无效的。所以编译后的包只有armv7。而我的app最低支持版本是4.0。在4.3以下的支持，AppStore会要求必须有armv6的binary，所以提交不了。所以如果app要支持4.3以下就必须用低版本Xcode编译了，否则app就只能支持4.3以上了。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/3/">&larr; 以往文章</a>
@@ -593,6 +601,10 @@ a.delegate = self;
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/10/28/operation-queue-intro/">并发编程之Operation Queue</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/10/21/tagged-pointer-and-64-bit/">64位与Tagged Pointer</a>
       </li>
     
@@ -606,10 +618,6 @@ a.delegate = self;
     
       <li class="post">
         <a href="/blog/2013/08/14/implement-objc-property-in-category/">Objective-C语言在Category中实现属性</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/07/30/no-keyboard-in-webview-of-ios5/">iOS5网页视图（UIWebView）中的输入框不能弹出键盘的问题</a>
       </li>
     
   </ul>

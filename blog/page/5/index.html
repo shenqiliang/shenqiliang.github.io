@@ -9,7 +9,8 @@
   <meta name="author" content="谌启亮">
 
   
-  <meta name="description" content="刚到深圳，由于工作比较忙，很久没关注自己的博客了。现在正好想写写之前在上海的一些经历。在上海也呆1年多了，由于工作原因得离开这个繁华的城市。在这里我做过外包，创过业，个中艰辛只能自己体会，它给我一个很好的人生经验。想过自己的理想，而现实往往是残酷的，虽然放弃，有些不舍， &hellip;">
+  <meta name="description" content="在iOS应用中，每个程序得main函数中都调用了UIApplicationMain函数。 int main(int argc, char *argv[])
+{ @autoreleasepool { return UIApplicationMain(argc, argv, nil, &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -75,6 +76,62 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/02/02/what-in-the-uiapplicationmain/">UIApplicationMain函数做了什么</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-02-02T21:07:00+08:00" pubdate data-updated="true">2012-02-02 21:07</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>在iOS应用中，每个程序得main函数中都调用了UIApplicationMain函数。</p>
+
+<pre><code>int main(int argc, char *argv[])
+{
+    @autoreleasepool {
+        return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));
+    }
+}
+</code></pre>
+
+<p>先来看看UIApplicationMain函数的原型：</p>
+
+<pre><code>int UIApplicationMain (
+    int argc,
+    char *argv[],
+    NSString *principalClassName,
+    NSString *delegateClassName
+);
+</code></pre>
+
+<p>前面的argc和argv是ISO C标准的main函数的参数，直接传递给UIApplicationMain进行相关处理。principalClassName是应用程序类的名字，该类必须继承自UIApplication类。而delegateClassName是应用程序类的代理类。如果主要nib文件（在info.plist文件中指定，key是NSMainNibFile）存在，就会在nib文件对象里寻找Application对象和连接它的delegate。此函数会根据principalClassName创建UIApplication对象，然后根据delegateClassName创建一个delegate对象，并将UIApplication对象中的delegate属性设置为delegate对象。接着会建立应用的main runloop，进行事件的处理（首先会调用– application:didFinishLaunchingWithOptions:）。程序正常退出时才返回（如今iOS支持后台运行，系统在必要时会强行杀死不用的进程，一般这个函数不等返回进程就终止了）。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -454,44 +511,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/04/16/an-utility-91-call/">小工具：91拨号</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-04-16T16:07:00+08:00" pubdate data-updated="true">2011-04-16 16:07</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>91来电秀开发3个月后，主要功能都已经完成，我被指派和另外一个同事L一起开发91拨号。那时L正在做拨号的横屏界面，我就负责开发了91拨号的竖屏界面。</p>
-
-<p>这个软件功能比较简单，就是一个辅助的iPhone拨号程序，主要功能是选择头像拨号，并支持ip拨号，同时提供一个比较好的UI效果。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/6/">&larr; 以往文章</a>
@@ -531,6 +550,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/10/28/operation-queue-intro/">并发编程之Operation Queue</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/10/21/tagged-pointer-and-64-bit/">64位与Tagged Pointer</a>
       </li>
     
@@ -544,10 +567,6 @@
     
       <li class="post">
         <a href="/blog/2013/08/14/implement-objc-property-in-category/">Objective-C语言在Category中实现属性</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/07/30/no-keyboard-in-webview-of-ios5/">iOS5网页视图（UIWebView）中的输入框不能弹出键盘的问题</a>
       </li>
     
   </ul>

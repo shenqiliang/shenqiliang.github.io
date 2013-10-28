@@ -9,7 +9,7 @@
   <meta name="author" content="谌启亮">
 
   
-  <meta name="description" content="在Mac OS X 10.6（Snow Leopard）中开始支持64位，如今最新版本iPhone 5s也开始采用了Arm64架构。在64位化的过程中，其中一个比较关键的改进就是，Mac OS 10.7（Lion）和iOS 7的64位环境先后引入了Tagged Pointer。 &hellip;">
+  <meta name="description" content="随着移动设备的更新换代，移动设备的性能也不断提高，现在流行的CPU已经进入双核、甚至四核时代。如何充分发挥这些CPU的性能，会变得越来越重要。在iOS中如果想要充分利用多核心CPU的优势，就要采用并发编程，提高CPU的利用率。iOS中并发编程中主要有2种方式Operation Queue和GCD（ &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -75,6 +75,47 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/10/28/operation-queue-intro/">并发编程之Operation Queue</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-10-28T11:26:00+08:00" pubdate data-updated="true">2013-10-28 11:26</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>随着移动设备的更新换代，移动设备的性能也不断提高，现在流行的CPU已经进入双核、甚至四核时代。如何充分发挥这些CPU的性能，会变得越来越重要。在iOS中如果想要充分利用多核心CPU的优势，就要采用并发编程，提高CPU的利用率。iOS中并发编程中主要有2种方式Operation Queue和GCD（Grand Central Dispatch）。下面就来先来说一下Operation Queue。</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/10/28/operation-queue-intro/">阅读更多 &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -459,50 +500,6 @@ id objc_getAssociatedObject(id object, const void *key);
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2013/04/10/uialertview-animation/">UIAlertView弹出视图动画效果</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-04-10T22:01:00+08:00" pubdate data-updated="true">2013-04-10 22:01</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>在App设计中为了加强用户体验，我们会常常加入一些友好的动画效果。比如类似UIAlertView弹出的动画效果，由于系统中并没有直接提供类似的动画API，如果我们想要做出一样的效果，那就得深入的研究一下系统中的UIAlertView了。</p>
-
-<p>仔细观察UIAlertView的动画你就会发现：这个动画是由几部分组成，它带一个视图大小抖动的效果。先是由小变大，再由大变小，最后变成本来的大小。但是这个大小的具体参数值和动画的速度恐怕是肉眼所不能看出来的。
-本篇文章会使用一些objc runtime和CAAnimation的一些知识，通过本文你可以了解到如何研究一些objc中内部调用机制和动画基础。</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2013/04/10/uialertview-animation/">阅读更多 &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; 以往文章</a>
@@ -540,6 +537,10 @@ id objc_getAssociatedObject(id object, const void *key);
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/10/28/operation-queue-intro/">并发编程之Operation Queue</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/10/21/tagged-pointer-and-64-bit/">64位与Tagged Pointer</a>
       </li>
     
@@ -553,10 +554,6 @@ id objc_getAssociatedObject(id object, const void *key);
     
       <li class="post">
         <a href="/blog/2013/08/14/implement-objc-property-in-category/">Objective-C语言在Category中实现属性</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/07/30/no-keyboard-in-webview-of-ios5/">iOS5网页视图（UIWebView）中的输入框不能弹出键盘的问题</a>
       </li>
     
   </ul>
