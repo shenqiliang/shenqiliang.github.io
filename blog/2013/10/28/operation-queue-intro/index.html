@@ -108,7 +108,7 @@
 
 <h2>异步调用和并发</h2>
 
-<p>在深入之前，首先说说异步调用和并发。这两个概念在并发编程中很容易弄混淆。异步调用是指调用时无需等待结果返回调用，异步调用往往会触发后台线程处理调用，比如NSURLConnection的异步网络回调。并发是指多个任务（线程）同时执行。在异步调用的实现中往往采用并发机制，但并不是所有异步都是并发机制，也有可能是其他，比如一些中断操作。</p>
+<p>在深入之前，首先说说异步调用和并发。这两个概念在并发编程中很容易弄混淆。异步调用是指调用时无需等待结果返回的调用，异步调用往往会触发后台线程处理，比如NSURLConnection的异步网络回调。并发是指多个任务（线程）同时执行。在异步调用的实现中往往采用并发机制，然而并不是所有异步都是并发机制，也有可能是其他机制，比如一些依靠中断进行的操作。</p>
 
 <h2>为什么Operation Queue</h2>
 
@@ -134,14 +134,14 @@
 <pre><code>NSInvocationOperation *invacationOperation = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(doSomethingWithObj:) object:obj];
 </code></pre>
 
-<p>同时你还可以获取Operation中Invation执行完成后返回的结果对象。</p>
+<p>同时当这个Operation完成后，你还可以获取Operation中Invation执行后返回的结果对象。</p>
 
 <pre><code>id result = [invacationOperation result];
 </code></pre>
 
 <h3>NSBlockOperation</h3>
 
-<p>在一个Block中执行一个任务，这时我们就需要用到NSBlockOperation。可以通过<code>blockOperationWithBlock:</code>方法来方便地创建一个Operation：</p>
+<p>在一个Block中执行一个任务，这时我们就需要用到NSBlockOperation。可以通过<code>blockOperationWithBlock:</code>方法来方便地创建一个NSBlockOperation：</p>
 
 <pre><code>NSBlockOperation *blockOperation = [NSBlockOperation blockOperationWithBlock:^{
     //Do something here.
@@ -155,7 +155,7 @@
 <pre><code>[operation start];
 </code></pre>
 
-<p>Operation提供一个<code>main</code>方法，你的所有任务都应该在main中进行处理。默认的<code>start</code>方法中会先做出一些异常判断然后直接调用<code>main</code>方法。如果需要自定义一个NSOperation必须重载<code>main</code>方法来执行你所想要执行的任务。</p>
+<p><code>start</code>方法用来启动一个Operation任务。同时，Operation提供一个<code>main</code>方法，你的所有任务都应该在main中进行处理。默认的<code>start</code>方法中会先做出一些异常判断然后直接调用<code>main</code>方法。如果需要自定义一个NSOperation必须重载<code>main</code>方法来执行你所想要执行的任务。</p>
 
 <pre><code>@implementation CustomOperation
 
@@ -177,7 +177,7 @@
 <pre><code>[operation cancel];
 </code></pre>
 
-<p>当向一个Operation对象发送cancel消息后，并不保证这个Operation对象一定能立刻取消，这取决于你的<code>main</code>中对<code>cancel</code>的处理。如果你在<code>main</code>方法中没有对<code>cancel</code>进行任何处理的话，发送<code>cancel</code>消息是没有任何效果的。为了让Operation响应<code>cancel</code>消息，那么你就要在<code>main</code>方法中手动的判断<code>isCancelled</code>属性，如果返回<code>YES</code>的话，应释放相关资源并立刻停止继续执行。</p>
+<p>当向一个Operation对象发送cancel消息后，并不保证这个Operation对象一定能立刻取消，这取决于你的<code>main</code>中对<code>cancel</code>的处理。如果你在<code>main</code>方法中没有对<code>cancel</code>进行任何处理的话，发送<code>cancel</code>消息是没有任何效果的。为了让Operation响应<code>cancel</code>消息，那么你就要在<code>main</code>方法中一些适当的地方手动的判断<code>isCancelled</code>属性，如果返回<code>YES</code>的话，应释放相关资源并立刻停止继续执行。</p>
 
 <h3>创建可并发的Operation</h3>
 
@@ -208,7 +208,7 @@
    [self didChangeValueForKey:@"isExecuting"];
 }
 
--(void)main {
+- (void)main {
    @try {
         // Do some work.
 
@@ -241,7 +241,7 @@
 
 <h3>设置Operation的线程优先级</h3>
 
-<p>我们可以为Operation设置一个线程优先级，即<code>threadPriority</code>。那么执行<code>main</code>的时候，线程优先级就会调整到所设置的线程优先级。这个默认值是0.5，我们可以在执行前修改它。</p>
+<p>我们可以为Operation设置一个线程优先级，即<code>threadPriority</code>。那么执行<code>main</code>的时候，线程优先级就会调整到所设置的线程优先级。这个默认值是0.5，我们可以在Operation执行前修改它。</p>
 
 <pre><code>operation.threadPriority = 0.1;
 </code></pre>
@@ -250,7 +250,7 @@
 
 <h3>Operation状态变化</h3>
 
-<p>我们可以通过KVO机制来监听Operation的一下状态改变，比如一个Operation的执行状态或完成状态。这些状态的keypath包括一下几个：</p>
+<p>我们可以通过KVO机制来监听Operation的一下状态改变，比如一个Operation的执行状态或完成状态。这些状态的keypath包括以下几个：</p>
 
 <ul>
 <li>isCancelled</li>
@@ -266,7 +266,7 @@
 
 <h2>NSOperationQueue</h2>
 
-<p>NSOperation是一个Operation执行队列，你可以将任何你想要执行的Operation添加到Operation Queue中，以在队列中执行。同时NSOperation提供了很多可配置选项。Operation Queue的实现中，创建了一个或多个可管理的线程，为队列中的Operation提供可高度自定的执行环境。</p>
+<p>NSOperationQueue是一个Operation执行队列，你可以将任何你想要执行的Operation添加到Operation Queue中，以在队列中执行。同时Operation和Operation Queue提供了很多可配置选项。Operation Queue的实现中，创建了一个或多个可管理的线程，为队列中的Operation提供可高度自定的执行环境。</p>
 
 <h3>Operation的依赖关系</h3>
 
@@ -280,11 +280,11 @@
 
 <h3>Operation在队列中执行的优先级</h3>
 
-<p>Operation在队列中默认是按FIFO（First In First Out）顺序执行的。同时我们可以为单个的Operation设置一个执行的优先级，打乱这个顺序。当Queue有空闲资源执行新的Operation会优先执行队列中优先级最高的Operation。</p>
+<p>Operation在队列中默认是按FIFO（First In First Out）顺序执行的。同时我们可以为单个的Operation设置一个执行的优先级，打乱这个顺序。当Queue有空闲资源执行新的Operation时，会优先执行当前队列中优先级最高的待执行Operation。</p>
 
 <h3>最大并发Operation数目</h3>
 
-<p>在一个Operation Queue中是可以同时执行多个Operation的，Operation会动态的创建多个线程来完成相应Operation。具体的线程数是由Operation Queue来优化配置的，这一般取决与系统CPU的性能，比如CPU的核心数，和CPU的负载。但我们还是可以设置一个最大并发数的，那么Operation Queue就不会创建超过最大并发数量的线程。</p>
+<p>在一个Operation Queue中是可以同时执行多个Operation的，Operation Queue会动态的创建多个线程来完成相应Operation。具体的线程数是由Operation Queue来优化配置的，这一般取决与系统CPU的性能，比如CPU的核心数，和CPU的负载。但我们还是可以设置一个最大并发数的，那么Operation Queue就不会创建超过最大并发数量的线程。</p>
 
 <pre><code>NSOperationQueue *queue = [[NSOperationQueue alloc] init];
 queue.maxConcurrentOperationCount = 1;
@@ -336,7 +336,7 @@ operation2s begin
 operation2s end
 </code></pre>
 
-<p>为了更好的展示队列优先级效果，我把queue。可以看出，第一个operation1s执行完毕后，会执行operation5s，而不是operation2s，因为operation5s的<code>queuePriority</code>是<code>NSOperationQueuePriorityHigh</code>。而第一个线程总是会第一个执行。在看看2-4行，我们可以看出operation1s的<code>completionBlock</code>比operation5s晚开始执行，说明它不在operation1s的线程中执行的。正如前面所说，<code>completionBlock</code>是通过KVO监听执行，一般会运行在主线程。</p>
+<p>为了更好的展示队列优先级效果，我把queue的<code>maxConcurrentOperationCount</code>设置为<code>1</code>，以便任务一个一个的执行。从上面日志可以看出，第一个operation1s执行完毕后，会执行operation5s，而不是operation2s，因为operation5s的<code>queuePriority</code>是<code>NSOperationQueuePriorityHigh</code>。而第一个线程总是会第一个执行。在看看2-4行，我们可以看出operation1s的<code>completionBlock</code>比operation5s晚开始执行，说明它不在operation1s的线程中执行的。正如前面所说，<code>completionBlock</code>是通过KVO监听执行，一般会运行在主线程。</p>
 
 <h2>注意事项</h2>
 
@@ -371,6 +371,12 @@ operation2s end
 
 <time datetime="2013-10-28T11:26:00+08:00" pubdate data-updated="true">2013-10-28 11:26</time>
       
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/mackai-fa/'>Mac开发</a>, <a class='category' href='/blog/categories/ioskai-fa/'>iOS开发</a>
+  
+</span>
 
 
     </p>

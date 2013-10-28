@@ -4,7 +4,7 @@
   <title><![CDATA[分类：iOS开发 | Xcode Dev]]></title>
   <link href="http://blog.xcodev.com/blog/categories/ioskai-fa/atom.xml" rel="self"/>
   <link href="http://blog.xcodev.com/"/>
-  <updated>2013-10-28T11:29:00+08:00</updated>
+  <updated>2013-10-28T14:34:46+08:00</updated>
   <id>http://blog.xcodev.com/</id>
   <author>
     <name><![CDATA[谌启亮]]></name>
@@ -12,6 +12,260 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[并发编程之Operation Queue]]></title>
+    <link href="http://blog.xcodev.com/blog/2013/10/28/operation-queue-intro/"/>
+    <updated>2013-10-28T11:26:00+08:00</updated>
+    <id>http://blog.xcodev.com/blog/2013/10/28/operation-queue-intro</id>
+    <content type="html"><![CDATA[<p>随着移动设备的更新换代，移动设备的性能也不断提高，现在流行的CPU已经进入双核、甚至四核时代。如何充分发挥这些CPU的性能，会变得越来越重要。在iOS中如果想要充分利用多核心CPU的优势，就要采用并发编程，提高CPU的利用率。iOS中并发编程中主要有2种方式Operation Queue和GCD（Grand Central Dispatch）。下面就来先来说一下Operation Queue。</p>
+
+<!--more-->
+
+
+<h2>异步调用和并发</h2>
+
+<p>在深入之前，首先说说异步调用和并发。这两个概念在并发编程中很容易弄混淆。异步调用是指调用时无需等待结果返回的调用，异步调用往往会触发后台线程处理，比如NSURLConnection的异步网络回调。并发是指多个任务（线程）同时执行。在异步调用的实现中往往采用并发机制，然而并不是所有异步都是并发机制，也有可能是其他机制，比如一些依靠中断进行的操作。</p>
+
+<h2>为什么Operation Queue</h2>
+
+<p>Operation Queue提供一个面向对象的并发编程接口，支持并发数，线程优先级，任务优先级，任务依赖关系等多种配置，可以方便满足各种复杂的多任务处理场景。</p>
+
+<ul>
+<li>面向对象接口</li>
+<li>支持并发数配置</li>
+<li>任务优先级调度</li>
+<li>任务依赖关系</li>
+<li>线程优先级配置</li>
+</ul>
+
+
+<h2>NSOperation简介</h2>
+
+<p>iOS并发编程中，把每个并发任务定义为一个Operation，对应的类名是NSOperation。NSOperation是一个抽象类，无法直接使用，它只定义了Operation的一些基本方法。我们需要创建一个继承于它的子类或者使用系统预定义的子类。目前系统预定义了两个子类：NSInvocationOperation和NSBlockOperation。</p>
+
+<h3>NSInvocationOperation</h3>
+
+<p>NSInvoationOperation是一个基于对象和selector的Operation，使用这个你只需要指定对象以及任务的selector，如果必要，你还可以设定传递的对象参数。</p>
+
+<pre><code>NSInvocationOperation *invacationOperation = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(doSomethingWithObj:) object:obj];
+</code></pre>
+
+<p>同时当这个Operation完成后，你还可以获取Operation中Invation执行后返回的结果对象。</p>
+
+<pre><code>id result = [invacationOperation result];
+</code></pre>
+
+<h3>NSBlockOperation</h3>
+
+<p>在一个Block中执行一个任务，这时我们就需要用到NSBlockOperation。可以通过<code>blockOperationWithBlock:</code>方法来方便地创建一个NSBlockOperation：</p>
+
+<pre><code>NSBlockOperation *blockOperation = [NSBlockOperation blockOperationWithBlock:^{
+    //Do something here.
+}];
+</code></pre>
+
+<h3>运行一个Operation</h3>
+
+<p>调用Operation的<code>start</code>方法就可以直接运行一个Operation。</p>
+
+<pre><code>[operation start];
+</code></pre>
+
+<p><code>start</code>方法用来启动一个Operation任务。同时，Operation提供一个<code>main</code>方法，你的所有任务都应该在main中进行处理。默认的<code>start</code>方法中会先做出一些异常判断然后直接调用<code>main</code>方法。如果需要自定义一个NSOperation必须重载<code>main</code>方法来执行你所想要执行的任务。</p>
+
+<pre><code>@implementation CustomOperation
+
+-(void)main {
+   @try {
+      // Do some work.
+   }
+   @catch(...) {
+      // Exception handle.
+   }
+}
+@end
+</code></pre>
+
+<h3>取消一个Operation</h3>
+
+<p>要取消一个Operation，要向Operation对象发送cancel消息：</p>
+
+<pre><code>[operation cancel];
+</code></pre>
+
+<p>当向一个Operation对象发送cancel消息后，并不保证这个Operation对象一定能立刻取消，这取决于你的<code>main</code>中对<code>cancel</code>的处理。如果你在<code>main</code>方法中没有对<code>cancel</code>进行任何处理的话，发送<code>cancel</code>消息是没有任何效果的。为了让Operation响应<code>cancel</code>消息，那么你就要在<code>main</code>方法中一些适当的地方手动的判断<code>isCancelled</code>属性，如果返回<code>YES</code>的话，应释放相关资源并立刻停止继续执行。</p>
+
+<h3>创建可并发的Operation</h3>
+
+<p>由于默认情况下Operation的<code>start</code>方法中直接调用了<code>main</code>方法，而<code>main</code>方法中会有比较耗时的处理任务。如果我们在一段代码连续<code>start</code>了多个Operation，这些Operation都是阻塞地依次执行完，因为第二个Operation必须等到第一个Operation执行完<code>start</code>内的<code>main</code>并返回。Operation默认都是不可并发的（使用了Operation Queue情况下除外，Operation Queue会独自管理自己的线程），因为默认情况下Operation并不额外创建线程。我们可以通过Operation的<code>isConcurrent</code>方法来判断Operation是否是可并发的。如果要让Operation可并发，我们需要让<code>main</code>在独立的线程中执行，并将<code>isConcurrent</code>返回YES。</p>
+
+<pre><code>@implementation MyOperation{
+    BOOL        executing;
+    BOOL        finished;
+}
+
+
+- (BOOL)isConcurrent {
+    return YES;
+}
+
+- (void)start {
+   if ([self isCancelled])
+   {
+      [self willChangeValueForKey:@"isFinished"];
+      finished = YES;
+      [self didChangeValueForKey:@"isFinished"];
+      return;
+   }
+
+   [self willChangeValueForKey:@"isExecuting"];
+   [NSThread detachNewThreadSelector:@selector(main) toTarget:self withObject:nil];
+   executing = YES;
+   [self didChangeValueForKey:@"isExecuting"];
+}
+
+- (void)main {
+   @try {
+        // Do some work.
+
+        [self willChangeValueForKey:@"isFinished"];
+        [self willChangeValueForKey:@"isExecuting"];
+        executing = NO;
+        finished = YES;
+        [self didChangeValueForKey:@"isExecuting"];
+        [self didChangeValueForKey:@"isFinished"];
+
+   }
+   @catch(...) {
+      // Exception handle.
+   }
+}
+
+@end
+</code></pre>
+
+<p>当你自定义了<code>start</code>或<code>main</code>方法时，一定要手动的调用一些KVO通知方法，以便让对象的KVO机制可以正常运作。</p>
+
+<h3>设置Operation的completionBlock</h3>
+
+<p>每个Operation都可以设置一个<code>completionBlock</code>，在Operation执行完成时自动执行这个Block。我们可以在此进行一些完成的处理。<code>completionBlock</code>实现原理是对Operation的<code>isFinnshed</code>字段进行KVO（Key-Value Observing），当监听到<code>isFinnished</code>变成YES时，就执行<code>completionBlock</code>。</p>
+
+<pre><code>operation.completionBlock = ^{
+    NSLog(@"finished");
+};
+</code></pre>
+
+<h3>设置Operation的线程优先级</h3>
+
+<p>我们可以为Operation设置一个线程优先级，即<code>threadPriority</code>。那么执行<code>main</code>的时候，线程优先级就会调整到所设置的线程优先级。这个默认值是0.5，我们可以在Operation执行前修改它。</p>
+
+<pre><code>operation.threadPriority = 0.1;
+</code></pre>
+
+<p>注意：如果你重载的<code>start</code>方法，那么你需要自己来配置<code>main</code>执行时的线程优先级和<code>threadPriority</code>字段保持一致。</p>
+
+<h3>Operation状态变化</h3>
+
+<p>我们可以通过KVO机制来监听Operation的一下状态改变，比如一个Operation的执行状态或完成状态。这些状态的keypath包括以下几个：</p>
+
+<ul>
+<li>isCancelled</li>
+<li>isConcurrent</li>
+<li>isExecuting</li>
+<li>isFinished</li>
+<li>isReady</li>
+<li>dependencies</li>
+<li>queuePriority</li>
+<li>completionBlock</li>
+</ul>
+
+
+<h2>NSOperationQueue</h2>
+
+<p>NSOperationQueue是一个Operation执行队列，你可以将任何你想要执行的Operation添加到Operation Queue中，以在队列中执行。同时Operation和Operation Queue提供了很多可配置选项。Operation Queue的实现中，创建了一个或多个可管理的线程，为队列中的Operation提供可高度自定的执行环境。</p>
+
+<h3>Operation的依赖关系</h3>
+
+<p>有时候我们对任务的执行顺序有要求，一个任务必须在另一个任务执行之前完成，这就需要用到Operation的依赖（Dependency）属性。我们可以为每个Operation设定一些依赖的另外一些Operation，那么如果依赖的Operation没有全部执行完毕，这个Operation就不会被执行。</p>
+
+<pre><code>[operation addDependency:anotherOperation];
+[operation removeDependency:anotherOperation];
+</code></pre>
+
+<p>如果将这些Operation和它所依赖的Operation加如队列中，那么Operation只有在它依赖的Operation都执行完毕后才可以被执行。这样我们就可以方便的控制Operation执行顺序。</p>
+
+<h3>Operation在队列中执行的优先级</h3>
+
+<p>Operation在队列中默认是按FIFO（First In First Out）顺序执行的。同时我们可以为单个的Operation设置一个执行的优先级，打乱这个顺序。当Queue有空闲资源执行新的Operation时，会优先执行当前队列中优先级最高的待执行Operation。</p>
+
+<h3>最大并发Operation数目</h3>
+
+<p>在一个Operation Queue中是可以同时执行多个Operation的，Operation Queue会动态的创建多个线程来完成相应Operation。具体的线程数是由Operation Queue来优化配置的，这一般取决与系统CPU的性能，比如CPU的核心数，和CPU的负载。但我们还是可以设置一个最大并发数的，那么Operation Queue就不会创建超过最大并发数量的线程。</p>
+
+<pre><code>NSOperationQueue *queue = [[NSOperationQueue alloc] init];
+queue.maxConcurrentOperationCount = 1;
+</code></pre>
+
+<p>如果我们将<code>maxConcurrentOperationCount</code>设置为<code>1</code>，那么在队列中每次只能执行一个任务。这就是一个串行的执行队列了。</p>
+
+<h3>Simple Code</h3>
+
+<p>下面我写了一个简单的Simple Code来说明一下Operation和Operation Queue。</p>
+
+<pre><code>NSBlockOperation *operation5s = [NSBlockOperation blockOperationWithBlock:^{
+    NSLog(@"operation5s begin");
+    sleep(5);
+    NSLog(@"operation5s end");
+}];
+operation5s.queuePriority = NSOperationQueuePriorityHigh;
+NSBlockOperation *operation1s = [NSBlockOperation blockOperationWithBlock:^{
+    NSLog(@"operation1s begin");
+    sleep(1);
+    NSLog(@"operation1s end");
+}];
+NSBlockOperation *operation2s = [NSBlockOperation blockOperationWithBlock:^{
+    NSLog(@"operation2s begin");
+    sleep(2);
+    NSLog(@"operation2s end");
+}];
+
+operation1s.completionBlock = ^{
+    NSLog(@"operation1s finished in completionBlock");
+};
+
+NSOperationQueue *queue = [[NSOperationQueue alloc] init];
+queue.maxConcurrentOperationCount = 1;
+[queue addOperation:operation1s];
+[queue addOperation:operation2s];
+[queue addOperation:operation5s];
+[queue waitUntilAllOperationsAreFinished];
+</code></pre>
+
+<p>运行这段代码，我得到了一下输出结果：</p>
+
+<pre><code>operation1s begin
+operation1s end
+operation5s begin
+operation1s finished in completionBlock
+operation5s end
+operation2s begin
+operation2s end
+</code></pre>
+
+<p>为了更好的展示队列优先级效果，我把queue的<code>maxConcurrentOperationCount</code>设置为<code>1</code>，以便任务一个一个的执行。从上面日志可以看出，第一个operation1s执行完毕后，会执行operation5s，而不是operation2s，因为operation5s的<code>queuePriority</code>是<code>NSOperationQueuePriorityHigh</code>。而第一个线程总是会第一个执行。在看看2-4行，我们可以看出operation1s的<code>completionBlock</code>比operation5s晚开始执行，说明它不在operation1s的线程中执行的。正如前面所说，<code>completionBlock</code>是通过KVO监听执行，一般会运行在主线程。</p>
+
+<h2>注意事项</h2>
+
+<ul>
+<li>当一个Operation被加入Queue中后，请不要对这个Operation再进行任何修改。因为一旦加入Queue，它随时就有可能会被执行，对它的任何修改都有可能导致它的运行状态不可控制。</li>
+<li><code>threadPriority</code>仅仅影响了<code>main</code>执行时的线程优先级，其他的方法包括<code>completionBlock</code>都是以默认的优先级来执行的。如果自定义的话，也要注意在<code>main</code>执行前设置好<code>threadPriority</code>，执行完毕后要还原默认线程优先级。</li>
+<li>经测试，Operation的<code>threadPriority</code>字段只有在Operation单独执行时有效，在Operation Queue中是无效的。</li>
+<li>第一个加入到Operation Queue中的Operation，无论它的优先级有多么低，总是会第一个执行。</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[64位与Tagged Pointer]]></title>
@@ -303,85 +557,6 @@ UIWindow *anotherWindow = [UIWindow new];
 </code></pre>
 
 <p>结果果然没有问题了。其实我觉得更好的做法是直接将delegate消息调用写成异步调用会更好一些。</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[iOS 5中使用UIAppearance来自定义应用的外观]]></title>
-    <link href="http://blog.xcodev.com/blog/2013/06/12/custom-ui-using-uiappearance/"/>
-    <updated>2013-06-12T16:31:00+08:00</updated>
-    <id>http://blog.xcodev.com/blog/2013/06/12/custom-ui-using-uiappearance</id>
-    <content type="html"><![CDATA[<p>做App时，我们经常需要自定义一些界面展现，来适合我们App的内容，或来使App看起来更漂亮，有时我们不得不写大量的自定义控件来达到这个目的。iOS 5新增了UIAppearance协议，使得自定义风格简单方便了很多，通过UIAppearance协议，我们快速的修改系统内置的控件的外观，也可以自己定义一些可自定义外观的控件。</p>
-
-<!--more-->
-
-
-<h2>系统框架控件的一些自定义方法</h2>
-
-<h4>自定义导航条背景</h4>
-
-<pre><code>[[UINavigationBar appearance] setBackgroundImage:[UIImage imageNamed:@"background"] forBarMetrics:UIBarMetricsDefault];
-</code></pre>
-
-<h4>自定义导航标题文字属性</h4>
-
-<pre><code>[[UINavigationBar appearance] setTitleTextAttributes:@{UITextAttributeTextColor:[UIColor darkGrayColor],UITextAttributeTextShadowColor:[UIColor clearColor]}];
-</code></pre>
-
-<p>可自定义标题字体，颜色，阴影。</p>
-
-<h4>自定义导航条返回和左右按钮按钮背景</h4>
-
-<pre><code>[[UIBarButtonItem appearanceWhenContainedIn:[UINavigationBar class], nil] setBackButtonBackgroundImage:[UIImage imageNamed:@"back_button_background"] forState:UIControlStateNormal barMetrics:UIBarMetricsDefault];
-[[UIBarButtonItem appearanceWhenContainedIn:[UINavigationBar class], nil] setBackgroundImage:[UIImage imageNamed:@"button_background"] forState:UIControlStateNormal barMetrics:UIBarMetricsDefault];
-</code></pre>
-
-<h4>自定义底部Tab条的背景</h4>
-
-<pre><code>[[UITabBar appearance] setBackgroundImage:[UIImage imageNamed:@"background"]];
-</code></pre>
-
-<h4>自定义底部条标题文字属性</h4>
-
-<pre><code>[[UITabBarItem appearance] setTitleTextAttributes:@{UITextAttributeTextColor:[UIColor grayColor]} forState:UIControlStateNormal];
-[[UITabBarItem appearance] setTitleTextAttributes:@{UITextAttributeTextColor:[UIColor orangeColor]} forState:UIControlStateSelected];
-</code></pre>
-
-<p>这里列举的都是一些最常用的自定义方法，只要是头文件中有“UI_APPEARANCE_SELECTOR”标记的方法都是可以用UIAppearance协议对象去调的。注意这些自定义方法都要在相应的对象显示之前调用，可以放到App启动后立刻配置，以后只要这个对象显示之前，就会设置相应的属性。</p>
-
-<h2>自己创建一个可自定义外观的控件</h2>
-
-<p>对于我们自己定义的控件，也可以支持UIAppearance协议，这样我们的控件也能支持自定义了。你只需要写一个设置外观的settor，然后在settor方法后面加上“UI_APPEARANCE_SELECTOR”标记就可以，其他什么都不需要做。比如一个可以自定义选择状态背景颜色的TableViewCell。</p>
-
-<pre><code>@interface CustomCell : UITableViewCell
-- (void)setSelectedBackgroundColor:(UIColor*)color UI_APPEARANCE_SELECTOR;
-@end
-
-@implementation CustomCell
-- (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
-{
-    self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
-    if (self) {
-        self.selectedBackgroundView = [UIView new];
-        self.selectedBackgroundView.backgroundColor = [UIColor lightGrayColor];
-    }
-    return self;
-}
-- (void)setSelectedBackgroundColor:(UIColor*)color{
-    self.selectedBackgroundView.backgroundColor = color;
-}
-@end
-</code></pre>
-
-<p>注意，官方文档中强调Appearance的setter定义格式应为：</p>
-
-<pre><code>- (void)setProperty:(PropertyType)property forAxis1:(IntegerType)axis1 axis2:(IntegerType)axis2 axisN:(IntegerType)axisN;
-- (PropertyType)propertyForAxis1:(IntegerType)axis1 axis2:(IntegerType)axis2 axisN:(IntegerType)axisN;
-</code></pre>
-
-<h2>UIAppearance实现原理</h2>
-
-<p>在通过UIAppearance调用“UI_APPEARANCE_SELECTOR”标记的方法来配置外观时，UIAppearance实际上没有进行任何实际调用，而是把这个调用保存起来（在Objc中可以用NSInvocation对象来保存一个调用）。当实际的对象显示之前（添加到窗口上，drawRect:之前），就会对这个对象调用之前保存的调用。当这个setter调用后，你的界面风格自定义就完成了。</p>
 ]]></content>
   </entry>
   
