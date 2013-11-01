@@ -9,7 +9,7 @@
   <meta name="author" content="谌启亮">
 
   
-  <meta name="description" content="随着移动设备的更新换代，移动设备的性能也不断提高，现在流行的CPU已经进入双核、甚至四核时代。如何充分发挥这些CPU的性能，会变得越来越重要。在iOS中如果想要充分利用多核心CPU的优势，就要采用并发编程，提高CPU的利用率。iOS中并发编程中主要有2种方式Operation Queue和GCD（ &hellip;">
+  <meta name="description" content="代码注释可以让代码更容易接受和使用，特别是在大型项目合作开发或模块开发中。Objective-C中也有一些很方便的注释插件和文档生成工具。本文推荐两个开源软件：VVDocumenter注释工具和appledoc文档生成工具。 ">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -75,6 +75,47 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/11/01/code-comment-and-doc-gen-tools-for-objc/">Objective-C代码注释和文档输出的工具和方法</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-11-01T01:31:00+08:00" pubdate data-updated="true">2013-11-01 01:31</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>代码注释可以让代码更容易接受和使用，特别是在大型项目合作开发或模块开发中。Objective-C中也有一些很方便的注释插件和文档生成工具。本文推荐两个开源软件：VVDocumenter注释工具和appledoc文档生成工具。</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/11/01/code-comment-and-doc-gen-tools-for-objc/">阅读更多 &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -457,49 +498,6 @@ id objc_getAssociatedObject(id object, const void *key);
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2013/05/30/method-signature-in-objc/">Objective-C中方法签名(Method Signature)机制</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-05-30T15:23:00+08:00" pubdate data-updated="true">2013-05-30 15:23</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h2>引言</h2>
-
-<p>在ObjC语言中，我们会自定义各种各样的类，在类定义中，我们又会定义各种方法，当方法达到一定的数量，有时会不可避免的出现一些同名的方法。而同名的方法有时会导致运行时出现很奇怪的问题。比如传递参数不一致时，出现运行时错误。这些都和ObjC中的方法签名（Method Signature）相关。</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2013/05/30/method-signature-in-objc/">阅读更多 &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; 以往文章</a>
@@ -537,6 +535,10 @@ id objc_getAssociatedObject(id object, const void *key);
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/11/01/code-comment-and-doc-gen-tools-for-objc/">Objective-C代码注释和文档输出的工具和方法</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/10/28/operation-queue-intro/">并发编程之Operation Queue</a>
       </li>
     
@@ -550,10 +552,6 @@ id objc_getAssociatedObject(id object, const void *key);
     
       <li class="post">
         <a href="/blog/2013/08/15/auto-key-press-using-appscript/">用AppleScript在Mac系统下实现按键精灵的功能以及在游戏中的运用</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/08/14/implement-objc-property-in-category/">Objective-C语言在Category中实现属性</a>
       </li>
     
   </ul>

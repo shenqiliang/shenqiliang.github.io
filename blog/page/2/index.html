@@ -9,7 +9,7 @@
   <meta name="author" content="谌启亮">
 
   
-  <meta name="description" content="在App设计中为了加强用户体验，我们会常常加入一些友好的动画效果。比如类似UIAlertView弹出的动画效果，由于系统中并没有直接提供类似的动画API，如果我们想要做出一样的效果，那就得深入的研究一下系统中的UIAlertView了。 仔细观察UIAlertView的动画你就会发现： &hellip;">
+  <meta name="description" content="引言 在ObjC语言中，我们会自定义各种各样的类，在类定义中，我们又会定义各种方法，当方法达到一定的数量，有时会不可避免的出现一些同名的方法。而同名的方法有时会导致运行时出现很奇怪的问题。比如传递参数不一致时，出现运行时错误。这些都和ObjC中的方法签名（Method Signature）相关。 ">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -75,6 +75,49 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/05/30/method-signature-in-objc/">Objective-C中方法签名(Method Signature)机制</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-05-30T15:23:00+08:00" pubdate data-updated="true">2013-05-30 15:23</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h2>引言</h2>
+
+<p>在ObjC语言中，我们会自定义各种各样的类，在类定义中，我们又会定义各种方法，当方法达到一定的数量，有时会不可避免的出现一些同名的方法。而同名的方法有时会导致运行时出现很奇怪的问题。比如传递参数不一致时，出现运行时错误。这些都和ObjC中的方法签名（Method Signature）相关。</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/05/30/method-signature-in-objc/">阅读更多 &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -511,57 +554,6 @@ a.delegate = self;
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/10/19/obj-setproperty-nonatomic-problem-update-ios6/">_objc_setProperty_nonatomic和_objc_setProperty_atomic运行时没有找到的问题</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-10-19T20:59:00+08:00" pubdate data-updated="true">2012-10-19 20:59</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>上次我们一个项目在iOS6上运行正常，但在iOS5.0上运行时却出现了一个错误：</p>
-
-<pre><code>dyld: lazy symbol binding failed: Symbol not found: _objc_setProperty_nonatomic
-</code></pre>
-
-<p>或者</p>
-
-<pre><code>dyld: lazy symbol binding failed: Symbol not found: _objc_setProperty_atomic
-</code></pre>
-
-<p>这个错误就是说App可执行文件里引用了objc_setProperty_nonatomic或objc_setProperty_atomic这些函数。但是代码里显然没有直接调用这2个函数，应该是系统在编译时生成的。经过Debug调试发现总是在设置一个对象的属性时出现这个错误。而这个对象的类定义在静态库里面，所以我看了看静态库。
-经过排查，发现导致这一问题的原因是这个静态库的Deployment Target设置成了6.0。因为objc_setProperty_nonatomic和objc_setProperty_atomic是iOS6中新增的函数，所以如果静态库的Deployment Target设置成iOS6，那么编译后就会使用objc_setProperty_nonatomic和objc_setProperty_atomic这些新的API。由于iOS5中没有这些API，运行后将会崩溃。</p>
-
-<h2>结论</h2>
-
-<p>静态库在编译时，Deployment Target一定要低于和等于工程的Deployment Target。否则容易出现低版本iOS运行不兼容的情况。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/3/">&larr; 以往文章</a>
@@ -601,6 +593,10 @@ a.delegate = self;
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/11/01/code-comment-and-doc-gen-tools-for-objc/">Objective-C代码注释和文档输出的工具和方法</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/10/28/operation-queue-intro/">并发编程之Operation Queue</a>
       </li>
     
@@ -614,10 +610,6 @@ a.delegate = self;
     
       <li class="post">
         <a href="/blog/2013/08/15/auto-key-press-using-appscript/">用AppleScript在Mac系统下实现按键精灵的功能以及在游戏中的运用</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/08/14/implement-objc-property-in-category/">Objective-C语言在Category中实现属性</a>
       </li>
     
   </ul>

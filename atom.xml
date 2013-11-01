@@ -4,7 +4,7 @@
   <title><![CDATA[Xcode Dev]]></title>
   <link href="http://blog.xcodev.com/atom.xml" rel="self"/>
   <link href="http://blog.xcodev.com/"/>
-  <updated>2013-10-30T16:06:08+08:00</updated>
+  <updated>2013-11-01T14:17:43+08:00</updated>
   <id>http://blog.xcodev.com/</id>
   <author>
     <name><![CDATA[谌启亮]]></name>
@@ -12,6 +12,55 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Objective-C代码注释和文档输出的工具和方法]]></title>
+    <link href="http://blog.xcodev.com/blog/2013/11/01/code-comment-and-doc-gen-tools-for-objc/"/>
+    <updated>2013-11-01T01:31:00+08:00</updated>
+    <id>http://blog.xcodev.com/blog/2013/11/01/code-comment-and-doc-gen-tools-for-objc</id>
+    <content type="html"><![CDATA[<p>代码注释可以让代码更容易接受和使用，特别是在大型项目合作开发或模块开发中。Objective-C中也有一些很方便的注释插件和文档生成工具。本文推荐两个开源软件：VVDocumenter注释工具和appledoc文档生成工具。</p>
+
+<!--more-->
+
+
+<h2>VVDocumenter</h2>
+
+<p>首先推荐一个Xcode插件<a href="https://github.com/onevcat/VVDocumenter-Xcode">VVDocumenter</a>，它可以让我们在代码中快捷的插入通用的注释代码。</p>
+
+<p><img src="https://raw.github.com/onevcat/VVDocumenter-Xcode/master/ScreenShot.gif" alt="image" /></p>
+
+<p>有了这个插件只需要在要注释的方法定义前输入三个斜杠（///），它就会自动为我们生成注释模板，这些注释模板可以用文档输出工具输出为说明文档。</p>
+
+<h3>下载和安装VVDocumenter</h3>
+
+<p>VVDocumenter插件是github上的一个开源项目，地址是<a href="https://github.com/onevcat/VVDocumenter-Xcode">https://github.com/onevcat/VVDocumenter-Xcode</a>。你可以<code>git clone</code>或在github网站上下载工程的zip压缩文件。下载完成后，打开其中的工程，build&amp;run一下就安装成功了。然后记得要重新启动一下Xcode应用，VVDocumenter插件就生效了。试试在方法定义前输入“///”。</p>
+
+<h2>appledoc</h2>
+
+<p>我们开发自己的模块时，经常会将模块接口提供给别人使用，这样我们不得不写一些接口说明文档。很多语言都提供了这种工具比如javadoc，doxygen等，可以将注释代码转化成在线文档。这里推荐一个特别适合Objective-C语言的一种文档输出工具<a href="https://github.com/tomaz/appledoc">appledoc</a>。它可以把一些格式的注释转换成Apple SDK风格的文档，同时它支持VVDocumenter的输出注释格式。</p>
+
+<h3>安装appledoc</h3>
+
+<p>建议使用brew命令来安装，如果没有安装brew，可以先用一下命令安装一下：</p>
+
+<pre><code>ruby -e "$(curl -fsSL https://raw.github.com/mxcl/homebrew/go)"：
+</code></pre>
+
+<p>然后执行brew安装命令来安装appledoc</p>
+
+<pre><code>brew install appledoc
+</code></pre>
+
+<h3>使用appledoc生成文档</h3>
+
+<pre><code>appledoc [OPTIONS] &lt;paths to source dirs or files&gt;
+</code></pre>
+
+<p>该命令将生成并安装文档到Xcode，可以通过Xcode的文档浏览器来查看文档，并可以在Xcode中搜索到相关接口。</p>
+
+<p><img src="http://blog.xcodev.com/images/post/xcode-doc-prev-apple-doc.png" alt="image" /></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[并发编程之Operation Queue]]></title>
@@ -1678,30 +1727,6 @@ a.delegate = self;
     NSLog(s);
 }
 </code></pre>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[_objc_setProperty_nonatomic和_objc_setProperty_atomic运行时没有找到的问题]]></title>
-    <link href="http://blog.xcodev.com/blog/2012/10/19/obj-setproperty-nonatomic-problem-update-ios6/"/>
-    <updated>2012-10-19T20:59:00+08:00</updated>
-    <id>http://blog.xcodev.com/blog/2012/10/19/obj-setproperty-nonatomic-problem-update-ios6</id>
-    <content type="html"><![CDATA[<p>上次我们一个项目在iOS6上运行正常，但在iOS5.0上运行时却出现了一个错误：</p>
-
-<pre><code>dyld: lazy symbol binding failed: Symbol not found: _objc_setProperty_nonatomic
-</code></pre>
-
-<p>或者</p>
-
-<pre><code>dyld: lazy symbol binding failed: Symbol not found: _objc_setProperty_atomic
-</code></pre>
-
-<p>这个错误就是说App可执行文件里引用了objc_setProperty_nonatomic或objc_setProperty_atomic这些函数。但是代码里显然没有直接调用这2个函数，应该是系统在编译时生成的。经过Debug调试发现总是在设置一个对象的属性时出现这个错误。而这个对象的类定义在静态库里面，所以我看了看静态库。
-经过排查，发现导致这一问题的原因是这个静态库的Deployment Target设置成了6.0。因为objc_setProperty_nonatomic和objc_setProperty_atomic是iOS6中新增的函数，所以如果静态库的Deployment Target设置成iOS6，那么编译后就会使用objc_setProperty_nonatomic和objc_setProperty_atomic这些新的API。由于iOS5中没有这些API，运行后将会崩溃。</p>
-
-<h2>结论</h2>
-
-<p>静态库在编译时，Deployment Target一定要低于和等于工程的Deployment Target。否则容易出现低版本iOS运行不兼容的情况。</p>
 ]]></content>
   </entry>
   

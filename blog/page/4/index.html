@@ -9,7 +9,8 @@
   <meta name="author" content="谌启亮">
 
   
-  <meta name="description" content="iOS的SDK中提供很多原生ViewController，大大提高了我们的开发效率，下面是我的一些经验。 结构 按结构可以对iOS的所有ViewController分成两类： 主要用于展示内容的ViewController，这种ViewController主要用于为用户展示内容，并与用户交互， &hellip;">
+  <meta name="description" content="如何描述这段代码： [window makeKeyAndVisible] 你可能想到以下答案： window调用了makeKeyAndVisible方法
+向window发送makeKeyAndVisible消息 不得不说，第2种才是正确的描述。 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -75,6 +76,55 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/03/22/difference-between-message-and-method/">Objective-C中消息（Message）和方法（Method）的区别</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-22T00:19:00+08:00" pubdate data-updated="true">2012-03-22 00:19</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>如何描述这段代码：</p>
+
+<pre><code>[window makeKeyAndVisible]
+</code></pre>
+
+<p>你可能想到以下答案：</p>
+
+<ol>
+<li>window调用了makeKeyAndVisible方法</li>
+<li>向window发送makeKeyAndVisible消息</li>
+</ol>
+
+
+<p>不得不说，第2种才是正确的描述。我们可以说UIWindow对象实现了makeKeyAndVisible方法，但调用什么方法是在运行时确定的，所以这里只能说明的是，向window对象发送makeKeyAndVisible消息，会导致在运行时调用window对象的makeKeyAndVisible方法。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -510,52 +560,6 @@ ViewController在响应链中的位于ViewController的view和它的superView之
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/02/02/resolove-ios-mem-error/">如何解决iOS内存错误</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-02-02T22:10:00+08:00" pubdate data-updated="true">2012-02-02 22:10</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>由于iOS5.0之前没有自动应用计数机制，也没有Java那样的垃圾回收功能。我们都需要自己管理和控制对象的回收，这是一件很麻烦的事情，也是做iOS项目中最容易出现的问题。如果不掌握这些方法，调试这些问题几乎没有头绪。</p>
-
-<h2>EXC_BAD_ACCESS内存错误与NSZombieEnabled</h2>
-
-<p>EXC_BAD_ACCESS是最常见的错误了，这个一般是访问了释放了的内存地址空间造成的。比如一个对象已经dealloc了，如果你仍向这个对象发送消息，就会出现这个错误。由于出现这个错误时，几乎不显示什么有用的信息，我们根本无法确定程序错在何处。使用NSZombieEnabled环境变量可以很好的解决这个问题。
-打开你的工程，选择菜单“Product->Edit Scheme”或快捷键“Commend+&lt;”</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2012/02/02/resolove-ios-mem-error/">阅读更多 &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/5/">&larr; 以往文章</a>
@@ -595,6 +599,10 @@ ViewController在响应链中的位于ViewController的view和它的superView之
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/11/01/code-comment-and-doc-gen-tools-for-objc/">Objective-C代码注释和文档输出的工具和方法</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/10/28/operation-queue-intro/">并发编程之Operation Queue</a>
       </li>
     
@@ -608,10 +616,6 @@ ViewController在响应链中的位于ViewController的view和它的superView之
     
       <li class="post">
         <a href="/blog/2013/08/15/auto-key-press-using-appscript/">用AppleScript在Mac系统下实现按键精灵的功能以及在游戏中的运用</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/08/14/implement-objc-property-in-category/">Objective-C语言在Category中实现属性</a>
       </li>
     
   </ul>

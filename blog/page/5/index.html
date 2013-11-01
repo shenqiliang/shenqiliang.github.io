@@ -9,8 +9,7 @@
   <meta name="author" content="谌启亮">
 
   
-  <meta name="description" content="在iOS应用中，每个程序得main函数中都调用了UIApplicationMain函数。 int main(int argc, char *argv[])
-{ @autoreleasepool { return UIApplicationMain(argc, argv, nil, &hellip;">
+  <meta name="description" content="由于iOS5.0之前没有自动应用计数机制，也没有Java那样的垃圾回收功能。我们都需要自己管理和控制对象的回收，这是一件很麻烦的事情，也是做iOS项目中最容易出现的问题。如果不掌握这些方法，调试这些问题几乎没有头绪。 EXC_BAD_ACCESS内存错误与NSZombieEnabled &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -76,6 +75,52 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/02/02/resolove-ios-mem-error/">如何解决iOS内存错误</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-02-02T22:10:00+08:00" pubdate data-updated="true">2012-02-02 22:10</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>由于iOS5.0之前没有自动应用计数机制，也没有Java那样的垃圾回收功能。我们都需要自己管理和控制对象的回收，这是一件很麻烦的事情，也是做iOS项目中最容易出现的问题。如果不掌握这些方法，调试这些问题几乎没有头绪。</p>
+
+<h2>EXC_BAD_ACCESS内存错误与NSZombieEnabled</h2>
+
+<p>EXC_BAD_ACCESS是最常见的错误了，这个一般是访问了释放了的内存地址空间造成的。比如一个对象已经dealloc了，如果你仍向这个对象发送消息，就会出现这个错误。由于出现这个错误时，几乎不显示什么有用的信息，我们根本无法确定程序错在何处。使用NSZombieEnabled环境变量可以很好的解决这个问题。
+打开你的工程，选择菜单“Product->Edit Scheme”或快捷键“Commend+&lt;”</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/02/02/resolove-ios-mem-error/">阅读更多 &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -475,42 +520,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/04/21/new-project-china-mobile-market/">又一个大项目：移动MM（Mobile Market）</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-04-21T18:12:00+08:00" pubdate data-updated="true">2011-04-21 18:12</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>完成91拨号后，轻松了一阵子，这时公司和中国移动合作了一个大项目：移动MM（Mobile Market）for iPhone。移动MM是个复杂的项目，在其他平台已经有相关开发应用。由于功能比较多，很多业务也涉及到其他公司，一些功能需要以插件的形式提供，我们要为他们提供托座服务接口。我当时就主要任务就是搞这个，插件一个实现方案就是其他公司提供一个动态库，我们在需要时动态加载他们的功能模块。后来又做了部分客户端变更主题皮肤功能与轮播广告的功能。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/6/">&larr; 以往文章</a>
@@ -550,6 +559,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/11/01/code-comment-and-doc-gen-tools-for-objc/">Objective-C代码注释和文档输出的工具和方法</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/10/28/operation-queue-intro/">并发编程之Operation Queue</a>
       </li>
     
@@ -563,10 +576,6 @@
     
       <li class="post">
         <a href="/blog/2013/08/15/auto-key-press-using-appscript/">用AppleScript在Mac系统下实现按键精灵的功能以及在游戏中的运用</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/08/14/implement-objc-property-in-category/">Objective-C语言在Category中实现属性</a>
       </li>
     
   </ul>

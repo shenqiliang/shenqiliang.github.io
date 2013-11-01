@@ -9,7 +9,7 @@
   <meta name="author" content="谌启亮">
 
   
-  <meta name="description" content="iOS6发布的时候，我下载了新的SDK，Xcode也更新到了4.5。那时我们的app正好要提交AppStore，我就尝试用新的Xcode编译开发包。但是在提交时，发现总是验证失败提交不成功。原因是说我的binary里没有armv6的包，但我检查了编译选项发现在Architectures和Valid &hellip;">
+  <meta name="description" content="上次我们一个项目在iOS6上运行正常，但在iOS5.0上运行时却出现了一个错误： dyld: lazy symbol binding failed: Symbol not found: _objc_setProperty_nonatomic 或者 dyld: lazy symbol binding &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -75,6 +75,57 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/10/19/obj-setproperty-nonatomic-problem-update-ios6/">_objc_setProperty_nonatomic和_objc_setProperty_atomic运行时没有找到的问题</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-10-19T20:59:00+08:00" pubdate data-updated="true">2012-10-19 20:59</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>上次我们一个项目在iOS6上运行正常，但在iOS5.0上运行时却出现了一个错误：</p>
+
+<pre><code>dyld: lazy symbol binding failed: Symbol not found: _objc_setProperty_nonatomic
+</code></pre>
+
+<p>或者</p>
+
+<pre><code>dyld: lazy symbol binding failed: Symbol not found: _objc_setProperty_atomic
+</code></pre>
+
+<p>这个错误就是说App可执行文件里引用了objc_setProperty_nonatomic或objc_setProperty_atomic这些函数。但是代码里显然没有直接调用这2个函数，应该是系统在编译时生成的。经过Debug调试发现总是在设置一个对象的属性时出现这个错误。而这个对象的类定义在静态库里面，所以我看了看静态库。
+经过排查，发现导致这一问题的原因是这个静态库的Deployment Target设置成了6.0。因为objc_setProperty_nonatomic和objc_setProperty_atomic是iOS6中新增的函数，所以如果静态库的Deployment Target设置成iOS6，那么编译后就会使用objc_setProperty_nonatomic和objc_setProperty_atomic这些新的API。由于iOS5中没有这些API，运行后将会崩溃。</p>
+
+<h2>结论</h2>
+
+<p>静态库在编译时，Deployment Target一定要低于和等于工程的Deployment Target。否则容易出现低版本iOS运行不兼容的情况。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -574,55 +625,6 @@ if (string1==string2) {
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/03/22/difference-between-message-and-method/">Objective-C中消息（Message）和方法（Method）的区别</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-03-22T00:19:00+08:00" pubdate data-updated="true">2012-03-22 00:19</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>如何描述这段代码：</p>
-
-<pre><code>[window makeKeyAndVisible]
-</code></pre>
-
-<p>你可能想到以下答案：</p>
-
-<ol>
-<li>window调用了makeKeyAndVisible方法</li>
-<li>向window发送makeKeyAndVisible消息</li>
-</ol>
-
-
-<p>不得不说，第2种才是正确的描述。我们可以说UIWindow对象实现了makeKeyAndVisible方法，但调用什么方法是在运行时确定的，所以这里只能说明的是，向window对象发送makeKeyAndVisible消息，会导致在运行时调用window对象的makeKeyAndVisible方法。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/4/">&larr; 以往文章</a>
@@ -662,6 +664,10 @@ if (string1==string2) {
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/11/01/code-comment-and-doc-gen-tools-for-objc/">Objective-C代码注释和文档输出的工具和方法</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/10/28/operation-queue-intro/">并发编程之Operation Queue</a>
       </li>
     
@@ -675,10 +681,6 @@ if (string1==string2) {
     
       <li class="post">
         <a href="/blog/2013/08/15/auto-key-press-using-appscript/">用AppleScript在Mac系统下实现按键精灵的功能以及在游戏中的运用</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/08/14/implement-objc-property-in-category/">Objective-C语言在Category中实现属性</a>
       </li>
     
   </ul>

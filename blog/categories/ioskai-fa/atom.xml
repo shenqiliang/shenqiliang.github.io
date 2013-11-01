@@ -4,7 +4,7 @@
   <title><![CDATA[分类：iOS开发 | Xcode Dev]]></title>
   <link href="http://blog.xcodev.com/blog/categories/ioskai-fa/atom.xml" rel="self"/>
   <link href="http://blog.xcodev.com/"/>
-  <updated>2013-10-30T16:06:08+08:00</updated>
+  <updated>2013-11-01T14:17:43+08:00</updated>
   <id>http://blog.xcodev.com/</id>
   <author>
     <name><![CDATA[谌启亮]]></name>
@@ -12,6 +12,55 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Objective-C代码注释和文档输出的工具和方法]]></title>
+    <link href="http://blog.xcodev.com/blog/2013/11/01/code-comment-and-doc-gen-tools-for-objc/"/>
+    <updated>2013-11-01T01:31:00+08:00</updated>
+    <id>http://blog.xcodev.com/blog/2013/11/01/code-comment-and-doc-gen-tools-for-objc</id>
+    <content type="html"><![CDATA[<p>代码注释可以让代码更容易接受和使用，特别是在大型项目合作开发或模块开发中。Objective-C中也有一些很方便的注释插件和文档生成工具。本文推荐两个开源软件：VVDocumenter注释工具和appledoc文档生成工具。</p>
+
+<!--more-->
+
+
+<h2>VVDocumenter</h2>
+
+<p>首先推荐一个Xcode插件<a href="https://github.com/onevcat/VVDocumenter-Xcode">VVDocumenter</a>，它可以让我们在代码中快捷的插入通用的注释代码。</p>
+
+<p><img src="https://raw.github.com/onevcat/VVDocumenter-Xcode/master/ScreenShot.gif" alt="image" /></p>
+
+<p>有了这个插件只需要在要注释的方法定义前输入三个斜杠（///），它就会自动为我们生成注释模板，这些注释模板可以用文档输出工具输出为说明文档。</p>
+
+<h3>下载和安装VVDocumenter</h3>
+
+<p>VVDocumenter插件是github上的一个开源项目，地址是<a href="https://github.com/onevcat/VVDocumenter-Xcode">https://github.com/onevcat/VVDocumenter-Xcode</a>。你可以<code>git clone</code>或在github网站上下载工程的zip压缩文件。下载完成后，打开其中的工程，build&amp;run一下就安装成功了。然后记得要重新启动一下Xcode应用，VVDocumenter插件就生效了。试试在方法定义前输入“///”。</p>
+
+<h2>appledoc</h2>
+
+<p>我们开发自己的模块时，经常会将模块接口提供给别人使用，这样我们不得不写一些接口说明文档。很多语言都提供了这种工具比如javadoc，doxygen等，可以将注释代码转化成在线文档。这里推荐一个特别适合Objective-C语言的一种文档输出工具<a href="https://github.com/tomaz/appledoc">appledoc</a>。它可以把一些格式的注释转换成Apple SDK风格的文档，同时它支持VVDocumenter的输出注释格式。</p>
+
+<h3>安装appledoc</h3>
+
+<p>建议使用brew命令来安装，如果没有安装brew，可以先用一下命令安装一下：</p>
+
+<pre><code>ruby -e "$(curl -fsSL https://raw.github.com/mxcl/homebrew/go)"：
+</code></pre>
+
+<p>然后执行brew安装命令来安装appledoc</p>
+
+<pre><code>brew install appledoc
+</code></pre>
+
+<h3>使用appledoc生成文档</h3>
+
+<pre><code>appledoc [OPTIONS] &lt;paths to source dirs or files&gt;
+</code></pre>
+
+<p>该命令将生成并安装文档到Xcode，可以通过Xcode的文档浏览器来查看文档，并可以在Xcode中搜索到相关接口。</p>
+
+<p><img src="/images/post/xcode-doc-prev-apple-doc.png" alt="image" /></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[并发编程之Operation Queue]]></title>
@@ -514,49 +563,6 @@ UIWindow *anotherWindow = [UIWindow new];
 <h2>小结</h2>
 
 <p>UIWebView要能弹出键盘，那么它所在的window必须是key window。如果你的App可能存在多个Window（如弹出自定义的Alert，状态条等），而且这些window有可能被设置为key window，一定要在web view显示时将它所在的window设置为key window。</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[TableView中嵌套一个ScrollView有时导致ScrollView无法滚动]]></title>
-    <link href="http://blog.xcodev.com/blog/2013/07/17/cant-scroll-in-tableview/"/>
-    <updated>2013-07-17T15:34:00+08:00</updated>
-    <id>http://blog.xcodev.com/blog/2013/07/17/cant-scroll-in-tableview</id>
-    <content type="html"><![CDATA[<h2>TableView中嵌套ScrollView导致ScrollView无法滚动</h2>
-
-<p>开发时，经常会在一个TableView中嵌套一个横向滚动ScrollView，当ScrollView进行滑动时，TableView中展示的信息也会需要相应的改变，那么有时就需要重新载入TableView的数据（reloadData）。这时当ScrollView连续滚动多次，经常会出现ScrollView滚动不了。在控制台上同时会出现以下日志信息：</p>
-
-<pre><code>Ignoring call to [UIPanGestureRecognizer setTranslation:inView:] since gesture recognizer is not active.
-</code></pre>
-
-<!--more-->
-
-
-<p>在QQ电影票新版开发过程中就遇到了这个问题。</p>
-
-<p><img src="/images/post/scrollView_in_tableView.jpg" alt="image" /></p>
-
-<p>中间显示电影列表的是一个ScrollView。滑动过程中，如果中间箭头所指向的电影发生变化，整个界面信息就会刷新，调用TableView的reloadData。经过几次连续不间断的滑动电影列表后，就会导致ScrollView卡住，然后控制台就会出现“Ignoring call to [UIPanGestureRecognizer setTranslation:inView:] since gesture recognizer is not active.”的错误日志。</p>
-
-<h2>原因分析</h2>
-
-<p>开始时我以为是我自定义的ScrollView控件有问题，尝试各种屏蔽代码的方法，结果只有屏蔽的delegate的方法才不会出现问题，应该是delegate中的某些调用出现了问题。我仔细的检查了一下delegate方法，发现和TableView有关的一句代码：</p>
-
-<pre><code>[self.tableView reloadData];
-</code></pre>
-
-<p>当我把reloadData注释调时，发现滑动起来很流畅，也没有出现这个问题了。可以断定时滑动过程中reloadData导致。结合错误日志，所以应该是滑动时同时reloadData，导致ScrollView的滑动手势失效。</p>
-
-<h2>解决办法</h2>
-
-<p>因为是在ScrollView的delegate消息中去调tableView的reloadData，可能在ScrollView的delegate消息处理完成之后，系统还会做一些其他的处理，这是你突然reloadData会导致ScrollView移出superView，然后导致滑动手势失效，所以我尝试异步调用一下TableView的reloadData：</p>
-
-<pre><code>dispatch_async(dispatch_get_main_queue(), ^{
-     [self.tableView reloadData];
-});
-</code></pre>
-
-<p>结果果然没有问题了。其实我觉得更好的做法是直接将delegate消息调用写成异步调用会更好一些。</p>
 ]]></content>
   </entry>
   
