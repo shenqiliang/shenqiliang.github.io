@@ -4,7 +4,7 @@
   <title><![CDATA[分类：Mac开发 | Xcode Dev]]></title>
   <link href="http://blog.xcodev.com/blog/categories/mackai-fa/atom.xml" rel="self"/>
   <link href="http://blog.xcodev.com/"/>
-  <updated>2013-11-01T14:17:43+08:00</updated>
+  <updated>2013-11-04T17:27:56+08:00</updated>
   <id>http://blog.xcodev.com/</id>
   <author>
     <name><![CDATA[谌启亮]]></name>
@@ -12,6 +12,352 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[并发编程之GCD]]></title>
+    <link href="http://blog.xcodev.com/blog/2013/11/04/gcd-intro/"/>
+    <updated>2013-11-04T17:13:00+08:00</updated>
+    <id>http://blog.xcodev.com/blog/2013/11/04/gcd-intro</id>
+    <content type="html"><![CDATA[<p>在<a href="/blog/2013/10/28/operation-queue-intro/">《并发编程之Operation Queue》</a>中讲了Cocoa并发编程中的Operation Queue，了解了Operation Queue是一个面向对象的并发编程接口，它支持并发数，线程优先级，任务优先级，任务依赖关系等多种配置，可以方便满足各种复杂的多任务处理场景。本篇将接着讲另一种并发编程机制 &ndash; GCD（Grand Central Dispatch）。iOS4.0中首度引入GCD，GCD是管理任务执行的一项技术，它使得我们对多任务处理变得更加方便和有效。它支持同步或异步任务处理，串行或并行的处理队列（Dispath Queue），非系统调用的信号量机制，定时任务处理，进程、文件或网络的监听任务等。这个庞大的任务处理技术大大减少了线程的管理工作，使基于任务的开发变得更加高效。</p>
+
+<!--more-->
+
+
+<h2>Dispatch Queue</h2>
+
+<p>Dispatch Queue是一个任务执行队列，可以让你异步或同步地执行多个Block或函数。Dispatch Queue是FIFO的，即先入队的任务总会先执行。目前有三种类型的Dispath Queue：</p>
+
+<ul>
+<li>串行队列（Serial dispatch queue）</li>
+<li>并发队列（Concurrent dispatch queue）</li>
+<li>主队列（Main dispatch queue）</li>
+</ul>
+
+
+<h3>串行队列</h3>
+
+<p>串行队列一次只能处理一个任务，可以由用户调用<code>dispatch_queue_create</code>创建：</p>
+
+<pre><code>dispatch_queue_t queue;
+queue = dispatch_queue_create("com.example.MyQueue", NULL);
+</code></pre>
+
+<p>dispatch_queue_create第一个参数是串行队列标识，一般用反转域名的格式表示以防冲突；第二个参数是queue的类型，设为NULL时默认是<code>DISPATCH_QUEUE_SERIAL</code>，将创建串行队列，在必要情况下，你可以将其设置为<code>DISPATCH_QUEUE_CONCURRENT</code>来创建自定义并行队列。</p>
+
+<h3>并行队列</h3>
+
+<p>并行队列可以同时处理多个任务，在不得以的情况下可以用<code>dispatch_queue_create</code>创建，但一般我们都要用系统预定义的并行队列，即全局队列（Global Concurrent Dispatch Queues）。目前系统预定义了四个不同运行优先级的全局队列，我们可以通过<code>dispatch_get_global_queue</code>来获取它们。</p>
+
+<pre><code>dispatch_queue_t aQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+</code></pre>
+
+<p><code>dispatch_get_global_queue</code>第一个参数是队列的优先级，分别对应四个全局队列：</p>
+
+<ul>
+<li>DISPATCH_QUEUE_PRIORITY_HIGH</li>
+<li>DISPATCH_QUEUE_PRIORITY_DEFAULT</li>
+<li>DISPATCH_QUEUE_PRIORITY_LOW</li>
+<li>DISPATCH_QUEUE_PRIORITY_BACKGROUND</li>
+</ul>
+
+
+<p><code>dispatch_get_global_queue</code>中第二个参数目前系统保留，请设置为0即可。</p>
+
+<h3>主队列</h3>
+
+<p>主队列是一个特殊的队列，它是系统预定义的运行在主线程的一个Dispatch Queue。可以通过<code>dispatch_get_main_queue</code>来获取唯一的主队列。主队列一般运行一些需要与主线程同步的一些短时任务。</p>
+
+<pre><code>dispatch_queue_t mainQueue = dispatch_get_main_queue();
+</code></pre>
+
+<h3>获取当前队列</h3>
+
+<p>你可以通过<code>dispatch_get_current_queue</code>获取运行时的队列：</p>
+
+<pre><code>dispatch_queue_t currentQueue = dispatch_get_current_queue();
+</code></pre>
+
+<p>如果在队列执行任务中调用，返回执行此任务的队列；如果在主线程中调用，将返回主队列；如果在一般线程（非主线程线程非队列执行任务）中调用，返回<code>DISPATCH_QUEUE_PRIORITY_DEFAULT</code>全局队列。</p>
+
+<h3>在队列中运行任务</h3>
+
+<p>你可以随时向一个队列中添加一个新任务，只需要调用一下<code>dispatch_async</code>即可：</p>
+
+<pre><code>dispatch_async(aQueue, ^{
+    //Do some work;
+});
+</code></pre>
+
+<p><code>dispatch_async</code>中的任务是异步执行的，就是说<code>dispatch_async</code>添加任务到执行队列后会立刻返回，而不会等待任务执行完成。然而，必要的话，你也可以调用<code>dispatch_sync</code>来同步的执行一个任务：</p>
+
+<pre><code>dispatch_sync(aQueue, ^{
+    //Do some work;
+});
+</code></pre>
+
+<p><code>dispatch_sync</code>会阻塞当前线程直到提交的任务完全执行完毕。</p>
+
+<h3>Dispatch Queue的内存管理</h3>
+
+<p>除了系统预定义的Dispatch Queue，我们自定义的Dispatch Queue需要手动的管理它的内存。<code>dispatch_retain</code>和<code>dispatch_release</code>这两个函数可以控制Dispatch Queue的引用计数（同时可以控制后面会讲到的Dispatch Group和Dispatch Source的引用计数）。当Dispatch Queue引用计数变为0后，就会调用finalizer，finalizer是Dispatch Queue销毁前调用的函数，用来清理Dispatch Queue的相关资源。可以用<code>dispatch_set_finalizer_f</code>函数来设置Dispatch Queue的finalizer，这个函数同时可以设置Dispatch Group和Dispatch Source的销毁函数（后面会讲到）。</p>
+
+<pre><code>void dispatch_set_finalizer_f(dispatch_object_t object, dispatch_function_t finalizer);
+</code></pre>
+
+<h3>Dispatch Queue的上下文环境数据</h3>
+
+<p>我们可以为每个Dispatch Queue设置一个自定义的上下文环境数据，调用<code>dispatch_set_context</code>来实现。同时我们也可以用<code>dispatch_get_context</code>获取这个上下文环境数据，这个函数同时可以设置Dispatch Group和Dispatch Source的上下文环境数据（后面会讲到）。</p>
+
+<pre><code>void dispatch_set_context(dispatch_object_t object,void *context);
+void * dispatch_get_context(dispatch_object_t object);
+</code></pre>
+
+<p>注意Dispatch Queue并不保证这个<code>context</code>不会释放，不会对它进行内存管理控制。我们需要自行管理<code>context</code>的内存分配和释放。一般我们非配内存设置<code>context</code>后，可以在finalizer里释放<code>context</code>占有的内存。</p>
+
+<h2>并行执行循环</h2>
+
+<p>在编程过程中，我们经常会用到<code>for</code>循环，而且<code>for</code>循环要做很多相关的任务。比如：</p>
+
+<pre><code>for (i = 0; i &lt; count; i++) {
+   //do a lot of work here.
+   doSomething(i);
+}
+</code></pre>
+
+<p>如果<code>for</code>循环中处理的任务是可并发的，显然放到一个线程中处理是很慢的，GCD提供两个函数<code>dispatch_apply</code>和<code>dispatch_apply_f</code>，<code>dispatch_apply</code>是用于Block的，而<code>dispatch_apply_f</code>可以用于c函数，它们可以替代可并发的<code>for</code>循环，来并行的运行而提高执行效率。</p>
+
+<pre><code>dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+dispatch_apply(count, queue, ^(size_t i) {
+   //do a lot of work here.
+   doSomething(i);
+});
+</code></pre>
+
+<h2>Dispatch Group</h2>
+
+<p>有时候我们进行下一步操作，而这个操作需要等待几个任务处理完毕后才能继续，这时我们就需要用的Dispatch Group（类似thread join）。我们可以把若干个任务放到一个Dispatch Group中：</p>
+
+<pre><code>dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+dispatch_group_t group = dispatch_group_create();
+dispatch_group_async(group, queue, ^{
+   // Some asynchronous work
+});
+</code></pre>
+
+<p><code>dispatch_group_async</code>跟<code>dispatch_async</code>一样，会把任务放到<code>queue</code>中执行，不过它比<code>dispatch_async</code>多做了一步操作就是把这个任务和<code>group</code>相关联。</p>
+
+<p>把一些任务放到Dispatch Group后，我们就可以调用<code>dispatch_group_wait</code>来等待这些任务完成。若任务已经全部完成或为空，则直接返回，否则等待所有任务完成后返回。注意：返回后<code>group</code>会清空。</p>
+
+<pre><code>dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
+// Do some work after.
+dispatch_release(group);
+</code></pre>
+
+<h2>Dispatch信号量</h2>
+
+<p>很多程序设计都设计到信号量，生产者-消费者模型在多线程编程中会频繁的使用。GCD提供了自己的一套信号量机制。</p>
+
+<pre><code>dispatch_semaphore_t sema = dispatch_semaphore_create(RESOURCE_SIZE);
+dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+//do some work here.
+dispatch_semaphore_signal(sema);
+</code></pre>
+
+<p><code>dispatch_semaphore_wait</code>用来获取信号量，若信号量为0，则等待直到信号量大于0。在处理任务结束后，应释放相关资源并调用<code>dispatch_semaphore_signal</code>使信号量增加1个。</p>
+
+<h2>Dispatch Source</h2>
+
+<p>Dispatch Source是GCD中监听一些系统事件的有个Dispatch对象，它包括定时器、文件监听、进程监听、Mach port监听等类型。</p>
+
+<p>可以通过<code>dispatch_source_create</code>创建一个Dispatch Source：</p>
+
+<pre><code>dispatch_source_t dispatch_source_create(
+   dispatch_source_type_t type,
+   uintptr_t handle,
+   unsigned long mask,
+   dispatch_queue_t queue);
+</code></pre>
+
+<p>这里可以指定Dispatch Source的类型，<code>type</code>可以为文件读或写、进程监听等。<code>handle</code>为监听对象的句柄，如果是文件就是文件描述符，如果是进程就是进程ID。<code>mask</code>用来指定一些想要监听的事件，它的意义取决于<code>type</code>。<code>queue</code>指定事件处理的任务队列。</p>
+
+<p>创建好Dispatch Source后，我们要为Dispatch Source设置一个事件处理模块。可以用<code>dispatch_source_set_event_handler</code>或<code>dispatch_source_set_event_handler_f</code>来设置：</p>
+
+<pre><code>void dispatch_source_set_event_handler(
+   dispatch_source_t source,
+   dispatch_block_t handler);
+</code></pre>
+
+<p>设置好Dispatch Source后就可以调用<code>dispatch_resume</code>来启动监听。如果相应的事件发生就会触发事件处理模块。</p>
+
+<p>同时我们也可以设置一个取消处理模块：</p>
+
+<pre><code>dispatch_source_set_cancel_handler(mySource, ^{
+   close(fd); // Close a file descriptor opened earlier.
+});
+</code></pre>
+
+<p>取消处理模块会在Dispatch Source取消时调用。</p>
+
+<p>下面介绍一下主要的Dispatch Source类型和示例代码。</p>
+
+<h3>定时器</h3>
+
+<p>定时器Dispatch Source可以每隔一个固定的时间处理一下任务。</p>
+
+<pre><code>dispatch_source_t CreateDispatchTimer(uint64_t interval,
+              uint64_t leeway,
+              dispatch_queue_t queue,
+              dispatch_block_t block)
+{
+   dispatch_source_t timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER,
+                                                     0, 0, queue);
+   if (timer)
+   {
+      dispatch_source_set_timer(timer, dispatch_walltime(NULL, 0), interval, leeway);
+      dispatch_source_set_event_handler(timer, block);
+      dispatch_resume(timer);
+   }
+   return timer;
+}
+
+void MyCreateTimer()
+{
+   dispatch_source_t aTimer = CreateDispatchTimer(30ull * NSEC_PER_SEC,
+                               1ull * NSEC_PER_SEC,
+                               dispatch_get_main_queue(),
+                               ^{ MyPeriodicTask(); });
+
+   // Store it somewhere for later use.
+    if (aTimer)
+    {
+        MyStoreTimer(aTimer);
+    }
+}
+</code></pre>
+
+<h4>dispatch_after和dispatch_after_f</h4>
+
+<p>有时候我们只想处理一次延迟任务，可以用dispatch_after和dispatch_after_f</p>
+
+<pre><code>void dispatch_after(
+   dispatch_time_t when,
+   dispatch_queue_t queue,
+   dispatch_block_t block);
+</code></pre>
+
+<h3>监听文件事件</h3>
+
+<p>监听文件事件分好几个类型，有读、写、属性的监听。</p>
+
+<h4>读取文件</h4>
+
+<pre><code>dispatch_source_t source = dispatch_source_create(DISPATCH_SOURCE_TYPE_READ, fd, 0, queue);
+dispatch_source_set_event_handler(source, ^{
+   // Get some data from the source variable, which is captured
+   // from the parent context.
+   size_t estimated = dispatch_source_get_data(source);
+   // Continue reading the descriptor...
+});
+dispatch_resume(source);
+</code></pre>
+
+<h4>写文件</h4>
+
+<pre><code>dispatch_source_t writeSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_WRITE,
+                        fd, 0, queue);
+if (!writeSource)
+{
+    close(fd);
+    return NULL;
+}
+
+dispatch_source_set_event_handler(writeSource, ^{
+    size_t bufferSize = MyGetDataSize();
+    void* buffer = malloc(bufferSize);
+
+    size_t actual = MyGetData(buffer, bufferSize);
+    write(fd, buffer, actual);
+
+    free(buffer);
+
+    // Cancel and release the dispatch source when done.
+    dispatch_source_cancel(writeSource);
+});
+</code></pre>
+
+<h4>监听文件属性</h4>
+
+<pre><code>dispatch_source_t source = dispatch_source_create(DISPATCH_SOURCE_TYPE_VNODE,
+            fd, DISPATCH_VNODE_RENAME, queue);
+if (source)
+{
+  // Copy the filename for later use.
+  int length = strlen(filename);
+  char* newString = (char*)malloc(length + 1);
+  newString = strcpy(newString, filename);
+  dispatch_set_context(source, newString);
+
+  // Install the event handler to process the name change
+  dispatch_source_set_event_handler(source, ^{
+        const char*  oldFilename = (char*)dispatch_get_context(source);
+        MyUpdateFileName(oldFilename, fd);
+  });
+
+  // Install a cancellation handler to free the descriptor
+  // and the stored string.
+  dispatch_source_set_cancel_handler(source, ^{
+      char* fileStr = (char*)dispatch_get_context(source);
+      free(fileStr);
+      close(fd);
+  });
+
+  // Start processing events.
+  dispatch_resume(source);
+}
+else
+  close(fd);
+</code></pre>
+
+<h3>监听进程事件</h3>
+
+<p><code>DISPATCH_PROC_EXIT</code>是一个监听进程退出的类型。</p>
+
+<pre><code>dispatch_source_t source = dispatch_source_create(DISPATCH_SOURCE_TYPE_PROC,
+                                                  parentPID, DISPATCH_PROC_EXIT, queue);
+if (source)
+{
+   dispatch_source_set_event_handler(source, ^{
+     MySetAppExitFlag();
+     dispatch_source_cancel(source);
+     dispatch_release(source);
+   });
+   dispatch_resume(source);
+}
+</code></pre>
+
+<h3>监听中断信号</h3>
+
+<pre><code>dispatch_source_t source = dispatch_source_create(DISPATCH_SOURCE_TYPE_SIGNAL, SIGHUP, 0, queue);
+if (source)
+{
+  dispatch_source_set_event_handler(source, ^{
+     MyProcessSIGHUP();
+  });
+
+  // Start processing signals
+  dispatch_resume(source);
+}
+</code></pre>
+
+<h2>参考文献</h2>
+
+<ul>
+<li>Dispatch Queues：<a href="https://developer.apple.com/library/mac/documentation/general/conceptual/concurrencyprogrammingguide/OperationQueues/OperationQueues.html#//apple_ref/doc/uid/TP40008091-CH102-SW1">https://developer.apple.com/library/mac/documentation/general/conceptual/concurrencyprogrammingguide/OperationQueues/OperationQueues.html#//apple_ref/doc/uid/TP40008091-CH102-SW1</a></li>
+<li>Dispatch Sources：<a href="https://developer.apple.com/library/mac/documentation/general/conceptual/concurrencyprogrammingguide/GCDWorkQueues/GCDWorkQueues.html">https://developer.apple.com/library/mac/documentation/general/conceptual/concurrencyprogrammingguide/GCDWorkQueues/GCDWorkQueues.html</a></li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Objective-C代码注释和文档输出的工具和方法]]></title>
@@ -302,7 +648,7 @@ operation2s begin
 operation2s end
 </code></pre>
 
-<p>为了更好的展示队列优先级效果，我把queue的<code>maxConcurrentOperationCount</code>设置为<code>1</code>，以便任务一个一个的执行。从上面日志可以看出，第一个operation1s执行完毕后，会执行operation5s，而不是operation2s，因为operation5s的<code>queuePriority</code>是<code>NSOperationQueuePriorityHigh</code>。而第一个线程总是会第一个执行。在看看2-4行，我们可以看出operation1s的<code>completionBlock</code>比operation5s晚开始执行，说明它不在operation1s的线程中执行的。正如前面所说，<code>completionBlock</code>是通过KVO监听执行，一般会运行在主线程。</p>
+<p>为了更好的展示队列优先级效果，我把queue的<code>maxConcurrentOperationCount</code>设置为<code>1</code>，以便任务一个一个的执行。从上面日志可以看出，第一个operation1s执行完毕后，会执行operation5s，而不是operation2s，因为operation5s的<code>queuePriority</code>是<code>NSOperationQueuePriorityHigh</code>。而第一个线程总是会第一个执行。在看看2-4行，我们可以看出operation1s的<code>completionBlock</code>比operation5s晚开始执行，说明它不在operation1s的线程中执行的。正如前面所说，<code>completionBlock</code>是通过KVO监听执行，一般会运行在监听所在线程，而不是Operation执行的线程。</p>
 
 <h2>注意事项</h2>
 
@@ -517,158 +863,6 @@ SYNTHESIZE_CATEGORY_OBJ_PROPERTY(userInfo, setUserInfo:)
 SYNTHESIZE_CATEGORY_VALUE_PROPERTY(CGRect, customArea, setCustomArea:)
 @end
 </code></pre>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Objective-C中方法签名(Method Signature)机制]]></title>
-    <link href="http://blog.xcodev.com/blog/2013/05/30/method-signature-in-objc/"/>
-    <updated>2013-05-30T15:23:00+08:00</updated>
-    <id>http://blog.xcodev.com/blog/2013/05/30/method-signature-in-objc</id>
-    <content type="html"><![CDATA[<h2>引言</h2>
-
-<p>在ObjC语言中，我们会自定义各种各样的类，在类定义中，我们又会定义各种方法，当方法达到一定的数量，有时会不可避免的出现一些同名的方法。而同名的方法有时会导致运行时出现很奇怪的问题。比如传递参数不一致时，出现运行时错误。这些都和ObjC中的方法签名（Method Signature）相关。</p>
-
-<!--more-->
-
-
-<h2>什么是方法签名</h2>
-
-<p>方法签名是ObjC中对一个方法的参数类型和返回值类型的一条记录。每个方法都对应一个方法签名。</p>
-
-<h2>一些基本概念</h2>
-
-<p>有几个名词在深入理解方法签名机制之前必须区分清楚：
-部分可参考我之前的一篇博文：
-<a href="/blog/2012/03/22/difference-between-message-and-method/">Objective-C中消息（Message）和方法（Method）的区别</a></p>
-
-<h3>消息</h3>
-
-<p>消息由消息的名字和参数组成，可以有返回值，用于发送给某个对象。大部分我们写的代码都是向一个对象发送消息。比如：</p>
-
-<pre><code>[receiver message];
-</code></pre>
-
-<h3>方法</h3>
-
-<p>方法对应一段可执行代码，是implementation的一部分。当我们向某个对象发送消息时，系统会分析我们所发送的消息，动态地调用响应的方法。对应ObjC中的IMP类型。</p>
-
-<h3>Selector</h3>
-
-<p>ObjC中有个SEL类型，这个类型就是Selector的类型。我们可以用@selector操作符来获取一个Selector。Selector可理解为方法的名字，但这并不包含参数和返回值，仅仅是名字。你还需注意，Selector不和任何类关联，你不能说某个Selector属于一个类，它仅仅是名字。</p>
-
-<h2>NSMethodSignature类</h2>
-
-<p>ObjC中有一个NSMethodSignature类，这个类很好的帮助我们来分析一下ObjC中的方法签名机制，这个类中定义了以下几个方法</p>
-
-<pre><code>- (NSUInteger)numberOfArguments;//参数的数量
-- (const char *)getArgumentTypeAtIndex:(NSUInteger)idx;//第idx个参数的类型
-- (const char *)methodReturnType;//返回值类型
-- (NSUInteger)methodReturnLength;//返回值长度，单位字节
-</code></pre>
-
-<p>从这些定义中我们可以看出，方法签名中会包含方法的参数个数，每个参数的类型，返回值类型，以及返回值占用的空间大小。
-NSObject基类中提供了获取这个对象的方法</p>
-
-<pre><code>- (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector
-</code></pre>
-
-<p>所以，只要知道一个对象，和一个SEL（selector），那么就可以动态的获取这个方法签名了。</p>
-
-<h2>参数类型签名不同导致的一个奇怪现象</h2>
-
-<p>下面先举个例子，来看看参数类型签名不同导致的一个奇怪现象。
-首先我们定义两个类，两个类是继承关系，但定义了同名的方法，但方法的参数类型不同。（所以它们的方法签名是不同的。）</p>
-
-<pre><code>//基类
-@interface ParamBase : NSObject
-- (void)doSomeThing:(int)i;
-@end
-
-@implementation ParamBase
-- (void)doSomeThing:(int)i{
-    NSLog(@"Base doSomeThing called with int: %d",i);
-}
-@end
-
-//子类
-@interface ParamSub : ParamBase
-- (void)doSomeThing:(double)d;
-@end
-
-@implementation ParamSub
-- (void)doSomeThing:(double)d{
-    NSLog(@"Sub doSomeThing called with double: %f",d);
-}
-@end
-</code></pre>
-
-<p>然后，我们创建个子类对象，然后分别在不同情况下执行doSomeThing，我们都传递相同的参数。</p>
-
-<pre><code>ParamBase *a = [ParamSub new];
-[a doSomeThing:1.0];
-[(ParamSub*)a doSomeThing:1.0];
-</code></pre>
-
-<p>然后运行，你会得到如下结果。</p>
-
-<pre><code>2013-05-30 14:25:03.242 MethodSignTest[2144:c07] Sub doSomeThing called with double: 0.000000
-2013-05-30 14:25:03.244 MethodSignTest[2144:c07] Sub doSomeThing called with double: 1.000000
-</code></pre>
-
-<p>向一个对象发送了相同的消息，并且参数相同，为什么两次得到的结果不同。明明发送了1，为什么确变成0了。这其实是方法签名在编译阶段时捣鬼。当编译第二行代码时，编译器发现ParamBase对象的doSomeThing方法签名中的第一个参数是int类型，虽然代码了写的是1.0，但编译后就转换整数1了。运行时在子类的doSomeThing把整数1强制以double类型打印出来就是0了。而第3行代码就没有问题。应为编译器已经知道a已强制为ParamSub类型，而ParamSub对象doSomeThing方法签名中的第一个参数是double类型，而不是int类型，所以就没问题了。</p>
-
-<h2>在ARC（自动引用计数机制）下返回值类型签名不同导致Crash</h2>
-
-<p>我们再定义两个类，两个类还是继承关系，定义了同名的方法，但方法的返回值类型不同。（所以它们的方法签名也是不同的。）</p>
-
-<pre><code>//基类
-@interface ReturnBase : NSObject
-- (id)getSomeThing;
-@end
-
-@implementation ReturnBase
-- (id)getSomeThing{
-    NSLog(@"Return Base called");
-    return [NSArray new];
-}
-@end
-
-//子类
-@interface ReturnSub : ReturnBase
-- (void)getSomeThing;
-@end
-
-@implementation ReturnSub
-- (void)getSomeThing{
-    NSLog(@"nothing");
-}
-@end
-</code></pre>
-
-<p>然后我们执行下面这段代码：</p>
-
-<pre><code>ReturnBase *b = [ReturnSub new];
-[(ReturnSub*)b getSomeThing];
-[b getSomeThing];
-</code></pre>
-
-<p>结果程序在第3行Crash了，Crash类型一般是内存访问（BAD ACCESS）错误。第2行和第3行在ObjC动态绑定的机制下完全是相同的代码啊，为什么第2行没Crash，到第3行就Crash了呢？这是由于ARC和方法签名机制共同作用的结果，ARC下系统会对消息的返回值自动做一些retain或release等操作，而b在运行时ReturnSub类型，getSomeThing是不返回任何对象的。第二行时编译器知道b是ReturnSub类型，所以不会处理返回值了，而在第3行时，编译器认为b是ReturnBase类型，而根据ReturnBase类的方法getSomeThing的签名，是有返回值的，所以第3行编译后会自动对getSomeThing的返回值加一些retain/release等操作，而运行时却是没有返回值的（void类型），那么返回值就是不确定的，对这个不确定的值进行retain/release操作，一般就会导致内存访问（BAD ACCESS）错误。
-也许你会想，我如果把b设为id类型，会怎样。</p>
-
-<pre><code>id b = [ReturnSub new];
-[(ReturnSub*)b getSomeThing];
-[b getSomeThing];
-</code></pre>
-
-<p>结果是编译不通过，名字为getSomeThing的方法的签名不一致，编译器就不知道有没有返回值了。</p>
-
-<h2>结论</h2>
-
-<p>方法签名在编译时对方法的参数进行一定的转换。
-ARC下会根据方法签名中的返回值进行retain/release等操作
-最好不要写方法名字相同，当方法签名不同的方法，以免出现怪异现象。
-有时我们改变了一个基类的参数类型或返回值类型，不要忘记了在子类中进行相应的修改。</p>
 ]]></content>
   </entry>
   

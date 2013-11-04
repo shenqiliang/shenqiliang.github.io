@@ -9,8 +9,9 @@
   <meta name="author" content="谌启亮">
 
   
-  <meta name="description" content="如何描述这段代码： [window makeKeyAndVisible] 你可能想到以下答案： window调用了makeKeyAndVisible方法
-向window发送makeKeyAndVisible消息 不得不说，第2种才是正确的描述。 &hellip;">
+  <meta name="description" content="在Objective-C中我们常常会用到常量字符串，常量字符串和一般的字符串还是有一定区别，本文将介绍一些常量字符串的特性，加强你的常量字符串的认识。请看下面一段代码。 NSString *string1 = @"Hello";
+NSString *string2 = @"Hello";
+if ( &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -76,6 +77,54 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/03/27/deep-in-objc-string/">深入理解Objective-C中字符串常量</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-27T19:23:00+08:00" pubdate data-updated="true">2012-03-27 19:23</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>在Objective-C中我们常常会用到常量字符串，常量字符串和一般的字符串还是有一定区别，本文将介绍一些常量字符串的特性，加强你的常量字符串的认识。请看下面一段代码。</p>
+
+<pre><code>NSString *string1 = @"Hello";
+NSString *string2 = @"Hello";
+if (string1==string2) {
+    NSLog(@"They are same address");
+}
+</code></pre>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/03/27/deep-in-objc-string/">阅读更多 &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -154,7 +203,9 @@
   </header>
 
 
-  <div class="entry-content"><p>iOS的SDK中提供很多原生ViewController，大大提高了我们的开发效率，下面是我的一些经验。</p>
+  <div class="entry-content"><p><em>请注意，iOS6以后内存警告时会自动把不显示的所有view的相关显示而占用的内存清除，而不会设置view属性对象为nil，也不会调用viewDidUnload，而viewDidload也只会调用一次。以下部分内容可能有所不同。</em></p>
+
+<p>iOS的SDK中提供很多原生ViewController，大大提高了我们的开发效率，下面是我的一些经验。</p>
 
 <h2>结构</h2>
 
@@ -521,45 +572,6 @@ DicUnifier是一个专门将一些字典转换成Mac OS字典格式的应用。
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/03/09/view-controller-response-uitouch/">ViewController如何响应Touch事件？</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-03-09T12:21:00+08:00" pubdate data-updated="true">2012-03-09 12:21</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>ViewController类都继承自UIResponder类，它们也可以响应Touch事件。ViewController何时响应Touch事件呢？iOS中Touch事件响应是根据响应链来进行处理的，Touch事件会逐个发向各个节点直到这个节点响应这个事件。</p>
-
-<p>而根据SDK记载：
-ViewController在响应链中的位于ViewController的view和它的superView之间的，因此只有在Touch在ViewController的view内部，而且viewController的view不响应Touch，ViewController才接受到Touch事件。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/5/">&larr; 以往文章</a>
@@ -599,6 +611,10 @@ ViewController在响应链中的位于ViewController的view和它的superView之
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/11/04/gcd-intro/">并发编程之GCD</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/11/01/code-comment-and-doc-gen-tools-for-objc/">Objective-C代码注释和文档输出的工具和方法</a>
       </li>
     
@@ -612,10 +628,6 @@ ViewController在响应链中的位于ViewController的view和它的superView之
     
       <li class="post">
         <a href="/blog/2013/10/16/start-using-octopress/">博客搬家到Octopress</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/08/15/auto-key-press-using-appscript/">用AppleScript在Mac系统下实现按键精灵的功能以及在游戏中的运用</a>
       </li>
     
   </ul>

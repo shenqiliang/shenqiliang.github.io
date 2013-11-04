@@ -9,7 +9,7 @@
   <meta name="author" content="谌启亮">
 
   
-  <meta name="description" content="iOS的SDK中提供很多原生ViewController，大大提高了我们的开发效率，下面是我的一些经验。 结构 按结构可以对iOS的所有ViewController分成两类： 主要用于展示内容的ViewController，这种ViewController主要用于为用户展示内容，并与用户交互， &hellip;">
+  <meta name="description" content="请注意，iOS6以后内存警告时会自动把不显示的所有view的相关显示而占用的内存清除，而不会设置view属性对象为nil，也不会调用viewDidUnload，而viewDidload也只会调用一次。以下部分内容可能有所不同。 iOS的SDK中提供很多原生ViewController， &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -101,7 +101,9 @@
   </header>
 
 
-<div class="entry-content"><p>iOS的SDK中提供很多原生ViewController，大大提高了我们的开发效率，下面是我的一些经验。</p>
+<div class="entry-content"><p><em>请注意，iOS6以后内存警告时会自动把不显示的所有view的相关显示而占用的内存清除，而不会设置view属性对象为nil，也不会调用viewDidUnload，而viewDidload也只会调用一次。以下部分内容可能有所不同。</em></p>
+
+<p>iOS的SDK中提供很多原生ViewController，大大提高了我们的开发效率，下面是我的一些经验。</p>
 
 <h2>结构</h2>
 
@@ -262,6 +264,10 @@ var uyan_config = {
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/11/04/gcd-intro/">并发编程之GCD</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/11/01/code-comment-and-doc-gen-tools-for-objc/">Objective-C代码注释和文档输出的工具和方法</a>
       </li>
     
@@ -275,10 +281,6 @@ var uyan_config = {
     
       <li class="post">
         <a href="/blog/2013/10/16/start-using-octopress/">博客搬家到Octopress</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/08/15/auto-key-press-using-appscript/">用AppleScript在Mac系统下实现按键精灵的功能以及在游戏中的运用</a>
       </li>
     
   </ul>

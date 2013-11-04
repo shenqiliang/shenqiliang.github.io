@@ -9,7 +9,7 @@
   <meta name="author" content="谌启亮">
 
   
-  <meta name="description" content="由于iOS5.0之前没有自动应用计数机制，也没有Java那样的垃圾回收功能。我们都需要自己管理和控制对象的回收，这是一件很麻烦的事情，也是做iOS项目中最容易出现的问题。如果不掌握这些方法，调试这些问题几乎没有头绪。 EXC_BAD_ACCESS内存错误与NSZombieEnabled &hellip;">
+  <meta name="description" content="ViewController类都继承自UIResponder类，它们也可以响应Touch事件。ViewController何时响应Touch事件呢？iOS中Touch事件响应是根据响应链来进行处理的，Touch事件会逐个发向各个节点直到这个节点响应这个事件。 而根据SDK记载： &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -75,6 +75,45 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/03/09/view-controller-response-uitouch/">ViewController如何响应Touch事件？</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-09T12:21:00+08:00" pubdate data-updated="true">2012-03-09 12:21</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>ViewController类都继承自UIResponder类，它们也可以响应Touch事件。ViewController何时响应Touch事件呢？iOS中Touch事件响应是根据响应链来进行处理的，Touch事件会逐个发向各个节点直到这个节点响应这个事件。</p>
+
+<p>而根据SDK记载：
+ViewController在响应链中的位于ViewController的view和它的superView之间的，因此只有在Touch在ViewController的view内部，而且viewController的view不响应Touch，ViewController才接受到Touch事件。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -484,42 +523,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/04/28/ios-app-91-farm/">顺势：91农场</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-04-28T22:30:00+08:00" pubdate data-updated="true">2011-04-28 22:30</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>在开心农场火爆的阶段，公司准备顺势开发一款在iphone上运行的偷菜程序，同时3D版91牧场已经在Android上开发的不错了。我在这个项目中主要负责服务器通讯接口以及其他的一些模块，如好友列表界面、好友搜索界面、好友管理、商店、仓库、留言等模块。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/6/">&larr; 以往文章</a>
@@ -559,6 +562,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/11/04/gcd-intro/">并发编程之GCD</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/11/01/code-comment-and-doc-gen-tools-for-objc/">Objective-C代码注释和文档输出的工具和方法</a>
       </li>
     
@@ -572,10 +579,6 @@
     
       <li class="post">
         <a href="/blog/2013/10/16/start-using-octopress/">博客搬家到Octopress</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/08/15/auto-key-press-using-appscript/">用AppleScript在Mac系统下实现按键精灵的功能以及在游戏中的运用</a>
       </li>
     
   </ul>

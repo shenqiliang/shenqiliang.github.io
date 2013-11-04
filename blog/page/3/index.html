@@ -9,7 +9,8 @@
   <meta name="author" content="谌启亮">
 
   
-  <meta name="description" content="上次我们一个项目在iOS6上运行正常，但在iOS5.0上运行时却出现了一个错误： dyld: lazy symbol binding failed: Symbol not found: _objc_setProperty_nonatomic 或者 dyld: lazy symbol binding &hellip;">
+  <meta name="description" content="自己在作项目时经常会遇到要上传文件同时还要附带一些字符串参数的网络请求，由于文件有时是二进制数据，采用http查询参数就不太适合了。最好的方式是采取Web表单的方式上传文件，自己写了这么一个类，就分享一下。
+代码地址：https://github.com/shenqiliang/HTTPForm- &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -75,6 +76,61 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/10/21/a-class-simulate-web-form/">一个模拟网页表单请求封装类（支持文件上传）</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-10-21T21:05:00+08:00" pubdate data-updated="true">2012-10-21 21:05</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>自己在作项目时经常会遇到要上传文件同时还要附带一些字符串参数的网络请求，由于文件有时是二进制数据，采用http查询参数就不太适合了。最好的方式是采取Web表单的方式上传文件，自己写了这么一个类，就分享一下。
+代码地址：<a href="https://github.com/shenqiliang/HTTPForm-iOS">https://github.com/shenqiliang/HTTPForm-iOS</a></p>
+
+<p>使用方法：</p>
+
+<pre><code>PPPostWebForm *a = [[PPPostWebForm alloc] initWithPostURL:[NSURL URLWithString:@"http://www.example.com/upload/uploadFile"]];
+[a addFileElement:@"文件参数" value:@"文件路径"];
+[a addTextElement:@"参数名" value:@"参数值"];
+[a addTextElement:@"参数名2" value:@"参数值2"];
+a.delegate = self;
+[a commitFormAsynchronous];
+</code></pre>
+
+<p>网络请求完毕后会得到回调：</p>
+
+<pre><code>- (void)postWebForm:(PPPostWebForm*)form didReceivedAsynchronousData:(NSData*)data{
+    NSString *s = [NSString stringWithUTF8String:[data bytes]];
+    NSLog(s);
+}
+</code></pre>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -577,54 +633,6 @@ freopen("/tmp/log.txt", "a+", stderr);
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/03/27/deep-in-objc-string/">深入理解Objective-C中字符串常量</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-03-27T19:23:00+08:00" pubdate data-updated="true">2012-03-27 19:23</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>在Objective-C中我们常常会用到常量字符串，常量字符串和一般的字符串还是有一定区别，本文将介绍一些常量字符串的特性，加强你的常量字符串的认识。请看下面一段代码。</p>
-
-<pre><code>NSString *string1 = @"Hello";
-NSString *string2 = @"Hello";
-if (string1==string2) {
-    NSLog(@"They are same address");
-}
-</code></pre>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2012/03/27/deep-in-objc-string/">阅读更多 &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/4/">&larr; 以往文章</a>
@@ -664,6 +672,10 @@ if (string1==string2) {
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/11/04/gcd-intro/">并发编程之GCD</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/11/01/code-comment-and-doc-gen-tools-for-objc/">Objective-C代码注释和文档输出的工具和方法</a>
       </li>
     
@@ -677,10 +689,6 @@ if (string1==string2) {
     
       <li class="post">
         <a href="/blog/2013/10/16/start-using-octopress/">博客搬家到Octopress</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/08/15/auto-key-press-using-appscript/">用AppleScript在Mac系统下实现按键精灵的功能以及在游戏中的运用</a>
       </li>
     
   </ul>

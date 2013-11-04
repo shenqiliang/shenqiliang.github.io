@@ -9,7 +9,7 @@
   <meta name="author" content="谌启亮">
 
   
-  <meta name="description" content="引言 在ObjC语言中，我们会自定义各种各样的类，在类定义中，我们又会定义各种方法，当方法达到一定的数量，有时会不可避免的出现一些同名的方法。而同名的方法有时会导致运行时出现很奇怪的问题。比如传递参数不一致时，出现运行时错误。这些都和ObjC中的方法签名（Method Signature）相关。 ">
+  <meta name="description" content="Unix文件系统中对单个文件提供了很多属性，比如创建时间、文件大小、修改时间等，这些信息都保存在文件系统中的inode节点中，获取这些属性并不需要读取文件，所以获取速度是很快的。在开发过程中常常会使用这些属性，但更多的时候我们需要一个自定义的属性，来保存我们需要的一些值。 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -75,6 +75,47 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/06/05/extented-file-property-in-unix/">Unix系统中设置文件的扩展属性</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-06-05T10:03:00+08:00" pubdate data-updated="true">2013-06-05 10:03</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Unix文件系统中对单个文件提供了很多属性，比如创建时间、文件大小、修改时间等，这些信息都保存在文件系统中的inode节点中，获取这些属性并不需要读取文件，所以获取速度是很快的。在开发过程中常常会使用这些属性，但更多的时候我们需要一个自定义的属性，来保存我们需要的一些值。比如我们给文件定义一个有效期，或者给文件加一个特殊标记等。</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/06/05/extented-file-property-in-unix/">阅读更多 &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -499,61 +540,6 @@ NSData还有一个API：</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/10/21/a-class-simulate-web-form/">一个模拟网页表单请求封装类（支持文件上传）</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-10-21T21:05:00+08:00" pubdate data-updated="true">2012-10-21 21:05</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>自己在作项目时经常会遇到要上传文件同时还要附带一些字符串参数的网络请求，由于文件有时是二进制数据，采用http查询参数就不太适合了。最好的方式是采取Web表单的方式上传文件，自己写了这么一个类，就分享一下。
-代码地址：<a href="https://github.com/shenqiliang/HTTPForm-iOS">https://github.com/shenqiliang/HTTPForm-iOS</a></p>
-
-<p>使用方法：</p>
-
-<pre><code>PPPostWebForm *a = [[PPPostWebForm alloc] initWithPostURL:[NSURL URLWithString:@"http://www.example.com/upload/uploadFile"]];
-[a addFileElement:@"文件参数" value:@"文件路径"];
-[a addTextElement:@"参数名" value:@"参数值"];
-[a addTextElement:@"参数名2" value:@"参数值2"];
-a.delegate = self;
-[a commitFormAsynchronous];
-</code></pre>
-
-<p>网络请求完毕后会得到回调：</p>
-
-<pre><code>- (void)postWebForm:(PPPostWebForm*)form didReceivedAsynchronousData:(NSData*)data{
-    NSString *s = [NSString stringWithUTF8String:[data bytes]];
-    NSLog(s);
-}
-</code></pre>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/3/">&larr; 以往文章</a>
@@ -593,6 +579,10 @@ a.delegate = self;
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/11/04/gcd-intro/">并发编程之GCD</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/11/01/code-comment-and-doc-gen-tools-for-objc/">Objective-C代码注释和文档输出的工具和方法</a>
       </li>
     
@@ -606,10 +596,6 @@ a.delegate = self;
     
       <li class="post">
         <a href="/blog/2013/10/16/start-using-octopress/">博客搬家到Octopress</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/08/15/auto-key-press-using-appscript/">用AppleScript在Mac系统下实现按键精灵的功能以及在游戏中的运用</a>
       </li>
     
   </ul>

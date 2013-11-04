@@ -9,8 +9,8 @@
   <meta name="author" content="谌启亮">
 
   
-  <meta name="description" content="前几天我把我的简历整理一下。正好看到苹果在招系统工程师，就投了个简历试试。没想到今天苹果公司竟然真的打电话过来了，不过我现在正在创业，并不想放弃，没办法就只能拒绝了。搞得打电话的那个人肯定很郁闷。
-">
+  <meta name="description" content="使用以下代码可以获得系统的所有字体。 NSArray *familyNames = [UIFont familyNames];
+for( NSString *familyName in familyNames ){ printf( "Family: %s n", [familyName &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -76,6 +76,57 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/03/03/get-fonts-in-ios/">获取iPhone里面的可用字体</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-03-03T18:30:00+08:00" pubdate data-updated="true">2011-03-03 18:30</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>使用以下代码可以获得系统的所有字体。</p>
+
+<pre><code>NSArray *familyNames = [UIFont familyNames];
+for( NSString *familyName in familyNames ){
+    printf( "Family: %s n", [familyName UTF8String] );
+    NSArray *fontNames = [UIFont fontNamesForFamilyName:familyName];
+    for( NSString *fontName in fontNames ){
+        printf( "tFont: %s n", [fontName UTF8String] );
+     }
+}
+</code></pre>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2011/03/03/get-fonts-in-ios/">阅读更多 &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -190,6 +241,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/11/04/gcd-intro/">并发编程之GCD</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/11/01/code-comment-and-doc-gen-tools-for-objc/">Objective-C代码注释和文档输出的工具和方法</a>
       </li>
     
@@ -203,10 +258,6 @@
     
       <li class="post">
         <a href="/blog/2013/10/16/start-using-octopress/">博客搬家到Octopress</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/08/15/auto-key-press-using-appscript/">用AppleScript在Mac系统下实现按键精灵的功能以及在游戏中的运用</a>
       </li>
     
   </ul>

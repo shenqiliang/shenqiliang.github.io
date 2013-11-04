@@ -9,7 +9,7 @@
   <meta name="author" content="谌启亮">
 
   
-  <meta name="description" content="代码注释可以让代码更容易接受和使用，特别是在大型项目合作开发或模块开发中。Objective-C中也有一些很方便的注释插件和文档生成工具。本文推荐两个开源软件：VVDocumenter注释工具和appledoc文档生成工具。 ">
+  <meta name="description" content="在《并发编程之Operation Queue》中讲了Cocoa并发编程中的Operation Queue，了解了Operation Queue是一个面向对象的并发编程接口，它支持并发数，线程优先级，任务优先级，任务依赖关系等多种配置，可以方便满足各种复杂的多任务处理场景。 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -75,6 +75,47 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/11/04/gcd-intro/">并发编程之GCD</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-11-04T17:13:00+08:00" pubdate data-updated="true">2013-11-04 17:13</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>在<a href="/blog/2013/10/28/operation-queue-intro/">《并发编程之Operation Queue》</a>中讲了Cocoa并发编程中的Operation Queue，了解了Operation Queue是一个面向对象的并发编程接口，它支持并发数，线程优先级，任务优先级，任务依赖关系等多种配置，可以方便满足各种复杂的多任务处理场景。本篇将接着讲另一种并发编程机制 &ndash; GCD（Grand Central Dispatch）。iOS4.0中首度引入GCD，GCD是管理任务执行的一项技术，它使得我们对多任务处理变得更加方便和有效。它支持同步或异步任务处理，串行或并行的处理队列（Dispath Queue），非系统调用的信号量机制，定时任务处理，进程、文件或网络的监听任务等。这个庞大的任务处理技术大大减少了线程的管理工作，使基于任务的开发变得更加高效。</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/11/04/gcd-intro/">阅读更多 &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -457,47 +498,6 @@ id objc_getAssociatedObject(id object, const void *key);
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2013/06/05/extented-file-property-in-unix/">Unix系统中设置文件的扩展属性</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-06-05T10:03:00+08:00" pubdate data-updated="true">2013-06-05 10:03</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Unix文件系统中对单个文件提供了很多属性，比如创建时间、文件大小、修改时间等，这些信息都保存在文件系统中的inode节点中，获取这些属性并不需要读取文件，所以获取速度是很快的。在开发过程中常常会使用这些属性，但更多的时候我们需要一个自定义的属性，来保存我们需要的一些值。比如我们给文件定义一个有效期，或者给文件加一个特殊标记等。</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2013/06/05/extented-file-property-in-unix/">阅读更多 &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; 以往文章</a>
@@ -535,6 +535,10 @@ id objc_getAssociatedObject(id object, const void *key);
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/11/04/gcd-intro/">并发编程之GCD</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/11/01/code-comment-and-doc-gen-tools-for-objc/">Objective-C代码注释和文档输出的工具和方法</a>
       </li>
     
@@ -548,10 +552,6 @@ id objc_getAssociatedObject(id object, const void *key);
     
       <li class="post">
         <a href="/blog/2013/10/16/start-using-octopress/">博客搬家到Octopress</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/08/15/auto-key-press-using-appscript/">用AppleScript在Mac系统下实现按键精灵的功能以及在游戏中的运用</a>
       </li>
     
   </ul>

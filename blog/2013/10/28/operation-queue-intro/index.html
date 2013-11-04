@@ -336,7 +336,7 @@ operation2s begin
 operation2s end
 </code></pre>
 
-<p>为了更好的展示队列优先级效果，我把queue的<code>maxConcurrentOperationCount</code>设置为<code>1</code>，以便任务一个一个的执行。从上面日志可以看出，第一个operation1s执行完毕后，会执行operation5s，而不是operation2s，因为operation5s的<code>queuePriority</code>是<code>NSOperationQueuePriorityHigh</code>。而第一个线程总是会第一个执行。在看看2-4行，我们可以看出operation1s的<code>completionBlock</code>比operation5s晚开始执行，说明它不在operation1s的线程中执行的。正如前面所说，<code>completionBlock</code>是通过KVO监听执行，一般会运行在主线程。</p>
+<p>为了更好的展示队列优先级效果，我把queue的<code>maxConcurrentOperationCount</code>设置为<code>1</code>，以便任务一个一个的执行。从上面日志可以看出，第一个operation1s执行完毕后，会执行operation5s，而不是operation2s，因为operation5s的<code>queuePriority</code>是<code>NSOperationQueuePriorityHigh</code>。而第一个线程总是会第一个执行。在看看2-4行，我们可以看出operation1s的<code>completionBlock</code>比operation5s晚开始执行，说明它不在operation1s的线程中执行的。正如前面所说，<code>completionBlock</code>是通过KVO监听执行，一般会运行在监听所在线程，而不是Operation执行的线程。</p>
 
 <h2>注意事项</h2>
 
@@ -460,6 +460,10 @@ var uyan_config = {
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/11/04/gcd-intro/">并发编程之GCD</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/11/01/code-comment-and-doc-gen-tools-for-objc/">Objective-C代码注释和文档输出的工具和方法</a>
       </li>
     
@@ -473,10 +477,6 @@ var uyan_config = {
     
       <li class="post">
         <a href="/blog/2013/10/16/start-using-octopress/">博客搬家到Octopress</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/08/15/auto-key-press-using-appscript/">用AppleScript在Mac系统下实现按键精灵的功能以及在游戏中的运用</a>
       </li>
     
   </ul>

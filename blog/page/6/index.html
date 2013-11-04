@@ -9,7 +9,8 @@
   <meta name="author" content="谌启亮">
 
   
-  <meta name="description" content="完成91拨号后，轻松了一阵子，这时公司和中国移动合作了一个大项目：移动MM（Mobile Market）for iPhone。移动MM是个复杂的项目，在其他平台已经有相关开发应用。由于功能比较多，很多业务也涉及到其他公司，一些功能需要以插件的形式提供，我们要为他们提供托座服务接口。 &hellip;">
+  <meta name="description" content="在开心农场火爆的阶段，公司准备顺势开发一款在iphone上运行的偷菜程序，同时3D版91牧场已经在Android上开发的不错了。我在这个项目中主要负责服务器通讯接口以及其他的一些模块，如好友列表界面、好友搜索界面、好友管理、商店、仓库、留言等模块。
+">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -75,6 +76,42 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/04/28/ios-app-91-farm/">顺势：91农场</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-04-28T22:30:00+08:00" pubdate data-updated="true">2011-04-28 22:30</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>在开心农场火爆的阶段，公司准备顺势开发一款在iphone上运行的偷菜程序，同时3D版91牧场已经在Android上开发的不错了。我在这个项目中主要负责服务器通讯接口以及其他的一些模块，如好友列表界面、好友搜索界面、好友管理、商店、仓库、留言等模块。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -430,57 +467,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/03/03/get-fonts-in-ios/">获取iPhone里面的可用字体</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-03-03T18:30:00+08:00" pubdate data-updated="true">2011-03-03 18:30</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>使用以下代码可以获得系统的所有字体。</p>
-
-<pre><code>NSArray *familyNames = [UIFont familyNames];
-for( NSString *familyName in familyNames ){
-    printf( "Family: %s n", [familyName UTF8String] );
-    NSArray *fontNames = [UIFont fontNamesForFamilyName:familyName];
-    for( NSString *fontName in fontNames ){
-        printf( "tFont: %s n", [fontName UTF8String] );
-     }
-}
-</code></pre>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2011/03/03/get-fonts-in-ios/">阅读更多 &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/7/">&larr; 以往文章</a>
@@ -520,6 +506,10 @@ for( NSString *familyName in familyNames ){
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/11/04/gcd-intro/">并发编程之GCD</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/11/01/code-comment-and-doc-gen-tools-for-objc/">Objective-C代码注释和文档输出的工具和方法</a>
       </li>
     
@@ -533,10 +523,6 @@ for( NSString *familyName in familyNames ){
     
       <li class="post">
         <a href="/blog/2013/10/16/start-using-octopress/">博客搬家到Octopress</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/08/15/auto-key-press-using-appscript/">用AppleScript在Mac系统下实现按键精灵的功能以及在游戏中的运用</a>
       </li>
     
   </ul>

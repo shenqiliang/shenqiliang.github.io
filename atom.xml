@@ -4,7 +4,7 @@
   <title><![CDATA[Xcode Dev]]></title>
   <link href="http://blog.xcodev.com/atom.xml" rel="self"/>
   <link href="http://blog.xcodev.com/"/>
-  <updated>2013-11-01T14:17:43+08:00</updated>
+  <updated>2013-11-04T17:27:56+08:00</updated>
   <id>http://blog.xcodev.com/</id>
   <author>
     <name><![CDATA[谌启亮]]></name>
@@ -12,6 +12,352 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[并发编程之GCD]]></title>
+    <link href="http://blog.xcodev.com/blog/2013/11/04/gcd-intro/"/>
+    <updated>2013-11-04T17:13:00+08:00</updated>
+    <id>http://blog.xcodev.com/blog/2013/11/04/gcd-intro</id>
+    <content type="html"><![CDATA[<p>在<a href="http://blog.xcodev.com/blog/2013/10/28/operation-queue-intro/">《并发编程之Operation Queue》</a>中讲了Cocoa并发编程中的Operation Queue，了解了Operation Queue是一个面向对象的并发编程接口，它支持并发数，线程优先级，任务优先级，任务依赖关系等多种配置，可以方便满足各种复杂的多任务处理场景。本篇将接着讲另一种并发编程机制 &ndash; GCD（Grand Central Dispatch）。iOS4.0中首度引入GCD，GCD是管理任务执行的一项技术，它使得我们对多任务处理变得更加方便和有效。它支持同步或异步任务处理，串行或并行的处理队列（Dispath Queue），非系统调用的信号量机制，定时任务处理，进程、文件或网络的监听任务等。这个庞大的任务处理技术大大减少了线程的管理工作，使基于任务的开发变得更加高效。</p>
+
+<!--more-->
+
+
+<h2>Dispatch Queue</h2>
+
+<p>Dispatch Queue是一个任务执行队列，可以让你异步或同步地执行多个Block或函数。Dispatch Queue是FIFO的，即先入队的任务总会先执行。目前有三种类型的Dispath Queue：</p>
+
+<ul>
+<li>串行队列（Serial dispatch queue）</li>
+<li>并发队列（Concurrent dispatch queue）</li>
+<li>主队列（Main dispatch queue）</li>
+</ul>
+
+
+<h3>串行队列</h3>
+
+<p>串行队列一次只能处理一个任务，可以由用户调用<code>dispatch_queue_create</code>创建：</p>
+
+<pre><code>dispatch_queue_t queue;
+queue = dispatch_queue_create("com.example.MyQueue", NULL);
+</code></pre>
+
+<p>dispatch_queue_create第一个参数是串行队列标识，一般用反转域名的格式表示以防冲突；第二个参数是queue的类型，设为NULL时默认是<code>DISPATCH_QUEUE_SERIAL</code>，将创建串行队列，在必要情况下，你可以将其设置为<code>DISPATCH_QUEUE_CONCURRENT</code>来创建自定义并行队列。</p>
+
+<h3>并行队列</h3>
+
+<p>并行队列可以同时处理多个任务，在不得以的情况下可以用<code>dispatch_queue_create</code>创建，但一般我们都要用系统预定义的并行队列，即全局队列（Global Concurrent Dispatch Queues）。目前系统预定义了四个不同运行优先级的全局队列，我们可以通过<code>dispatch_get_global_queue</code>来获取它们。</p>
+
+<pre><code>dispatch_queue_t aQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+</code></pre>
+
+<p><code>dispatch_get_global_queue</code>第一个参数是队列的优先级，分别对应四个全局队列：</p>
+
+<ul>
+<li>DISPATCH_QUEUE_PRIORITY_HIGH</li>
+<li>DISPATCH_QUEUE_PRIORITY_DEFAULT</li>
+<li>DISPATCH_QUEUE_PRIORITY_LOW</li>
+<li>DISPATCH_QUEUE_PRIORITY_BACKGROUND</li>
+</ul>
+
+
+<p><code>dispatch_get_global_queue</code>中第二个参数目前系统保留，请设置为0即可。</p>
+
+<h3>主队列</h3>
+
+<p>主队列是一个特殊的队列，它是系统预定义的运行在主线程的一个Dispatch Queue。可以通过<code>dispatch_get_main_queue</code>来获取唯一的主队列。主队列一般运行一些需要与主线程同步的一些短时任务。</p>
+
+<pre><code>dispatch_queue_t mainQueue = dispatch_get_main_queue();
+</code></pre>
+
+<h3>获取当前队列</h3>
+
+<p>你可以通过<code>dispatch_get_current_queue</code>获取运行时的队列：</p>
+
+<pre><code>dispatch_queue_t currentQueue = dispatch_get_current_queue();
+</code></pre>
+
+<p>如果在队列执行任务中调用，返回执行此任务的队列；如果在主线程中调用，将返回主队列；如果在一般线程（非主线程线程非队列执行任务）中调用，返回<code>DISPATCH_QUEUE_PRIORITY_DEFAULT</code>全局队列。</p>
+
+<h3>在队列中运行任务</h3>
+
+<p>你可以随时向一个队列中添加一个新任务，只需要调用一下<code>dispatch_async</code>即可：</p>
+
+<pre><code>dispatch_async(aQueue, ^{
+    //Do some work;
+});
+</code></pre>
+
+<p><code>dispatch_async</code>中的任务是异步执行的，就是说<code>dispatch_async</code>添加任务到执行队列后会立刻返回，而不会等待任务执行完成。然而，必要的话，你也可以调用<code>dispatch_sync</code>来同步的执行一个任务：</p>
+
+<pre><code>dispatch_sync(aQueue, ^{
+    //Do some work;
+});
+</code></pre>
+
+<p><code>dispatch_sync</code>会阻塞当前线程直到提交的任务完全执行完毕。</p>
+
+<h3>Dispatch Queue的内存管理</h3>
+
+<p>除了系统预定义的Dispatch Queue，我们自定义的Dispatch Queue需要手动的管理它的内存。<code>dispatch_retain</code>和<code>dispatch_release</code>这两个函数可以控制Dispatch Queue的引用计数（同时可以控制后面会讲到的Dispatch Group和Dispatch Source的引用计数）。当Dispatch Queue引用计数变为0后，就会调用finalizer，finalizer是Dispatch Queue销毁前调用的函数，用来清理Dispatch Queue的相关资源。可以用<code>dispatch_set_finalizer_f</code>函数来设置Dispatch Queue的finalizer，这个函数同时可以设置Dispatch Group和Dispatch Source的销毁函数（后面会讲到）。</p>
+
+<pre><code>void dispatch_set_finalizer_f(dispatch_object_t object, dispatch_function_t finalizer);
+</code></pre>
+
+<h3>Dispatch Queue的上下文环境数据</h3>
+
+<p>我们可以为每个Dispatch Queue设置一个自定义的上下文环境数据，调用<code>dispatch_set_context</code>来实现。同时我们也可以用<code>dispatch_get_context</code>获取这个上下文环境数据，这个函数同时可以设置Dispatch Group和Dispatch Source的上下文环境数据（后面会讲到）。</p>
+
+<pre><code>void dispatch_set_context(dispatch_object_t object,void *context);
+void * dispatch_get_context(dispatch_object_t object);
+</code></pre>
+
+<p>注意Dispatch Queue并不保证这个<code>context</code>不会释放，不会对它进行内存管理控制。我们需要自行管理<code>context</code>的内存分配和释放。一般我们非配内存设置<code>context</code>后，可以在finalizer里释放<code>context</code>占有的内存。</p>
+
+<h2>并行执行循环</h2>
+
+<p>在编程过程中，我们经常会用到<code>for</code>循环，而且<code>for</code>循环要做很多相关的任务。比如：</p>
+
+<pre><code>for (i = 0; i &lt; count; i++) {
+   //do a lot of work here.
+   doSomething(i);
+}
+</code></pre>
+
+<p>如果<code>for</code>循环中处理的任务是可并发的，显然放到一个线程中处理是很慢的，GCD提供两个函数<code>dispatch_apply</code>和<code>dispatch_apply_f</code>，<code>dispatch_apply</code>是用于Block的，而<code>dispatch_apply_f</code>可以用于c函数，它们可以替代可并发的<code>for</code>循环，来并行的运行而提高执行效率。</p>
+
+<pre><code>dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+dispatch_apply(count, queue, ^(size_t i) {
+   //do a lot of work here.
+   doSomething(i);
+});
+</code></pre>
+
+<h2>Dispatch Group</h2>
+
+<p>有时候我们进行下一步操作，而这个操作需要等待几个任务处理完毕后才能继续，这时我们就需要用的Dispatch Group（类似thread join）。我们可以把若干个任务放到一个Dispatch Group中：</p>
+
+<pre><code>dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+dispatch_group_t group = dispatch_group_create();
+dispatch_group_async(group, queue, ^{
+   // Some asynchronous work
+});
+</code></pre>
+
+<p><code>dispatch_group_async</code>跟<code>dispatch_async</code>一样，会把任务放到<code>queue</code>中执行，不过它比<code>dispatch_async</code>多做了一步操作就是把这个任务和<code>group</code>相关联。</p>
+
+<p>把一些任务放到Dispatch Group后，我们就可以调用<code>dispatch_group_wait</code>来等待这些任务完成。若任务已经全部完成或为空，则直接返回，否则等待所有任务完成后返回。注意：返回后<code>group</code>会清空。</p>
+
+<pre><code>dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
+// Do some work after.
+dispatch_release(group);
+</code></pre>
+
+<h2>Dispatch信号量</h2>
+
+<p>很多程序设计都设计到信号量，生产者-消费者模型在多线程编程中会频繁的使用。GCD提供了自己的一套信号量机制。</p>
+
+<pre><code>dispatch_semaphore_t sema = dispatch_semaphore_create(RESOURCE_SIZE);
+dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+//do some work here.
+dispatch_semaphore_signal(sema);
+</code></pre>
+
+<p><code>dispatch_semaphore_wait</code>用来获取信号量，若信号量为0，则等待直到信号量大于0。在处理任务结束后，应释放相关资源并调用<code>dispatch_semaphore_signal</code>使信号量增加1个。</p>
+
+<h2>Dispatch Source</h2>
+
+<p>Dispatch Source是GCD中监听一些系统事件的有个Dispatch对象，它包括定时器、文件监听、进程监听、Mach port监听等类型。</p>
+
+<p>可以通过<code>dispatch_source_create</code>创建一个Dispatch Source：</p>
+
+<pre><code>dispatch_source_t dispatch_source_create(
+   dispatch_source_type_t type,
+   uintptr_t handle,
+   unsigned long mask,
+   dispatch_queue_t queue);
+</code></pre>
+
+<p>这里可以指定Dispatch Source的类型，<code>type</code>可以为文件读或写、进程监听等。<code>handle</code>为监听对象的句柄，如果是文件就是文件描述符，如果是进程就是进程ID。<code>mask</code>用来指定一些想要监听的事件，它的意义取决于<code>type</code>。<code>queue</code>指定事件处理的任务队列。</p>
+
+<p>创建好Dispatch Source后，我们要为Dispatch Source设置一个事件处理模块。可以用<code>dispatch_source_set_event_handler</code>或<code>dispatch_source_set_event_handler_f</code>来设置：</p>
+
+<pre><code>void dispatch_source_set_event_handler(
+   dispatch_source_t source,
+   dispatch_block_t handler);
+</code></pre>
+
+<p>设置好Dispatch Source后就可以调用<code>dispatch_resume</code>来启动监听。如果相应的事件发生就会触发事件处理模块。</p>
+
+<p>同时我们也可以设置一个取消处理模块：</p>
+
+<pre><code>dispatch_source_set_cancel_handler(mySource, ^{
+   close(fd); // Close a file descriptor opened earlier.
+});
+</code></pre>
+
+<p>取消处理模块会在Dispatch Source取消时调用。</p>
+
+<p>下面介绍一下主要的Dispatch Source类型和示例代码。</p>
+
+<h3>定时器</h3>
+
+<p>定时器Dispatch Source可以每隔一个固定的时间处理一下任务。</p>
+
+<pre><code>dispatch_source_t CreateDispatchTimer(uint64_t interval,
+              uint64_t leeway,
+              dispatch_queue_t queue,
+              dispatch_block_t block)
+{
+   dispatch_source_t timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER,
+                                                     0, 0, queue);
+   if (timer)
+   {
+      dispatch_source_set_timer(timer, dispatch_walltime(NULL, 0), interval, leeway);
+      dispatch_source_set_event_handler(timer, block);
+      dispatch_resume(timer);
+   }
+   return timer;
+}
+
+void MyCreateTimer()
+{
+   dispatch_source_t aTimer = CreateDispatchTimer(30ull * NSEC_PER_SEC,
+                               1ull * NSEC_PER_SEC,
+                               dispatch_get_main_queue(),
+                               ^{ MyPeriodicTask(); });
+
+   // Store it somewhere for later use.
+    if (aTimer)
+    {
+        MyStoreTimer(aTimer);
+    }
+}
+</code></pre>
+
+<h4>dispatch_after和dispatch_after_f</h4>
+
+<p>有时候我们只想处理一次延迟任务，可以用dispatch_after和dispatch_after_f</p>
+
+<pre><code>void dispatch_after(
+   dispatch_time_t when,
+   dispatch_queue_t queue,
+   dispatch_block_t block);
+</code></pre>
+
+<h3>监听文件事件</h3>
+
+<p>监听文件事件分好几个类型，有读、写、属性的监听。</p>
+
+<h4>读取文件</h4>
+
+<pre><code>dispatch_source_t source = dispatch_source_create(DISPATCH_SOURCE_TYPE_READ, fd, 0, queue);
+dispatch_source_set_event_handler(source, ^{
+   // Get some data from the source variable, which is captured
+   // from the parent context.
+   size_t estimated = dispatch_source_get_data(source);
+   // Continue reading the descriptor...
+});
+dispatch_resume(source);
+</code></pre>
+
+<h4>写文件</h4>
+
+<pre><code>dispatch_source_t writeSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_WRITE,
+                        fd, 0, queue);
+if (!writeSource)
+{
+    close(fd);
+    return NULL;
+}
+
+dispatch_source_set_event_handler(writeSource, ^{
+    size_t bufferSize = MyGetDataSize();
+    void* buffer = malloc(bufferSize);
+
+    size_t actual = MyGetData(buffer, bufferSize);
+    write(fd, buffer, actual);
+
+    free(buffer);
+
+    // Cancel and release the dispatch source when done.
+    dispatch_source_cancel(writeSource);
+});
+</code></pre>
+
+<h4>监听文件属性</h4>
+
+<pre><code>dispatch_source_t source = dispatch_source_create(DISPATCH_SOURCE_TYPE_VNODE,
+            fd, DISPATCH_VNODE_RENAME, queue);
+if (source)
+{
+  // Copy the filename for later use.
+  int length = strlen(filename);
+  char* newString = (char*)malloc(length + 1);
+  newString = strcpy(newString, filename);
+  dispatch_set_context(source, newString);
+
+  // Install the event handler to process the name change
+  dispatch_source_set_event_handler(source, ^{
+        const char*  oldFilename = (char*)dispatch_get_context(source);
+        MyUpdateFileName(oldFilename, fd);
+  });
+
+  // Install a cancellation handler to free the descriptor
+  // and the stored string.
+  dispatch_source_set_cancel_handler(source, ^{
+      char* fileStr = (char*)dispatch_get_context(source);
+      free(fileStr);
+      close(fd);
+  });
+
+  // Start processing events.
+  dispatch_resume(source);
+}
+else
+  close(fd);
+</code></pre>
+
+<h3>监听进程事件</h3>
+
+<p><code>DISPATCH_PROC_EXIT</code>是一个监听进程退出的类型。</p>
+
+<pre><code>dispatch_source_t source = dispatch_source_create(DISPATCH_SOURCE_TYPE_PROC,
+                                                  parentPID, DISPATCH_PROC_EXIT, queue);
+if (source)
+{
+   dispatch_source_set_event_handler(source, ^{
+     MySetAppExitFlag();
+     dispatch_source_cancel(source);
+     dispatch_release(source);
+   });
+   dispatch_resume(source);
+}
+</code></pre>
+
+<h3>监听中断信号</h3>
+
+<pre><code>dispatch_source_t source = dispatch_source_create(DISPATCH_SOURCE_TYPE_SIGNAL, SIGHUP, 0, queue);
+if (source)
+{
+  dispatch_source_set_event_handler(source, ^{
+     MyProcessSIGHUP();
+  });
+
+  // Start processing signals
+  dispatch_resume(source);
+}
+</code></pre>
+
+<h2>参考文献</h2>
+
+<ul>
+<li>Dispatch Queues：<a href="https://developer.apple.com/library/mac/documentation/general/conceptual/concurrencyprogrammingguide/OperationQueues/OperationQueues.html#//apple_ref/doc/uid/TP40008091-CH102-SW1">https://developer.apple.com/library/mac/documentation/general/conceptual/concurrencyprogrammingguide/OperationQueues/OperationQueues.html#//apple_ref/doc/uid/TP40008091-CH102-SW1</a></li>
+<li>Dispatch Sources：<a href="https://developer.apple.com/library/mac/documentation/general/conceptual/concurrencyprogrammingguide/GCDWorkQueues/GCDWorkQueues.html">https://developer.apple.com/library/mac/documentation/general/conceptual/concurrencyprogrammingguide/GCDWorkQueues/GCDWorkQueues.html</a></li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Objective-C代码注释和文档输出的工具和方法]]></title>
@@ -302,7 +648,7 @@ operation2s begin
 operation2s end
 </code></pre>
 
-<p>为了更好的展示队列优先级效果，我把queue的<code>maxConcurrentOperationCount</code>设置为<code>1</code>，以便任务一个一个的执行。从上面日志可以看出，第一个operation1s执行完毕后，会执行operation5s，而不是operation2s，因为operation5s的<code>queuePriority</code>是<code>NSOperationQueuePriorityHigh</code>。而第一个线程总是会第一个执行。在看看2-4行，我们可以看出operation1s的<code>completionBlock</code>比operation5s晚开始执行，说明它不在operation1s的线程中执行的。正如前面所说，<code>completionBlock</code>是通过KVO监听执行，一般会运行在主线程。</p>
+<p>为了更好的展示队列优先级效果，我把queue的<code>maxConcurrentOperationCount</code>设置为<code>1</code>，以便任务一个一个的执行。从上面日志可以看出，第一个operation1s执行完毕后，会执行operation5s，而不是operation2s，因为operation5s的<code>queuePriority</code>是<code>NSOperationQueuePriorityHigh</code>。而第一个线程总是会第一个执行。在看看2-4行，我们可以看出operation1s的<code>completionBlock</code>比operation5s晚开始执行，说明它不在operation1s的线程中执行的。正如前面所说，<code>completionBlock</code>是通过KVO监听执行，一般会运行在监听所在线程，而不是Operation执行的线程。</p>
 
 <h2>注意事项</h2>
 
@@ -1699,34 +2045,6 @@ NSData还有一个API：</p>
 什么是文件内存映射呢</p>
 
 <p>文件内存映射是指把一个文件的内容映射到进程的内存虚拟地址空间中，这个实际上并没有为文件内容分配物理内存。实际上就相当于将内存地址值指向文件的磁盘地址。如果对这些内存进行读写，实际上就是对文件在磁盘上内容进行读写。</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[一个模拟网页表单请求封装类（支持文件上传）]]></title>
-    <link href="http://blog.xcodev.com/blog/2012/10/21/a-class-simulate-web-form/"/>
-    <updated>2012-10-21T21:05:00+08:00</updated>
-    <id>http://blog.xcodev.com/blog/2012/10/21/a-class-simulate-web-form</id>
-    <content type="html"><![CDATA[<p>自己在作项目时经常会遇到要上传文件同时还要附带一些字符串参数的网络请求，由于文件有时是二进制数据，采用http查询参数就不太适合了。最好的方式是采取Web表单的方式上传文件，自己写了这么一个类，就分享一下。
-代码地址：<a href="https://github.com/shenqiliang/HTTPForm-iOS">https://github.com/shenqiliang/HTTPForm-iOS</a></p>
-
-<p>使用方法：</p>
-
-<pre><code>PPPostWebForm *a = [[PPPostWebForm alloc] initWithPostURL:[NSURL URLWithString:@"http://www.example.com/upload/uploadFile"]];
-[a addFileElement:@"文件参数" value:@"文件路径"];
-[a addTextElement:@"参数名" value:@"参数值"];
-[a addTextElement:@"参数名2" value:@"参数值2"];
-a.delegate = self;
-[a commitFormAsynchronous];
-</code></pre>
-
-<p>网络请求完毕后会得到回调：</p>
-
-<pre><code>- (void)postWebForm:(PPPostWebForm*)form didReceivedAsynchronousData:(NSData*)data{
-    NSString *s = [NSString stringWithUTF8String:[data bytes]];
-    NSLog(s);
-}
-</code></pre>
 ]]></content>
   </entry>
   
