@@ -4,7 +4,7 @@
   <title><![CDATA[Xcode Dev]]></title>
   <link href="http://blog.xcodev.com/atom.xml" rel="self"/>
   <link href="http://blog.xcodev.com/"/>
-  <updated>2013-11-04T17:27:56+08:00</updated>
+  <updated>2013-11-06T09:53:30+08:00</updated>
   <id>http://blog.xcodev.com/</id>
   <author>
     <name><![CDATA[谌启亮]]></name>
@@ -16,7 +16,7 @@
   <entry>
     <title type="html"><![CDATA[并发编程之GCD]]></title>
     <link href="http://blog.xcodev.com/blog/2013/11/04/gcd-intro/"/>
-    <updated>2013-11-04T17:13:00+08:00</updated>
+    <updated>2013-11-04T18:03:00+08:00</updated>
     <id>http://blog.xcodev.com/blog/2013/11/04/gcd-intro</id>
     <content type="html"><![CDATA[<p>在<a href="http://blog.xcodev.com/blog/2013/10/28/operation-queue-intro/">《并发编程之Operation Queue》</a>中讲了Cocoa并发编程中的Operation Queue，了解了Operation Queue是一个面向对象的并发编程接口，它支持并发数，线程优先级，任务优先级，任务依赖关系等多种配置，可以方便满足各种复杂的多任务处理场景。本篇将接着讲另一种并发编程机制 &ndash; GCD（Grand Central Dispatch）。iOS4.0中首度引入GCD，GCD是管理任务执行的一项技术，它使得我们对多任务处理变得更加方便和有效。它支持同步或异步任务处理，串行或并行的处理队列（Dispath Queue），非系统调用的信号量机制，定时任务处理，进程、文件或网络的监听任务等。这个庞大的任务处理技术大大减少了线程的管理工作，使基于任务的开发变得更加高效。</p>
 
