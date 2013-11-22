@@ -4,7 +4,7 @@
   <title><![CDATA[Xcode Dev]]></title>
   <link href="http://blog.xcodev.com/atom.xml" rel="self"/>
   <link href="http://blog.xcodev.com/"/>
-  <updated>2013-11-15T12:01:42+08:00</updated>
+  <updated>2013-11-22T15:05:57+08:00</updated>
   <id>http://blog.xcodev.com/</id>
   <author>
     <name><![CDATA[谌启亮]]></name>
@@ -12,6 +12,54 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[使用CFStringTransform将汉字转换为拼音]]></title>
+    <link href="http://blog.xcodev.com/blog/2013/11/22/tranform-hanzi-to-pinyin-using-cfstringtransform/"/>
+    <updated>2013-11-22T11:47:00+08:00</updated>
+    <id>http://blog.xcodev.com/blog/2013/11/22/tranform-hanzi-to-pinyin-using-cfstringtransform</id>
+    <content type="html"><![CDATA[<p>之前做通讯录相关的一些App时，有一个比较常用的算法是将汉字转换成拼音。当时采用的做法是：将各个拼音段的首个汉字（按Unicode排序）做成两个数组，一个数组存拼音，另一个数组存拼音对应首个汉字的Unicode。如果要获取某个汉字的拼音，可以折半查找法找的对应拼音。最近无意间发现<a href="http://nshipster.com/cfstringtransform/">CFStringTransform</a>这篇文章后，发现系统本身已经提供了一个这样的函数。</p>
+
+<!--more-->
+
+
+<h2>CFStringTransform</h2>
+
+<p>iOS在CoreFoundation中提供了CFStringTransform函数，但在Foundation中却没有相对应的方法。它的定义如下：</p>
+
+<pre><code>Boolean CFStringTransform(CFMutableStringRef string, CFRange *range, CFStringRef transform, Boolean reverse);
+</code></pre>
+
+<p>其中<code>string</code>参数是要转换的string，比如要转换的中文，同时它是mutable的，因此也直接作为最终转换后的字符串。<code>range</code>是要转换的范围，同时输出转换后改变的范围，如果为NULL，视为全部转换。<code>transform</code>可以指定要进行什么样的转换，这里可以指定多种语言的拼写转换。<code>reverse</code>指定该转换是否必须是可逆向转换的。如果转换成功就返回<code>true</code>，否则返回<code>false</code>。</p>
+
+<p>如果要进行汉字到拼音的转换，我们只需要将<code>transform</code>设定为<code>kCFStringTransformMandarinLatin</code>或者<code>kCFStringTransformToLatin</code>（<code>kCFStringTransformToLatin</code>也可适用于非汉字字符串）:</p>
+
+<pre><code>CFMutableStringRef string = CFStringCreateMutableCopy(NULL, 0, CFSTR("中国"));
+CFStringTransform(string, NULL, kCFStringTransformMandarinLatin, NO);
+NSLog(@"%@", string);
+</code></pre>
+
+<p>这段代码将输出：</p>
+
+<pre><code>2013-11-22 14:41:14.644 Test[2436:907] zhōng guó
+</code></pre>
+
+<p>可以看出，<code>CFStringTransform</code>正确的输出了“中国”的拼音，而且还带上了音标。有时候我们不需要音标怎么办？还好<code>CFStringTransform</code>同时提供了将音标字母转换为普通字母的方法<code>kCFStringTransformStripDiacritics</code>。我们在上面的代码基础上再加上这个：</p>
+
+<pre><code>CFStringTransform(string, NULL, kCFStringTransformStripDiacritics, NO);
+NSLog(@"%@", string);
+</code></pre>
+
+<p>那么最终将输出：</p>
+
+<pre><code>2013-11-22 14:47:00.380 Test[2470:907] zhong guo
+</code></pre>
+
+<h2>参考文章</h2>
+
+<p><a href="http://nshipster.com/cfstringtransform/">http://nshipster.com/cfstringtransform/</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[并发编程之GCD]]></title>
@@ -2014,37 +2062,6 @@ ERROR: CategoryView buttons 没有在dealloc中release.
 ERROR: TodayDealListViewController dealInfosThisRounds 没有在dealloc中release.
 ERROR: TodayDealListViewController dealInfosThisRound 没有在dealloc中release.
 </code></pre>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[iOS将大文件映射到内存]]></title>
-    <link href="http://blog.xcodev.com/blog/2012/10/23/ios-mmap-api/"/>
-    <updated>2012-10-23T21:23:00+08:00</updated>
-    <id>http://blog.xcodev.com/blog/2012/10/23/ios-mmap-api</id>
-    <content type="html"><![CDATA[<p>在《<a href="http://blog.xcodev.com/blog/2011/11/02/gps-offset-in-google-map-at-china/">中国区GPS偏移纠正（适用于Google地图）</a>》一文中曾读取一个78M的大数据文件，一开始采用了NSData的dataWithContentsOfFile:方法。不少人反馈说如果直接使用，将会耗尽iOS的内存。其实这个是可以改善的。
-NSData还有一个API：</p>
-
-<pre><code>+ (id)dataWithContentsOfFile:(NSString *)path options:(NSDataReadingOptions)readOptionsMask error:(NSError **)errorPtr;
-</code></pre>
-
-<p>其中NSDataReadingOptions可以附加一个参数NSDataReadingMappedIfSafe参数。使用这个参数后，iOS就不会把整个文件全部读取的内存了，而是将文件映射到进程的地址空间中，这么做并不会占用实际内存。这样就可以解决内存满的问题。</p>
-
-<!--more-->
-
-
-<h2>实际测试效果</h2>
-
-<p>不带参数时内存占用：
-<img src="http://blog.xcodev.com/images/post/mem-of-gps-data-not-mmap.png" alt="image" /></p>
-
-<p>使用NSDataReadingMappedIfSafe参数后内存占用：
-<img src="http://blog.xcodev.com/images/post/mem-of-gps-data-mmap.png" alt="image" /></p>
-
-<p>由此可见，对于体积很大文件，使用内存映射方式读取将会减少大量内存占用。
-什么是文件内存映射呢</p>
-
-<p>文件内存映射是指把一个文件的内容映射到进程的内存虚拟地址空间中，这个实际上并没有为文件内容分配物理内存。实际上就相当于将内存地址值指向文件的磁盘地址。如果对这些内存进行读写，实际上就是对文件在磁盘上内容进行读写。</p>
 ]]></content>
   </entry>
   

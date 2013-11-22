@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>让项目在编译时自动加上occheck - Xcode Dev</title>
+  <title>使用CFStringTransform将汉字转换为拼音 - Xcode Dev</title>
   <meta name="author" content="谌启亮">
 
   
-  <meta name="description" content="之前我开源了一个项目occheck，它是一个检查内存泄漏和高危函数的自动化工具。但是如何利用好它呢？如果能够像Xcode静态分析那样能自动在编译时执行就好了。呵呵，言归正传，这篇文章将为你详细介绍如何在项目调试前进行自动检查，以达到减少不安全的代码目的。我们开始吧！ 1、创建一个Runscript &hellip;">
+  <meta name="description" content="之前做通讯录相关的一些App时，有一个比较常用的算法是将汉字转换成拼音。当时采用的做法是：将各个拼音段的首个汉字（按Unicode排序）做成两个数组，一个数组存拼音，另一个数组存拼音对应首个汉字的Unicode。如果要获取某个汉字的拼音，可以折半查找法找的对应拼音。 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://blog.xcodev.com/blog/2012/10/24/add-occheck-to-project-when-run">
+  <link rel="canonical" href="http://blog.xcodev.com/blog/2013/11/22/tranform-hanzi-to-pinyin-using-cfstringtransform">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="Xcode Dev" type="application/atom+xml">
@@ -79,7 +79,7 @@
   
   <header>
     
-      <h1 class="entry-title">让项目在编译时自动加上occheck</h1>
+      <h1 class="entry-title">使用CFStringTransform将汉字转换为拼音</h1>
     
     
       <p class="meta">
@@ -95,42 +95,53 @@
   
 
 
-<time datetime="2012-10-24T21:18:00+08:00" pubdate data-updated="true">2012-10-24 21:18</time>
+<time datetime="2013-11-22T11:47:00+08:00" pubdate data-updated="true">2013-11-22 11:47</time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><p>之前我开源了一个项目occheck，它是一个检查内存泄漏和高危函数的自动化工具。但是如何利用好它呢？如果能够像Xcode静态分析那样能自动在编译时执行就好了。呵呵，言归正传，这篇文章将为你详细介绍如何在项目调试前进行自动检查，以达到减少不安全的代码目的。我们开始吧！</p>
-
-<h4>1、创建一个Runscript(运行脚本)</h4>
-
-<p>打开项目配置，选择合适的target，在右侧选择“Build Phases”。然后在下方点击“Add Build Phases”－“Add Run Script”。如下图：</p>
+<div class="entry-content"><p>之前做通讯录相关的一些App时，有一个比较常用的算法是将汉字转换成拼音。当时采用的做法是：将各个拼音段的首个汉字（按Unicode排序）做成两个数组，一个数组存拼音，另一个数组存拼音对应首个汉字的Unicode。如果要获取某个汉字的拼音，可以折半查找法找的对应拼音。最近无意间发现<a href="http://nshipster.com/cfstringtransform/">CFStringTransform</a>这篇文章后，发现系统本身已经提供了一个这样的函数。</p>
 
 <!--more-->
 
 
-<p><img src="/images/post/add-occheck-to-runscript-step-one.png" alt="image" /></p>
+<h2>CFStringTransform</h2>
 
-<h4>2、输入相应的运行脚本</h4>
+<p>iOS在CoreFoundation中提供了CFStringTransform函数，但在Foundation中却没有相对应的方法。它的定义如下：</p>
 
-<p>点击“Add Run Script”菜单后，将会在中间添加“Run Script”项，在此项的第二个文本框里输入脚本：</p>
-
-<p>/path/to/occheck /path/to/class目录
-如下图：</p>
-
-<p><img src="/images/post/add-occheck-to-runscript-step-two.png" alt="image" /></p>
-
-<h4>3、运行</h4>
-
-<p>Build&amp;Run吧，如果检查到内存信息或高危函数，将无法运行。同时，在build日志里会显示那个类或文件出错了。如：</p>
-
-<pre><code>ERROR: QHTTPCacheManager cacheRootPath 没有在dealloc中release.
-ERROR: CategoryView buttons 没有在dealloc中release.
-ERROR: TodayDealListViewController dealInfosThisRounds 没有在dealloc中release.
-ERROR: TodayDealListViewController dealInfosThisRound 没有在dealloc中release.
+<pre><code>Boolean CFStringTransform(CFMutableStringRef string, CFRange *range, CFStringRef transform, Boolean reverse);
 </code></pre>
+
+<p>其中<code>string</code>参数是要转换的string，比如要转换的中文，同时它是mutable的，因此也直接作为最终转换后的字符串。<code>range</code>是要转换的范围，同时输出转换后改变的范围，如果为NULL，视为全部转换。<code>transform</code>可以指定要进行什么样的转换，这里可以指定多种语言的拼写转换。<code>reverse</code>指定该转换是否必须是可逆向转换的。如果转换成功就返回<code>true</code>，否则返回<code>false</code>。</p>
+
+<p>如果要进行汉字到拼音的转换，我们只需要将<code>transform</code>设定为<code>kCFStringTransformMandarinLatin</code>或者<code>kCFStringTransformToLatin</code>（<code>kCFStringTransformToLatin</code>也可适用于非汉字字符串）:</p>
+
+<pre><code>CFMutableStringRef string = CFStringCreateMutableCopy(NULL, 0, CFSTR("中国"));
+CFStringTransform(string, NULL, kCFStringTransformMandarinLatin, NO);
+NSLog(@"%@", string);
+</code></pre>
+
+<p>这段代码将输出：</p>
+
+<pre><code>2013-11-22 14:41:14.644 Test[2436:907] zhōng guó
+</code></pre>
+
+<p>可以看出，<code>CFStringTransform</code>正确的输出了“中国”的拼音，而且还带上了音标。有时候我们不需要音标怎么办？还好<code>CFStringTransform</code>同时提供了将音标字母转换为普通字母的方法<code>kCFStringTransformStripDiacritics</code>。我们在上面的代码基础上再加上这个：</p>
+
+<pre><code>CFStringTransform(string, NULL, kCFStringTransformStripDiacritics, NO);
+NSLog(@"%@", string);
+</code></pre>
+
+<p>那么最终将输出：</p>
+
+<pre><code>2013-11-22 14:47:00.380 Test[2470:907] zhong guo
+</code></pre>
+
+<h2>参考文章</h2>
+
+<p><a href="http://nshipster.com/cfstringtransform/">http://nshipster.com/cfstringtransform/</a></p>
 </div>
 
 
@@ -153,12 +164,12 @@ ERROR: TodayDealListViewController dealInfosThisRound 没有在dealloc中release
   
 
 
-<time datetime="2012-10-24T21:18:00+08:00" pubdate data-updated="true">2012-10-24 21:18</time>
+<time datetime="2013-11-22T11:47:00+08:00" pubdate data-updated="true">2013-11-22 11:47</time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/ioskai-fa/'>iOS开发</a>
+    <a class='category' href='/blog/categories/mackai-fa/'>Mac开发</a>, <a class='category' href='/blog/categories/ioskai-fa/'>iOS开发</a>
   
 </span>
 
@@ -189,10 +200,8 @@ ERROR: TodayDealListViewController dealInfosThisRound 没有在dealloc中release
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2012/10/23/ios-mmap-api/" title="Previous Post: iOS将大文件映射到内存">&laquo; iOS将大文件映射到内存</a>
+        <a class="basic-alignment left" href="/blog/2013/11/04/gcd-intro/" title="Previous Post: 并发编程之GCD">&laquo; 并发编程之GCD</a>
       
-      
-        <a class="basic-alignment right" href="/blog/2012/10/25/anti-alise-for-image-ios/" title="Next Post: 在iOS中让图片旋转时抗锯齿">在iOS中让图片旋转时抗锯齿 &raquo;</a>
       
     </p>
   </footer>

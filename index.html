@@ -9,7 +9,7 @@
   <meta name="author" content="谌启亮">
 
   
-  <meta name="description" content="在《并发编程之Operation Queue》中讲了Cocoa并发编程中的Operation Queue，了解了Operation Queue是一个面向对象的并发编程接口，它支持并发数，线程优先级，任务优先级，任务依赖关系等多种配置，可以方便满足各种复杂的多任务处理场景。 &hellip;">
+  <meta name="description" content="之前做通讯录相关的一些App时，有一个比较常用的算法是将汉字转换成拼音。当时采用的做法是：将各个拼音段的首个汉字（按Unicode排序）做成两个数组，一个数组存拼音，另一个数组存拼音对应首个汉字的Unicode。如果要获取某个汉字的拼音，可以折半查找法找的对应拼音。 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -76,6 +76,47 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/11/22/tranform-hanzi-to-pinyin-using-cfstringtransform/">使用CFStringTransform将汉字转换为拼音</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-11-22T11:47:00+08:00" pubdate data-updated="true">2013-11-22 11:47</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>之前做通讯录相关的一些App时，有一个比较常用的算法是将汉字转换成拼音。当时采用的做法是：将各个拼音段的首个汉字（按Unicode排序）做成两个数组，一个数组存拼音，另一个数组存拼音对应首个汉字的Unicode。如果要获取某个汉字的拼音，可以折半查找法找的对应拼音。最近无意间发现<a href="http://nshipster.com/cfstringtransform/">CFStringTransform</a>这篇文章后，发现系统本身已经提供了一个这样的函数。</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/11/22/tranform-hanzi-to-pinyin-using-cfstringtransform/">阅读更多 &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -458,47 +499,6 @@ id objc_getAssociatedObject(id object, const void *key);
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2013/06/12/custom-ui-using-uiappearance/">iOS 5中使用UIAppearance来自定义应用的外观</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-06-12T16:31:00+08:00" pubdate data-updated="true">2013-06-12 16:31</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>做App时，我们经常需要自定义一些界面展现，来适合我们App的内容，或来使App看起来更漂亮，有时我们不得不写大量的自定义控件来达到这个目的。iOS 5新增了UIAppearance协议，使得自定义风格简单方便了很多，通过UIAppearance协议，我们快速的修改系统内置的控件的外观，也可以自己定义一些可自定义外观的控件。</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2013/06/12/custom-ui-using-uiappearance/">阅读更多 &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; 以往文章</a>
@@ -536,6 +536,10 @@ id objc_getAssociatedObject(id object, const void *key);
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/11/22/tranform-hanzi-to-pinyin-using-cfstringtransform/">使用CFStringTransform将汉字转换为拼音</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/11/04/gcd-intro/">并发编程之GCD</a>
       </li>
     
@@ -549,10 +553,6 @@ id objc_getAssociatedObject(id object, const void *key);
     
       <li class="post">
         <a href="/blog/2013/10/21/tagged-pointer-and-64-bit/">64位与Tagged Pointer</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/10/16/start-using-octopress/">博客搬家到Octopress</a>
       </li>
     
   </ul>

@@ -9,9 +9,7 @@
   <meta name="author" content="谌启亮">
 
   
-  <meta name="description" content="在Objective-C中我们常常会用到常量字符串，常量字符串和一般的字符串还是有一定区别，本文将介绍一些常量字符串的特性，加强你的常量字符串的认识。请看下面一段代码。 NSString *string1 = @"Hello";
-NSString *string2 = @"Hello";
-if ( &hellip;">
+  <meta name="description" content="当我们获取到一些iOS的app包后，发现里面的png图片使用系统的预览看不了。因为在Xcode生成应用程序包时，自动将png图片进行优化，而优化后的图片不能直接使用预览查看，这个优化工具是pngcrush。它也提供了还原的功能，使图片再度可见。为了批量处理这些图片，我写了一个脚本pngdecode &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +76,47 @@ if ( &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/03/28/view-png-in-ios-app-bundle/">如何查看iOS App包中的png图片</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-28T00:26:00+08:00" pubdate data-updated="true">2012-03-28 00:26</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>当我们获取到一些iOS的app包后，发现里面的png图片使用系统的预览看不了。因为在Xcode生成应用程序包时，自动将png图片进行优化，而优化后的图片不能直接使用预览查看，这个优化工具是pngcrush。它也提供了还原的功能，使图片再度可见。为了批量处理这些图片，我写了一个脚本pngdecode：</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/03/28/view-png-in-ios-app-bundle/">阅读更多 &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -519,60 +558,6 @@ should->will->action->did
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/03/09/create-your-own-mac-dict/">打造自己的Mac系统字典</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-03-09T23:25:00+08:00" pubdate data-updated="true">2012-03-09 23:25</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>看SDK英文文档头疼啊…
-软件还要支持英文的国际化…
-iOS开发中经常会遇到这些问题，每个Mac OS都自带了“字典”应用，不幸的是，这个字典只支持英文对英文的解释。对于咱们对英文不熟的人来说，这个应用确实是个鸡肋。我们最需要的是英文到中文或中文到英文的翻译，也许你会尝试去寻找其他Mac OS字典应用来满足你的需求，但其实系统自带的字典app只需简单几步就可以加入这些翻译功能，而且可以随意添加我们想要的字典，牛津、朗文随便挑选了。(^o^)</p>
-
-<p>1、下载并安装DicUnifier
-DicUnifier是一个专门将一些字典转换成Mac OS字典格式的应用。
-<a href="http://code.google.com/p/mac-dictionary-kit/downloads/list">http://code.google.com/p/mac-dictionary-kit/downloads/list</a></p>
-
-<p>2、下载字典文件
-你可以选择下面链接下载简体中文字典：
-<a href="http://abloz.com/huzheng/stardict-dic/zh_CN/">http://abloz.com/huzheng/stardict-dic/zh_CN/</a>
-也可以下载所有字典（包括其他语言：日文，德文等）：
-<a href="http://abloz.com/huzheng/stardict-dic/">http://abloz.com/huzheng/stardict-dic/</a></p>
-
-<p>3、打开DicUnifier，并将第2步下载的字典文件（不要解压）直接拖到DicUnifier的窗口上，选择确认后就开始转换。这可能会需要几分钟时间。</p>
-
-<p>4、DicUnifier转换完成后，重新开启你的字典app。你也可以在字典的偏好设置里设置你需要的字典并排序。</p>
-
-<p><img src="/images/post/mac-dict.png" alt="image" /></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/5/">&larr; 以往文章</a>
@@ -612,6 +597,10 @@ DicUnifier是一个专门将一些字典转换成Mac OS字典格式的应用。
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/11/22/tranform-hanzi-to-pinyin-using-cfstringtransform/">使用CFStringTransform将汉字转换为拼音</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/11/04/gcd-intro/">并发编程之GCD</a>
       </li>
     
@@ -625,10 +614,6 @@ DicUnifier是一个专门将一些字典转换成Mac OS字典格式的应用。
     
       <li class="post">
         <a href="/blog/2013/10/21/tagged-pointer-and-64-bit/">64位与Tagged Pointer</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/10/16/start-using-octopress/">博客搬家到Octopress</a>
       </li>
     
   </ul>

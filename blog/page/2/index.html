@@ -9,7 +9,7 @@
   <meta name="author" content="谌启亮">
 
   
-  <meta name="description" content="Unix文件系统中对单个文件提供了很多属性，比如创建时间、文件大小、修改时间等，这些信息都保存在文件系统中的inode节点中，获取这些属性并不需要读取文件，所以获取速度是很快的。在开发过程中常常会使用这些属性，但更多的时候我们需要一个自定义的属性，来保存我们需要的一些值。 &hellip;">
+  <meta name="description" content="做App时，我们经常需要自定义一些界面展现，来适合我们App的内容，或来使App看起来更漂亮，有时我们不得不写大量的自定义控件来达到这个目的。iOS 5新增了UIAppearance协议，使得自定义风格简单方便了很多，通过UIAppearance协议，我们快速的修改系统内置的控件的外观， &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -76,6 +76,47 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/06/12/custom-ui-using-uiappearance/">iOS 5中使用UIAppearance来自定义应用的外观</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-06-12T16:31:00+08:00" pubdate data-updated="true">2013-06-12 16:31</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>做App时，我们经常需要自定义一些界面展现，来适合我们App的内容，或来使App看起来更漂亮，有时我们不得不写大量的自定义控件来达到这个目的。iOS 5新增了UIAppearance协议，使得自定义风格简单方便了很多，通过UIAppearance协议，我们快速的修改系统内置的控件的外观，也可以自己定义一些可自定义外观的控件。</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/06/12/custom-ui-using-uiappearance/">阅读更多 &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -494,53 +535,6 @@ return YES;
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/10/23/ios-mmap-api/">iOS将大文件映射到内存</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-10-23T21:23:00+08:00" pubdate data-updated="true">2012-10-23 21:23</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>在《<a href="/blog/2011/11/02/gps-offset-in-google-map-at-china/">中国区GPS偏移纠正（适用于Google地图）</a>》一文中曾读取一个78M的大数据文件，一开始采用了NSData的dataWithContentsOfFile:方法。不少人反馈说如果直接使用，将会耗尽iOS的内存。其实这个是可以改善的。
-NSData还有一个API：</p>
-
-<pre><code>+ (id)dataWithContentsOfFile:(NSString *)path options:(NSDataReadingOptions)readOptionsMask error:(NSError **)errorPtr;
-</code></pre>
-
-<p>其中NSDataReadingOptions可以附加一个参数NSDataReadingMappedIfSafe参数。使用这个参数后，iOS就不会把整个文件全部读取的内存了，而是将文件映射到进程的地址空间中，这么做并不会占用实际内存。这样就可以解决内存满的问题。</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2012/10/23/ios-mmap-api/">阅读更多 &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/3/">&larr; 以往文章</a>
@@ -580,6 +574,10 @@ NSData还有一个API：</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/11/22/tranform-hanzi-to-pinyin-using-cfstringtransform/">使用CFStringTransform将汉字转换为拼音</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/11/04/gcd-intro/">并发编程之GCD</a>
       </li>
     
@@ -593,10 +591,6 @@ NSData还有一个API：</p>
     
       <li class="post">
         <a href="/blog/2013/10/21/tagged-pointer-and-64-bit/">64位与Tagged Pointer</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/10/16/start-using-octopress/">博客搬家到Octopress</a>
       </li>
     
   </ul>

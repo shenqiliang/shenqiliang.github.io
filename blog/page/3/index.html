@@ -9,8 +9,8 @@
   <meta name="author" content="谌启亮">
 
   
-  <meta name="description" content="自己在作项目时经常会遇到要上传文件同时还要附带一些字符串参数的网络请求，由于文件有时是二进制数据，采用http查询参数就不太适合了。最好的方式是采取Web表单的方式上传文件，自己写了这么一个类，就分享一下。
-代码地址：https://github.com/shenqiliang/HTTPForm- &hellip;">
+  <meta name="description" content="在《中国区GPS偏移纠正（适用于Google地图）》一文中曾读取一个78M的大数据文件，一开始采用了NSData的dataWithContentsOfFile:方法。不少人反馈说如果直接使用，将会耗尽iOS的内存。其实这个是可以改善的。
+NSData还有一个API： + (id) &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -77,6 +77,53 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/10/23/ios-mmap-api/">iOS将大文件映射到内存</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-10-23T21:23:00+08:00" pubdate data-updated="true">2012-10-23 21:23</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>在《<a href="/blog/2011/11/02/gps-offset-in-google-map-at-china/">中国区GPS偏移纠正（适用于Google地图）</a>》一文中曾读取一个78M的大数据文件，一开始采用了NSData的dataWithContentsOfFile:方法。不少人反馈说如果直接使用，将会耗尽iOS的内存。其实这个是可以改善的。
+NSData还有一个API：</p>
+
+<pre><code>+ (id)dataWithContentsOfFile:(NSString *)path options:(NSDataReadingOptions)readOptionsMask error:(NSError **)errorPtr;
+</code></pre>
+
+<p>其中NSDataReadingOptions可以附加一个参数NSDataReadingMappedIfSafe参数。使用这个参数后，iOS就不会把整个文件全部读取的内存了，而是将文件映射到进程的地址空间中，这么做并不会占用实际内存。这样就可以解决内存满的问题。</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/10/23/ios-mmap-api/">阅读更多 &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -593,47 +640,6 @@ freopen("/tmp/log.txt", "a+", stderr);
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/03/28/view-png-in-ios-app-bundle/">如何查看iOS App包中的png图片</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-03-28T00:26:00+08:00" pubdate data-updated="true">2012-03-28 00:26</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>当我们获取到一些iOS的app包后，发现里面的png图片使用系统的预览看不了。因为在Xcode生成应用程序包时，自动将png图片进行优化，而优化后的图片不能直接使用预览查看，这个优化工具是pngcrush。它也提供了还原的功能，使图片再度可见。为了批量处理这些图片，我写了一个脚本pngdecode：</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2012/03/28/view-png-in-ios-app-bundle/">阅读更多 &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/4/">&larr; 以往文章</a>
@@ -673,6 +679,10 @@ freopen("/tmp/log.txt", "a+", stderr);
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/11/22/tranform-hanzi-to-pinyin-using-cfstringtransform/">使用CFStringTransform将汉字转换为拼音</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/11/04/gcd-intro/">并发编程之GCD</a>
       </li>
     
@@ -686,10 +696,6 @@ freopen("/tmp/log.txt", "a+", stderr);
     
       <li class="post">
         <a href="/blog/2013/10/21/tagged-pointer-and-64-bit/">64位与Tagged Pointer</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/10/16/start-using-octopress/">博客搬家到Octopress</a>
       </li>
     
   </ul>
