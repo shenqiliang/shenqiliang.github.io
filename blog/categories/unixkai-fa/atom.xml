@@ -4,7 +4,7 @@
   <title><![CDATA[分类：Unix开发 | Xcode Dev]]></title>
   <link href="http://blog.xcodev.com/blog/categories/unixkai-fa/atom.xml" rel="self"/>
   <link href="http://blog.xcodev.com/"/>
-  <updated>2013-11-22T15:05:57+08:00</updated>
+  <updated>2013-12-06T15:57:07+08:00</updated>
   <id>http://blog.xcodev.com/</id>
   <author>
     <name><![CDATA[谌启亮]]></name>
@@ -12,6 +12,92 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[“#”的迷雾]]></title>
+    <link href="http://blog.xcodev.com/blog/2013/12/16/mists-of-the-sharp/"/>
+    <updated>2013-12-16T12:38:00+08:00</updated>
+    <id>http://blog.xcodev.com/blog/2013/12/16/mists-of-the-sharp</id>
+    <content type="html"><![CDATA[<p>在代码中使用Autolayout时，大家都会使用<code>NSDictionaryOfVariableBindings</code>这个宏，这个宏可以生成一个变量名到变量值映射的Dictionary。比如<code>NSDictionaryOfVariableBindings(button1, button2)</code>将会生成一个<code>{ @"button1" = button1, @"button2 = button2 }</code>的Dictionary。它是怎么做到的呢？我们来看看这个宏的定义：</p>
+
+<pre><code>#define NSDictionaryOfVariableBindings(...) _NSDictionaryOfVariableBindings(@"" # __VA_ARGS__, __VA_ARGS__, nil)
+</code></pre>
+
+<p>这个宏定义中有3个参数，后两个参数不难理解，但第一个参数中间有个<code>#</code>符号，语法上看起来比较怪异，这个是什么呢？以前在做越狱的mobilesubstrate开发时，其中定义的一堆宏频繁使用了这个符号，下面就来揭开<code>#</code>这个符号在宏定义中的迷雾。</p>
+
+<!--more-->
+
+
+<h2>预编译的一些知识</h2>
+
+<p>我们的代码在build时并不是直接进行编译的，在编译之前还进行了预编译处理。预编译会把include或import的文件导入到文件中，同时会将代码中用到的宏进行替换。注意宏是直接在代码中替换成宏的定义的，如果有嵌套也会逐层替换。</p>
+
+<h2>&ldquo;#"指示一些预编译命令</h2>
+
+<p>预编译命令一般都是以<code>#</code>开头的，比如<code>#include</code>、<code>#import</code>、<code>#if</code>等，在这里就不一一说明了，本文主要说明一下<code>#</code>在宏定义里面的一些作用。</p>
+
+<h2>宏参数字符串化</h2>
+
+<p>在一个参数前加一个<code>#</code>，预处理时将会变成这个参数名的字符串常量，即字符串化（stringify）。比如:</p>
+
+<pre><code>#define GET_NAME(X) #X
+int a = 0;
+NSLog(@"%s",GET_NAME(a));      //output: "a"
+NSLog(@"%s",GET_NAME(a+3));    //output: "a+3"
+</code></pre>
+
+<p>将会得到以下输出：</p>
+
+<pre><code>a
+a+3
+</code></pre>
+
+<p>可以看出<code>#</code>，将参数原样转换成字符串常量，如果参数是一个表达式，那么输出这个表达式的原样字符串常量。</p>
+
+<p>回头再看看<code>NSDictionaryOfVariableBindings</code>的定义：</p>
+
+<pre><code>#define NSDictionaryOfVariableBindings(...) _NSDictionaryOfVariableBindings(@"" # __VA_ARGS__, __VA_ARGS__, nil)
+</code></pre>
+
+<p>如果这样生成两个button的映射：</p>
+
+<pre><code>NSDictionaryOfVariableBindings(button1, button2);
+</code></pre>
+
+<p>那么预编译时就会转换成：</p>
+
+<pre><code>_NSDictionaryOfVariableBindings(@"""button1, button2", button1, button2, nil);
+</code></pre>
+
+<p>由于两个常量字符串放在一起就是字符串常量串联，将变成两个字符串常量组合在一起的字符串常量，也就是上面是一个空字符串<code>""</code>和<code>"button1, button2"</code>串联，所以上面的代码等价于：</p>
+
+<pre><code>_NSDictionaryOfVariableBindings(@"button1, button2", button1, button2, nil);
+</code></pre>
+
+<p>那么<code>_NSDictionaryOfVariableBindings</code>函数就可以将它的第一个参数按逗号<code>,</code>分割开作为key，后面就是各个key对应的值了。因此这段代码就创建了一个内容为<code>{ @"button1" = button1, @"button2 = button2 }</code>的Dictionary。</p>
+
+<h2>命名的串联</h2>
+
+<p><code>#</code>在宏定义中的另一个作用就是用于命名的串联，用<code>##</code>就可以串联它左右两边的命名，比如以下代码：</p>
+
+<pre><code>#define CONCAT(X, Y) X ## Y
+NSString *helloworld = @"Hello, world!";
+NSLog(@"%@",CONCAT(hello, world)); //output: "Hello, world"
+</code></pre>
+
+<p><code>CONCAT(hello, world)</code>实际被转换成<code>helloworld</code>。注意一下，因为宏是预编译阶段进行展开的，就是说在编译之前，因此代码中的<code>hello</code>和<code>world</code>即使没有定义其实也是没问题的，预编译处理后，这两个命名是不存在的。</p>
+
+<h2>可选可变参数</h2>
+
+<p><code>##</code>在宏定义中可以放在<code>__VA_ARGS__</code>之前表示可变参数可以为空，否则的话可变参数至少为一个了。</p>
+
+<pre><code>#define MYLOG(format, ...) NSLog(format, ##__VA_ARGS__)
+MYLOG(@"Don't make an error!");
+</code></pre>
+
+<p>上面代码中MLOG中只有一个参数，如果不加<code>##</code>，则MLOG至少需要两个参数，在Xcode里将会出现编译错误。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Unix系统中设置文件的扩展属性]]></title>

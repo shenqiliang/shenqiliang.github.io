@@ -9,7 +9,7 @@
   <meta name="author" content="谌启亮">
 
   
-  <meta name="description" content="之前做通讯录相关的一些App时，有一个比较常用的算法是将汉字转换成拼音。当时采用的做法是：将各个拼音段的首个汉字（按Unicode排序）做成两个数组，一个数组存拼音，另一个数组存拼音对应首个汉字的Unicode。如果要获取某个汉字的拼音，可以折半查找法找的对应拼音。 &hellip;">
+  <meta name="description" content="在代码中使用Autolayout时，大家都会使用NSDictionaryOfVariableBindings这个宏，这个宏可以生成一个变量名到变量值映射的Dictionary。比如NSDictionaryOfVariableBindings(button1, button2)将会生成一个{ @" &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -76,6 +76,52 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/12/16/mists-of-the-sharp/">“#”的迷雾</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-12-16T12:38:00+08:00" pubdate data-updated="true">2013-12-16 12:38</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>在代码中使用Autolayout时，大家都会使用<code>NSDictionaryOfVariableBindings</code>这个宏，这个宏可以生成一个变量名到变量值映射的Dictionary。比如<code>NSDictionaryOfVariableBindings(button1, button2)</code>将会生成一个<code>{ @"button1" = button1, @"button2 = button2 }</code>的Dictionary。它是怎么做到的呢？我们来看看这个宏的定义：</p>
+
+<pre><code>#define NSDictionaryOfVariableBindings(...) _NSDictionaryOfVariableBindings(@"" # __VA_ARGS__, __VA_ARGS__, nil)
+</code></pre>
+
+<p>这个宏定义中有3个参数，后两个参数不难理解，但第一个参数中间有个<code>#</code>符号，语法上看起来比较怪异，这个是什么呢？以前在做越狱的mobilesubstrate开发时，其中定义的一堆宏频繁使用了这个符号，下面就来揭开<code>#</code>这个符号在宏定义中的迷雾。</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/12/16/mists-of-the-sharp/">阅读更多 &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -453,52 +499,6 @@ id objc_getAssociatedObject(id object, const void *key);
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2013/07/17/cant-scroll-in-tableview/">TableView中嵌套一个ScrollView有时导致ScrollView无法滚动</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-07-17T15:34:00+08:00" pubdate data-updated="true">2013-07-17 15:34</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h2>TableView中嵌套ScrollView导致ScrollView无法滚动</h2>
-
-<p>开发时，经常会在一个TableView中嵌套一个横向滚动ScrollView，当ScrollView进行滑动时，TableView中展示的信息也会需要相应的改变，那么有时就需要重新载入TableView的数据（reloadData）。这时当ScrollView连续滚动多次，经常会出现ScrollView滚动不了。在控制台上同时会出现以下日志信息：</p>
-
-<pre><code>Ignoring call to [UIPanGestureRecognizer setTranslation:inView:] since gesture recognizer is not active.
-</code></pre>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2013/07/17/cant-scroll-in-tableview/">阅读更多 &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; 以往文章</a>
@@ -536,6 +536,10 @@ id objc_getAssociatedObject(id object, const void *key);
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/12/16/mists-of-the-sharp/">“#”的迷雾</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/11/22/tranform-hanzi-to-pinyin-using-cfstringtransform/">使用CFStringTransform将汉字转换为拼音</a>
       </li>
     
@@ -549,10 +553,6 @@ id objc_getAssociatedObject(id object, const void *key);
     
       <li class="post">
         <a href="/blog/2013/10/28/operation-queue-intro/">并发编程之Operation Queue</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/10/21/tagged-pointer-and-64-bit/">64位与Tagged Pointer</a>
       </li>
     
   </ul>

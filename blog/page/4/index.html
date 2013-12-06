@@ -9,7 +9,7 @@
   <meta name="author" content="谌启亮">
 
   
-  <meta name="description" content="当我们获取到一些iOS的app包后，发现里面的png图片使用系统的预览看不了。因为在Xcode生成应用程序包时，自动将png图片进行优化，而优化后的图片不能直接使用预览查看，这个优化工具是pngcrush。它也提供了还原的功能，使图片再度可见。为了批量处理这些图片，我写了一个脚本pngdecode &hellip;">
+  <meta name="description" content="逛开发论坛时经常发现一些同学说使用nib文件能提高性能，我对此保持怀疑态度，毕竟它是要读取并解析一个文件的。本着事实求是的精神，我实测了一下，对比使用nib和使用代码创建view的效率。 首先我创建了两个ViewController， &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -76,6 +76,49 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/03/29/nib-file-preformance-test/">实测xib(nib)文件创建ViewController的性能</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-29T00:29:00+08:00" pubdate data-updated="true">2012-03-29 00:29</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>逛开发论坛时经常发现一些同学说使用nib文件能提高性能，我对此保持怀疑态度，毕竟它是要读取并解析一个文件的。本着事实求是的精神，我实测了一下，对比使用nib和使用代码创建view的效率。</p>
+
+<p>首先我创建了两个ViewController，分别是XIBViewController和NoXIBViewController，前者会使用一个nib文件初始化，而后者不会。为了测试我让每个ViewController都循环初始化很多次，并调用view属性的getter，这样才能保持ViewController加载View。基本代码如下：</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/03/29/nib-file-preformance-test/">阅读更多 &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -508,56 +551,6 @@ prefs:root=Wallpaper 设置壁纸
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/03/12/objc-name-keyword/">Objective-C对象消息名关键词</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-03-12T23:31:00+08:00" pubdate data-updated="true">2012-03-12 23:31</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>我们在写Objective－C的代码时，在进行某个动作（action）时，会发送一些相关联的消息。经常会遇到以下的一些关键词：</p>
-
-<ol>
-<li><p>should
-决定某个动作是否要发生，如果返回NO，则不会执行这个动作，也不会有will和did消息（下面将会说明）了。如shouldAutorotateToInterfaceOrientation:</p></li>
-<li><p>will
-通常在某个动作发生之前，如viewWillAppear、viewWillDisappear等</p></li>
-<li><p>did
-通常在某个动作发生之后，如viewDidAppear，didAddSubView等</p></li>
-</ol>
-
-
-<p>所以它们的调用顺序依次是：
-should->will->action->did
-写代码时一定要搞清这个顺序，否则很容易出现逻辑错误。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/5/">&larr; 以往文章</a>
@@ -597,6 +590,10 @@ should->will->action->did
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/12/16/mists-of-the-sharp/">“#”的迷雾</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/11/22/tranform-hanzi-to-pinyin-using-cfstringtransform/">使用CFStringTransform将汉字转换为拼音</a>
       </li>
     
@@ -610,10 +607,6 @@ should->will->action->did
     
       <li class="post">
         <a href="/blog/2013/10/28/operation-queue-intro/">并发编程之Operation Queue</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/10/21/tagged-pointer-and-64-bit/">64位与Tagged Pointer</a>
       </li>
     
   </ul>

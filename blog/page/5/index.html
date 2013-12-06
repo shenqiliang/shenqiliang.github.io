@@ -9,9 +9,8 @@
   <meta name="author" content="谌启亮">
 
   
-  <meta name="description" content="看SDK英文文档头疼啊…
-软件还要支持英文的国际化…
-iOS开发中经常会遇到这些问题，每个Mac OS都自带了“字典”应用，不幸的是，这个字典只支持英文对英文的解释。对于咱们对英文不熟的人来说，这个应用确实是个鸡肋。我们最需要的是英文到中文或中文到英文的翻译，也许你会尝试去寻找其他Mac &hellip;">
+  <meta name="description" content="我们在写Objective－C的代码时，在进行某个动作（action）时，会发送一些相关联的消息。经常会遇到以下的一些关键词： should
+决定某个动作是否要发生，如果返回NO，则不会执行这个动作，也不会有will和did消息（下面将会说明）了。 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +77,56 @@ iOS开发中经常会遇到这些问题，每个Mac OS都自带了“字典”�
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/03/12/objc-name-keyword/">Objective-C对象消息名关键词</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-12T23:31:00+08:00" pubdate data-updated="true">2012-03-12 23:31</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>我们在写Objective－C的代码时，在进行某个动作（action）时，会发送一些相关联的消息。经常会遇到以下的一些关键词：</p>
+
+<ol>
+<li><p>should
+决定某个动作是否要发生，如果返回NO，则不会执行这个动作，也不会有will和did消息（下面将会说明）了。如shouldAutorotateToInterfaceOrientation:</p></li>
+<li><p>will
+通常在某个动作发生之前，如viewWillAppear、viewWillDisappear等</p></li>
+<li><p>did
+通常在某个动作发生之后，如viewDidAppear，didAddSubView等</p></li>
+</ol>
+
+
+<p>所以它们的调用顺序依次是：
+should->will->action->did
+写代码时一定要搞清这个顺序，否则很容易出现逻辑错误。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -491,54 +540,6 @@ ViewController在响应链中的位于ViewController的view和它的superView之
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/08/01/cocoa-key-value-mechanism/">Cocoa的键－值机制（Key-value Mechanisms）</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-08-01T17:41:00+08:00" pubdate data-updated="true">2011-08-01 17:41</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>对象的键－值机制是Cocoa的一部分。</p>
-
-<ul>
-<li>键－值绑定（Key-value binding）</li>
-<li>键－值编码（Key-value coding）</li>
-<li>键－值监听（Key-value observing）</li>
-</ul>
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2011/08/01/cocoa-key-value-mechanism/">阅读更多 &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/6/">&larr; 以往文章</a>
@@ -578,6 +579,10 @@ ViewController在响应链中的位于ViewController的view和它的superView之
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/12/16/mists-of-the-sharp/">“#”的迷雾</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/11/22/tranform-hanzi-to-pinyin-using-cfstringtransform/">使用CFStringTransform将汉字转换为拼音</a>
       </li>
     
@@ -591,10 +596,6 @@ ViewController在响应链中的位于ViewController的view和它的superView之
     
       <li class="post">
         <a href="/blog/2013/10/28/operation-queue-intro/">并发编程之Operation Queue</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/10/21/tagged-pointer-and-64-bit/">64位与Tagged Pointer</a>
       </li>
     
   </ul>

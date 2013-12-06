@@ -9,8 +9,7 @@
   <meta name="author" content="谌启亮">
 
   
-  <meta name="description" content="在《中国区GPS偏移纠正（适用于Google地图）》一文中曾读取一个78M的大数据文件，一开始采用了NSData的dataWithContentsOfFile:方法。不少人反馈说如果直接使用，将会耗尽iOS的内存。其实这个是可以改善的。
-NSData还有一个API： + (id) &hellip;">
+  <meta name="description" content="之前我开源了一个项目occheck，它是一个检查内存泄漏和高危函数的自动化工具。但是如何利用好它呢？如果能够像Xcode静态分析那样能自动在编译时执行就好了。呵呵，言归正传，这篇文章将为你详细介绍如何在项目调试前进行自动检查，以达到减少不安全的代码目的。我们开始吧！ 1、创建一个Runscript &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -77,6 +76,51 @@ NSData还有一个API： + (id) &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/10/24/add-occheck-to-project-when-run/">让项目在编译时自动加上occheck</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-10-24T21:18:00+08:00" pubdate data-updated="true">2012-10-24 21:18</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>之前我开源了一个项目occheck，它是一个检查内存泄漏和高危函数的自动化工具。但是如何利用好它呢？如果能够像Xcode静态分析那样能自动在编译时执行就好了。呵呵，言归正传，这篇文章将为你详细介绍如何在项目调试前进行自动检查，以达到减少不安全的代码目的。我们开始吧！</p>
+
+<h4>1、创建一个Runscript(运行脚本)</h4>
+
+<p>打开项目配置，选择合适的target，在右侧选择“Build Phases”。然后在下方点击“Add Build Phases”－“Add Run Script”。如下图：</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/10/24/add-occheck-to-project-when-run/">阅读更多 &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -597,49 +641,6 @@ freopen("/tmp/log.txt", "a+", stderr);
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/03/29/nib-file-preformance-test/">实测xib(nib)文件创建ViewController的性能</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-03-29T00:29:00+08:00" pubdate data-updated="true">2012-03-29 00:29</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>逛开发论坛时经常发现一些同学说使用nib文件能提高性能，我对此保持怀疑态度，毕竟它是要读取并解析一个文件的。本着事实求是的精神，我实测了一下，对比使用nib和使用代码创建view的效率。</p>
-
-<p>首先我创建了两个ViewController，分别是XIBViewController和NoXIBViewController，前者会使用一个nib文件初始化，而后者不会。为了测试我让每个ViewController都循环初始化很多次，并调用view属性的getter，这样才能保持ViewController加载View。基本代码如下：</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2012/03/29/nib-file-preformance-test/">阅读更多 &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/4/">&larr; 以往文章</a>
@@ -679,6 +680,10 @@ freopen("/tmp/log.txt", "a+", stderr);
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/12/16/mists-of-the-sharp/">“#”的迷雾</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/11/22/tranform-hanzi-to-pinyin-using-cfstringtransform/">使用CFStringTransform将汉字转换为拼音</a>
       </li>
     
@@ -692,10 +697,6 @@ freopen("/tmp/log.txt", "a+", stderr);
     
       <li class="post">
         <a href="/blog/2013/10/28/operation-queue-intro/">并发编程之Operation Queue</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/10/21/tagged-pointer-and-64-bit/">64位与Tagged Pointer</a>
       </li>
     
   </ul>
