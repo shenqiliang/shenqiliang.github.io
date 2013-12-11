@@ -4,7 +4,7 @@
   <title><![CDATA[分类：Mac开发 | Xcode Dev]]></title>
   <link href="http://blog.xcodev.com/blog/categories/mackai-fa/atom.xml" rel="self"/>
   <link href="http://blog.xcodev.com/"/>
-  <updated>2013-12-11T10:27:33+08:00</updated>
+  <updated>2013-12-11T11:50:06+08:00</updated>
   <id>http://blog.xcodev.com/</id>
   <author>
     <name><![CDATA[谌启亮]]></name>
@@ -502,7 +502,7 @@ if (source)
 <hr/>
 <ol>
 <li id="fn:1">
-<p>感谢Vincent Xue指出这里有些容易让新手迷糊的地方，我增加了一些关于信号量的说明，希望对新手能有所帮组。<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+<p>感谢Vincent Xue指出这里有些容易让新手迷糊的地方，我增加了一些关于信号量的说明，希望对新手能有所帮助。<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
 </ol>
 </div>
 
