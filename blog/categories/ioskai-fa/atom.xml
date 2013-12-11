@@ -4,7 +4,7 @@
   <title><![CDATA[分类：iOS开发 | Xcode Dev]]></title>
   <link href="http://blog.xcodev.com/blog/categories/ioskai-fa/atom.xml" rel="self"/>
   <link href="http://blog.xcodev.com/"/>
-  <updated>2013-12-06T17:49:54+08:00</updated>
+  <updated>2013-12-11T10:24:49+08:00</updated>
   <id>http://blog.xcodev.com/</id>
   <author>
     <name><![CDATA[谌启亮]]></name>
@@ -291,13 +291,21 @@ dispatch_release(group);
 
 <p>很多程序设计都设计到信号量，生产者-消费者模型在多线程编程中会频繁的使用。GCD提供了自己的一套信号量机制。</p>
 
-<pre><code>dispatch_semaphore_t sema = dispatch_semaphore_create(RESOURCE_SIZE);
+<p>信号量就是一些有限可数资源。比如打印机，假如系统有2台打印机，但同时有5个任务要使用打印机，那么只能有2个任务能同时进行打印，剩下3个眼等待这2个任务打印完。那么程序工作过程应该是：任务首先获取打印机资源（<code>dispatch_semaphore_wait</code>），如果没有打印机可用了就要等待，直到其他任务用完这个打印机。当任务获取到打印机，就开始执行打印任务。任务用完打印机工作后，就必须把占用打印机释放（<code>dispatch_semaphore_signal</code>），以便其他任务可以接着打印。</p>
+
+<pre><code>//创建资源的信号量，只创建一次，比如2台打印机，那么RESOURCE_SIZE为2.
+dispatch_semaphore_t sema = dispatch_semaphore_create(RESOURCE_SIZE);
+
+//如果任务使用一个资源时，使用前调用dispatch_semaphore_wait，用完后dispatch_semaphore_signal。
+//下面的代码可能在多个线程中调用多次
 dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
-//do some work here.
+//do some work here. the work will use one resource.
 dispatch_semaphore_signal(sema);
 </code></pre>
 
-<p><code>dispatch_semaphore_wait</code>用来获取信号量，若信号量为0，则等待直到信号量大于0。在处理任务结束后，应释放相关资源并调用<code>dispatch_semaphore_signal</code>使信号量增加1个。</p>
+<p>信号量必须在资源使用之前调用<code>dispatch_semaphore_create</code>创建，而且只创建一次，<code>RESOURCE_SIZE</code>是可用资源的总数。使用资源时<code>dispatch_semaphore_wait</code>将资源的可用数减少一个，如果当前没有可用资源了，将会等待直到其他线程回收资源，即调用<code>dispatch_semaphore_signal</code>让可用资源增加。用完资源后调用<code>dispatch_semaphore_signal</code>回收可利用资源，资源可用数将增加一个。</p>
+
+<p>如果是生产者-消费者模型的话，<code>RESOURCE_SIZE</code>可能最初为0，那么生产者将调用<code>dispatch_semaphore_signal</code>来产生一个单位的资源，消费者调用<code>dispatch_semaphore_wait</code>来消费（减少）一个单位的资源。当资源不足时，消费者会一直等待到资源数大于0，即生产者生成新的资源。<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup></p>
 
 <h2>Dispatch Source</h2>
 
@@ -489,6 +497,14 @@ if (source)
 <li>Dispatch Queues：<a href="https://developer.apple.com/library/mac/documentation/general/conceptual/concurrencyprogrammingguide/OperationQueues/OperationQueues.html#//apple_ref/doc/uid/TP40008091-CH102-SW1">https://developer.apple.com/library/mac/documentation/general/conceptual/concurrencyprogrammingguide/OperationQueues/OperationQueues.html#//apple_ref/doc/uid/TP40008091-CH102-SW1</a></li>
 <li>Dispatch Sources：<a href="https://developer.apple.com/library/mac/documentation/general/conceptual/concurrencyprogrammingguide/GCDWorkQueues/GCDWorkQueues.html">https://developer.apple.com/library/mac/documentation/general/conceptual/concurrencyprogrammingguide/GCDWorkQueues/GCDWorkQueues.html</a></li>
 </ul>
+
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>感谢Vincent Xue指出这里有些容易让新手迷糊的地方，我增加了一些关于信号量的说明，希望对新手能有所帮组。<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
 
 ]]></content>
   </entry>
