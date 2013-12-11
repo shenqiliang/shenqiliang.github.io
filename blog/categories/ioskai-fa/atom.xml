@@ -4,7 +4,7 @@
   <title><![CDATA[分类：iOS开发 | Xcode Dev]]></title>
   <link href="http://blog.xcodev.com/blog/categories/ioskai-fa/atom.xml" rel="self"/>
   <link href="http://blog.xcodev.com/"/>
-  <updated>2013-12-11T11:50:06+08:00</updated>
+  <updated>2013-12-11T14:27:04+08:00</updated>
   <id>http://blog.xcodev.com/</id>
   <author>
     <name><![CDATA[谌启亮]]></name>
@@ -305,7 +305,7 @@ dispatch_semaphore_signal(sema);
 
 <p>信号量必须在资源使用之前调用<code>dispatch_semaphore_create</code>创建，而且只创建一次，<code>RESOURCE_SIZE</code>是可用资源的总数。使用资源时<code>dispatch_semaphore_wait</code>将资源的可用数减少一个，如果当前没有可用资源了，将会等待直到其他线程回收资源，即调用<code>dispatch_semaphore_signal</code>让可用资源增加。用完资源后调用<code>dispatch_semaphore_signal</code>回收可利用资源，资源可用数将增加一个。</p>
 
-<p>如果是生产者-消费者模型的话，<code>RESOURCE_SIZE</code>可能最初为0，那么生产者将调用<code>dispatch_semaphore_signal</code>来产生一个单位的资源，消费者调用<code>dispatch_semaphore_wait</code>来消费（减少）一个单位的资源。当资源不足时，消费者会一直等待到资源数大于0，即生产者生成新的资源。<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup></p>
+<p>如果是生产者-消费者模型的话，<code>RESOURCE_SIZE</code>可能最初为0，那么生产者将调用<code>dispatch_semaphore_signal</code>来产生一个单位的资源，消费者调用<code>dispatch_semaphore_wait</code>来消费（减少）一个单位的资源。当资源不足时，消费者会一直等待到资源数大于0，即生产者生成新的资源。</p>
 
 <h2>Dispatch Source</h2>
 
@@ -497,14 +497,6 @@ if (source)
 <li>Dispatch Queues：<a href="https://developer.apple.com/library/mac/documentation/general/conceptual/concurrencyprogrammingguide/OperationQueues/OperationQueues.html#//apple_ref/doc/uid/TP40008091-CH102-SW1">https://developer.apple.com/library/mac/documentation/general/conceptual/concurrencyprogrammingguide/OperationQueues/OperationQueues.html#//apple_ref/doc/uid/TP40008091-CH102-SW1</a></li>
 <li>Dispatch Sources：<a href="https://developer.apple.com/library/mac/documentation/general/conceptual/concurrencyprogrammingguide/GCDWorkQueues/GCDWorkQueues.html">https://developer.apple.com/library/mac/documentation/general/conceptual/concurrencyprogrammingguide/GCDWorkQueues/GCDWorkQueues.html</a></li>
 </ul>
-
-<div class="footnotes">
-<hr/>
-<ol>
-<li id="fn:1">
-<p>感谢Vincent Xue指出这里有些容易让新手迷糊的地方，我增加了一些关于信号量的说明，希望对新手能有所帮助。<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
-</ol>
-</div>
 
 ]]></content>
   </entry>
