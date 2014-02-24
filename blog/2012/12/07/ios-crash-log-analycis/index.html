@@ -9,7 +9,7 @@
   <meta name="author" content="谌启亮">
 
   
-  <meta name="description" content="崩溃日志的产生 iOS中运行App过程中如果发生程序崩溃，会生成一个崩溃日志文件。这个文件会保存的特定系统目录下，扩展名是crash。当手机连接到iTunes时，会将该文件同步到电脑上。 在Mac系统中这些文件会同步到“~/Library/Logs/CrashReporter/ &hellip;">
+  <meta name="description" content="崩溃日志的产生 iOS中运行App过程中如果发生程序崩溃，会生成一个崩溃日志文件。这个文件会保存的特定系统目录下，扩展名是crash。你可以通过系统设置中的“通用-关于本机-诊断与用量-诊断与用量数据”来查看崩溃日志文件。 当手机连接到iTunes时，也会将该文件同步到电脑上。 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -104,18 +104,32 @@
 
 <div class="entry-content"><h2>崩溃日志的产生</h2>
 
-<p>iOS中运行App过程中如果发生程序崩溃，会生成一个崩溃日志文件。这个文件会保存的特定系统目录下，扩展名是crash。当手机连接到iTunes时，会将该文件同步到电脑上。</p>
+<p>iOS中运行App过程中如果发生程序崩溃，会生成一个崩溃日志文件。这个文件会保存的特定系统目录下，扩展名是crash。你可以通过系统设置中的“通用-关于本机-诊断与用量-诊断与用量数据”来查看崩溃日志文件。</p>
 
-<p>在Mac系统中这些文件会同步到“~/Library/Logs/CrashReporter/MobileDevice”下。</p>
+<p>当手机连接到iTunes时，也会将该文件同步到电脑上。</p>
 
-<p>而在Windows系统中会同步到“C:UsersAppDataRoamingApple computerLogsCrashReporter/MobileDevice”（Vista或以上）或“C:Documents and SettingsApplication DataApple computerLogsCrashReporter”（XP）。</p>
+<ul>
+<li><p>在Mac系统中这些文件会同步到“~/Library/Logs/CrashReporter/MobileDevice”下。</p></li>
+<li><p>在Windows系统中会同步到“C:UsersAppDataRoamingApple computerLogsCrashReporter/MobileDevice”（Vista或以上）或“C:Documents and SettingsApplication DataApple computerLogsCrashReporter”（XP）。</p></li>
+</ul>
+
 
 <!--more-->
 
 
-<h2>崩溃日志的上传</h2>
+<h2>崩溃日志的发送</h2>
 
-<p>iOS中崩溃日志是可以上传的App Store的服务器，并由开发者查看的。用户可以通过系统设置中的“通用－诊断与用量”来设定是否上传崩溃日志。同时开发者也可以通过捕获异常信号自己定制异常上报。</p>
+<h3>通过手机发送崩溃日志文本</h3>
+
+<p>打开系统设置中的“通用-关于本机-诊断与用量-诊断与用量数据”，你会看到一个按App包名排序的崩溃日志列表，找到相应App的崩溃日志并打开，复制崩溃日志内容发送给相应的开发者。开发者可以复制收到的日志文本保存为扩展名是crash的文本文件。</p>
+
+<h3>通过日志文件发送</h3>
+
+<p>当手机连接到iTunes时，会将崩溃日志文件同步到电脑上。在Mac系统中，可以到“~/Library/Logs/CrashReporter/MobileDevice”目录中找到该文件，而Windows系统在“C:UsersAppDataRoamingApple computerLogsCrashReporter/MobileDevice”（Vista或以上）或“C:Documents and SettingsApplication DataApple computerLogsCrashReporter”（XP）。可以将这些文件发送给开发者。</p>
+
+<h3>自动上传崩溃日志到iTC(iTunes Connect)</h3>
+
+<p>iOS中崩溃日志是可以上传的iTC的服务器，并由开发者查看的。用户可以通过系统设置中的“通用-关于本机-诊断与用量”来设定是否上传崩溃日志。同时开发者也可以通过捕获异常信号自己定制异常上报。</p>
 
 <h2>崩溃日志的格式</h2>
 
@@ -315,6 +329,10 @@ var uyan_config = {
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2014/02/24/iphone-baseband-intro/">初识iPhone基带通讯</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/12/16/mists-of-the-sharp/">“#”的迷雾</a>
       </li>
     
@@ -328,10 +346,6 @@ var uyan_config = {
     
       <li class="post">
         <a href="/blog/2013/11/01/code-comment-and-doc-gen-tools-for-objc/">Objective-C代码注释和文档输出的工具和方法</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/10/28/operation-queue-intro/">并发编程之Operation Queue</a>
       </li>
     
   </ul>
@@ -362,7 +376,7 @@ var uyan_config = {
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2013 - 谌启亮 -
+  Copyright &copy; 2014 - 谌启亮 -
   <span class="credit">使用 <a href="http://octopress.org">Octopress</a></span>
 </p>
 

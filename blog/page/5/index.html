@@ -9,8 +9,8 @@
   <meta name="author" content="谌启亮">
 
   
-  <meta name="description" content="我们在写Objective－C的代码时，在进行某个动作（action）时，会发送一些相关联的消息。经常会遇到以下的一些关键词： should
-决定某个动作是否要发生，如果返回NO，则不会执行这个动作，也不会有will和did消息（下面将会说明）了。 &hellip;">
+  <meta name="description" content="iOS5.0中增加了通过URL Schema打开系统设置功能，并且可以具体打开到相关设置页。这样就很方便在我们提示用户修改系统设置时进行相关跳转。
+比如打开位置服务设置的URL是： prefs:root=LOCATION_SERVICES &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -77,6 +77,67 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/03/13/open-setting-use-url-schema/">通过URL Schema中打开iOS设置</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-13T22:34:00+08:00" pubdate data-updated="true">2012-03-13 22:34</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>iOS5.0中增加了通过URL Schema打开系统设置功能，并且可以具体打开到相关设置页。这样就很方便在我们提示用户修改系统设置时进行相关跳转。
+比如打开位置服务设置的URL是：</p>
+
+<pre><code>prefs:root=LOCATION_SERVICES
+</code></pre>
+
+<p>如果位置服务没有打开我们就可以用以下代码来跳转到位置服务设置，这样方便了很多。</p>
+
+<pre><code>[[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"prefs:root=LOCATION_SERVICES"]];
+</code></pre>
+
+<p>也可以打开你自己应用的设置</p>
+
+<pre><code>[[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"prefs:root=Apps&amp;amp;path=AppDisplayName"]];
+</code></pre>
+
+<p>还有其他一些很常用的URL：</p>
+
+<pre><code>prefs:root=TWITTER 设置Twitter
+prefs:root=General&amp;path=Bluetooth 设置蓝牙
+prefs:root=WIFI 设置WiFi
+prefs:root=General&amp;path=DATE_AND_TIME 设置日期／时间
+prefs:root=Wallpaper 设置壁纸
+</code></pre>
+
+<p><strong>注意：这种方式在iOS5.1和以上版本已经无效了。</strong></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -493,53 +554,6 @@ ViewController在响应链中的位于ViewController的view和它的superView之
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/08/04/save-uiview-to-uiimage/">如何将一个UIView对象的内容保存为UIImage</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-08-04T22:48:00+08:00" pubdate data-updated="true">2011-08-04 22:48</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>在iPhone程序开发中有可能我们会需要将一个View的内容转换成图片。我自己对UIImage进行类扩展，写了一个方法：</p>
-
-<pre><code>+ (UIImage*)imageFromView:(UIView*)view{
-    UIGraphicsBeginImageContextWithOptions(view.bounds.size, YES, view.layer.contentsScale);
-    [view.layer renderInContext:UIGraphicsGetCurrentContext()];
-    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    return image;
-}
-</code></pre>
-
-<p>注意：生成的图片的scale和view的scale一致，这样才可以保证图片的效果和view显示的完全一致，使用renderInContext方法可以让subviews的内容也显示的图片里。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/6/">&larr; 以往文章</a>
@@ -579,6 +593,10 @@ ViewController在响应链中的位于ViewController的view和它的superView之
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2014/02/24/iphone-baseband-intro/">初识iPhone基带通讯</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/12/16/mists-of-the-sharp/">“#”的迷雾</a>
       </li>
     
@@ -592,10 +610,6 @@ ViewController在响应链中的位于ViewController的view和它的superView之
     
       <li class="post">
         <a href="/blog/2013/11/01/code-comment-and-doc-gen-tools-for-objc/">Objective-C代码注释和文档输出的工具和方法</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/10/28/operation-queue-intro/">并发编程之Operation Queue</a>
       </li>
     
   </ul>
@@ -625,7 +639,7 @@ ViewController在响应链中的位于ViewController的view和它的superView之
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2013 - 谌启亮 -
+  Copyright &copy; 2014 - 谌启亮 -
   <span class="credit">使用 <a href="http://octopress.org">Octopress</a></span>
 </p>
 

@@ -4,7 +4,7 @@
   <title><![CDATA[Xcode Dev]]></title>
   <link href="http://blog.xcodev.com/atom.xml" rel="self"/>
   <link href="http://blog.xcodev.com/"/>
-  <updated>2013-12-11T14:26:53+08:00</updated>
+  <updated>2014-02-24T17:57:08+08:00</updated>
   <id>http://blog.xcodev.com/</id>
   <author>
     <name><![CDATA[谌启亮]]></name>
@@ -12,6 +12,108 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[初识iPhone基带通讯]]></title>
+    <link href="http://blog.xcodev.com/blog/2014/02/24/iphone-baseband-intro/"/>
+    <updated>2014-02-24T18:01:00+08:00</updated>
+    <id>http://blog.xcodev.com/blog/2014/02/24/iphone-baseband-intro</id>
+    <content type="html"><![CDATA[<p>基带（Baseband）是手机的通讯模块，它负责移动网络的调制与解调工作，它与手机核心通讯功能息息相关。iPhone中也有一个基带，越狱用户可能会经常听到这个名词，有锁的iPhone，如果基带不进行破解是没办法进行操作的。下面来介绍一下用iPhone基带进行通讯，本文需要手机越狱并具备足够的系统权限，建议在命令行下以root权限运行。未来会继续介绍利用基带进行SIM卡联系人和短信数据的导入导出，以及发短信等知识，敬请关注。</p>
+
+<!--more-->
+
+
+<h2>基带设备文件</h2>
+
+<p>与iPhone基带设备文件有好几个，目前发现比较方便可用的是<code>/dev/dlci.spi-baseband.extra_0</code>。如果是旧版本的iOS可能会是<code>/dev/tty.debug</code>。如果你是比较旧的iOS，可以尝试<code>tty.debug</code>。为了进行基带通讯，首先我们要打开基带设备文件，代码如下：</p>
+
+<pre><code>NSFileHandle *baseBand = [NSFileHandle fileHandleForUpdatingAtPath:@"/dev/dlci.spi-baseband.extra_0"];
+if (baseBand == nil) {
+    NSLog(@"Can't open baseband.");
+}
+</code></pre>
+
+<p>打开基带设备后，需要对基带进行一些配置，如串口速率，数据位，模式等。配置基带文件代码如下：</p>
+
+<pre><code>int fd = [baseBand fileDescriptor];
+
+ioctl(fd, TIOCEXCL);
+fcntl(fd, F_SETFL, 0);
+
+static struct termios term;
+
+tcgetattr(fd, &amp;term);
+
+cfmakeraw(&amp;term);
+cfsetspeed(&amp;term, 115200);
+term.c_cflag = CS8 | CLOCAL | CREAD;
+term.c_iflag = 0;
+term.c_oflag = 0;
+term.c_lflag = 0;
+term.c_cc[VMIN] = 0;
+term.c_cc[VTIME] = 0;
+tcsetattr(fd, TCSANOW, &amp;term);
+</code></pre>
+
+<h2>AT指令</h2>
+
+<p>基带是根据AT指令进行通讯，AT指令是GSM网络中非常常见的通讯指令，这里就不再详细说明，相关AT指令的东西和文档请自行Google，有很多手册。AT指令是以“AT”开头的一些字符串，可以发送给基带，用以设置、查询信息或条件测试。它包括查看SIM卡数据，打电话，发短信，查运营商，设置运营商等各种指令。与移动网络相关的大部分操作都要用AT指令来完成。最简单的AT指令就是发送“AT”，然后返回“AT\rOK\r\n”，用于测试联通性。每个AT命令以回车（\r）结束。</p>
+
+<pre><code>&gt; AT\r
+
+AT
+
+OK
+</code></pre>
+
+<h3>发送AT指令并接收结果</h3>
+
+<p>发送AT指令很简单，只需要向基带设备文件写入数据即可。处理结果也只是从基带设备文件中读入数据。由于</p>
+
+<pre><code>NSString *sendATCommand(NSFileHandle *baseBand, NSString *atCommand){
+    NSLog(@"SEND AT: %@", atCommand);
+    [baseBand writeData:[atCommand dataUsingEncoding:NSASCIIStringEncoding]];
+    NSMutableString *result = [NSMutableString string];
+    NSData *resultData = [baseBand availableData];
+    while ([resultData length]) {
+        [result appendString:[[NSString alloc] initWithData:resultData encoding:NSASCIIStringEncoding]];
+        if ([result hasSuffix:@"OK\r\n"]||[result hasSuffix:@"ERROR\r\n"]) {
+            NSLog(@"RESULT: %@", result);
+            return result;
+        }
+        else{
+            resultData = [baseBand availableData];
+        }
+    }
+    return nil;
+}
+</code></pre>
+
+<h3>一些简单的AT命令测试</h3>
+
+<p>获取手机IMEI</p>
+
+<pre><code>NSString *result = sendATCommand(baseBand, @"AT+CGSN\r");
+</code></pre>
+
+<p>获取IMSI</p>
+
+<pre><code>result = sendATCommand(baseBand, @"AT+CIMI\r");
+</code></pre>
+
+<p>获取ICCID</p>
+
+<pre><code>result = sendATCommand(baseBand, @"AT+CCID\r");
+</code></pre>
+
+<p>拨打电话(在我的手机上可以看到拨打电话界面，但没有声音，可能还要结合其他接口才行。)</p>
+
+<pre><code>sendATCommand(baseBand, @"ATD10010\r");
+</code></pre>
+
+<p><strong><em> 全部代码：<a href="https://gist.github.com/shenqiliang/9183906">https://gist.github.com/shenqiliang/9183906</a> </em></strong></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[“#”的迷雾]]></title>
@@ -1923,18 +2025,32 @@ return YES;
     <id>http://blog.xcodev.com/blog/2012/12/07/ios-crash-log-analycis</id>
     <content type="html"><![CDATA[<h2>崩溃日志的产生</h2>
 
-<p>iOS中运行App过程中如果发生程序崩溃，会生成一个崩溃日志文件。这个文件会保存的特定系统目录下，扩展名是crash。当手机连接到iTunes时，会将该文件同步到电脑上。</p>
+<p>iOS中运行App过程中如果发生程序崩溃，会生成一个崩溃日志文件。这个文件会保存的特定系统目录下，扩展名是crash。你可以通过系统设置中的“通用-关于本机-诊断与用量-诊断与用量数据”来查看崩溃日志文件。</p>
 
-<p>在Mac系统中这些文件会同步到“~/Library/Logs/CrashReporter/MobileDevice”下。</p>
+<p>当手机连接到iTunes时，也会将该文件同步到电脑上。</p>
 
-<p>而在Windows系统中会同步到“C:UsersAppDataRoamingApple computerLogsCrashReporter/MobileDevice”（Vista或以上）或“C:Documents and SettingsApplication DataApple computerLogsCrashReporter”（XP）。</p>
+<ul>
+<li><p>在Mac系统中这些文件会同步到“~/Library/Logs/CrashReporter/MobileDevice”下。</p></li>
+<li><p>在Windows系统中会同步到“C:UsersAppDataRoamingApple computerLogsCrashReporter/MobileDevice”（Vista或以上）或“C:Documents and SettingsApplication DataApple computerLogsCrashReporter”（XP）。</p></li>
+</ul>
+
 
 <!--more-->
 
 
-<h2>崩溃日志的上传</h2>
+<h2>崩溃日志的发送</h2>
 
-<p>iOS中崩溃日志是可以上传的App Store的服务器，并由开发者查看的。用户可以通过系统设置中的“通用－诊断与用量”来设定是否上传崩溃日志。同时开发者也可以通过捕获异常信号自己定制异常上报。</p>
+<h3>通过手机发送崩溃日志文本</h3>
+
+<p>打开系统设置中的“通用-关于本机-诊断与用量-诊断与用量数据”，你会看到一个按App包名排序的崩溃日志列表，找到相应App的崩溃日志并打开，复制崩溃日志内容发送给相应的开发者。开发者可以复制收到的日志文本保存为扩展名是crash的文本文件。</p>
+
+<h3>通过日志文件发送</h3>
+
+<p>当手机连接到iTunes时，会将崩溃日志文件同步到电脑上。在Mac系统中，可以到“~/Library/Logs/CrashReporter/MobileDevice”目录中找到该文件，而Windows系统在“C:UsersAppDataRoamingApple computerLogsCrashReporter/MobileDevice”（Vista或以上）或“C:Documents and SettingsApplication DataApple computerLogsCrashReporter”（XP）。可以将这些文件发送给开发者。</p>
+
+<h3>自动上传崩溃日志到iTC(iTunes Connect)</h3>
+
+<p>iOS中崩溃日志是可以上传的iTC的服务器，并由开发者查看的。用户可以通过系统设置中的“通用-关于本机-诊断与用量”来设定是否上传崩溃日志。同时开发者也可以通过捕获异常信号自己定制异常上报。</p>
 
 <h2>崩溃日志的格式</h2>
 
@@ -2049,43 +2165,6 @@ Thread 0 Crashed:
 <h2>结论</h2>
 
 <p>由于Pass只是一个zip包，客户端需要做的事情就是下载和调用api添加。一些复杂的签名和更新逻辑则需要服务器端完成。</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[在iOS中让图片旋转时抗锯齿]]></title>
-    <link href="http://blog.xcodev.com/blog/2012/10/25/anti-alise-for-image-ios/"/>
-    <updated>2012-10-25T11:36:00+08:00</updated>
-    <id>http://blog.xcodev.com/blog/2012/10/25/anti-alise-for-image-ios</id>
-    <content type="html"><![CDATA[<p>在iOS界面开发时，经常会将某一个视图进行旋转，旋转时会发现图片边缘出现了很多锯齿。即使把layer的edgeAntialiasingMask属性设置了依然会有锯齿。如何才能消除锯齿呢？如果你仔细，你会发现那些边缘虚化(透明)的图片在旋转时并不会出现锯齿。那么如果我们把这些图片的边缘透明化，会不会解决这个问题呢？
-我取了一个图片，不进行任何处理，然后让它旋转0.1弧度：</p>
-
-<p><img src="http://blog.xcodev.com/images/post/image-without-anti-alise.png" alt="image" /></p>
-
-<!--more-->
-
-
-<p>可见确实出现了很多锯齿。
-我在图片边缘加了一个像素的透明区域，代码如下：</p>
-
-<pre><code>- (UIImage*)antialiasedImageOfSize:(CGSize)size scale:(CGFloat)scale{
-    UIGraphicsBeginImageContextWithOptions(size, NO, scale);
-    [self drawInRect:CGRectMake(1, 1, size.width-2, size.height-2)];
-    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    return image;
-}
-</code></pre>
-
-<p>结果完全实现了抗锯齿效果：</p>
-
-<p><img src="http://blog.xcodev.com/images/post/image-with-anti-alise.png" alt="image" /></p>
-
-<h2>结论</h2>
-
-<p>Layer的edgeAntialiasingMask属性并不能有效抗锯齿，只需要在图片边缘加入1个像素的透明区域就可以完美实现图片抗锯齿了。</p>
-
-<p>我把这些代码发布在我的开源项目中了，里面有Demo。项目地址是：<a href="https://github.com/shenqiliang/ImageAntialiase">ImageAntialiase</a></p>
 ]]></content>
   </entry>
   

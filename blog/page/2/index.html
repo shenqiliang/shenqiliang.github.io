@@ -9,7 +9,7 @@
   <meta name="author" content="谌启亮">
 
   
-  <meta name="description" content="TableView中嵌套ScrollView导致ScrollView无法滚动 开发时，经常会在一个TableView中嵌套一个横向滚动ScrollView，当ScrollView进行滑动时，TableView中展示的信息也会需要相应的改变，那么有时就需要重新载入TableView的数据（ &hellip;">
+  <meta name="description" content="项目开发时，发现有时候在网页视图中的输入框获得焦点后，却不能弹出键盘。而且全部都是在iOS5的系统中出现了这个问题，iOS6中运行完全是正常的，而且即使是在iOS5中，其他的UITextView和UITextField仍然可以正常地弹出键盘。我仔细了看了一下代码， &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -76,6 +76,47 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/07/30/no-keyboard-in-webview-of-ios5/">iOS5网页视图（UIWebView）中的输入框不能弹出键盘的问题</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-07-30T10:32:00+08:00" pubdate data-updated="true">2013-07-30 10:32</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>项目开发时，发现有时候在网页视图中的输入框获得焦点后，却不能弹出键盘。而且全部都是在iOS5的系统中出现了这个问题，iOS6中运行完全是正常的，而且即使是在iOS5中，其他的UITextView和UITextField仍然可以正常地弹出键盘。我仔细了看了一下代码，发现对UIWebView的一些操作和键盘弹出并没有什么关系。我看了一些UIWebView的一些资料，然后发现了这个问题：UIWebView要能弹出键盘，那么它所在的window必须是key window。</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/07/30/no-keyboard-in-webview-of-ios5/">阅读更多 &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -430,11 +471,15 @@ return YES;
 
   <div class="entry-content"><h2>崩溃日志的产生</h2>
 
-<p>iOS中运行App过程中如果发生程序崩溃，会生成一个崩溃日志文件。这个文件会保存的特定系统目录下，扩展名是crash。当手机连接到iTunes时，会将该文件同步到电脑上。</p>
+<p>iOS中运行App过程中如果发生程序崩溃，会生成一个崩溃日志文件。这个文件会保存的特定系统目录下，扩展名是crash。你可以通过系统设置中的“通用-关于本机-诊断与用量-诊断与用量数据”来查看崩溃日志文件。</p>
 
-<p>在Mac系统中这些文件会同步到“~/Library/Logs/CrashReporter/MobileDevice”下。</p>
+<p>当手机连接到iTunes时，也会将该文件同步到电脑上。</p>
 
-<p>而在Windows系统中会同步到“C:UsersAppDataRoamingApple computerLogsCrashReporter/MobileDevice”（Vista或以上）或“C:Documents and SettingsApplication DataApple computerLogsCrashReporter”（XP）。</p>
+<ul>
+<li><p>在Mac系统中这些文件会同步到“~/Library/Logs/CrashReporter/MobileDevice”下。</p></li>
+<li><p>在Windows系统中会同步到“C:UsersAppDataRoamingApple computerLogsCrashReporter/MobileDevice”（Vista或以上）或“C:Documents and SettingsApplication DataApple computerLogsCrashReporter”（XP）。</p></li>
+</ul>
+
 
 </div>
   
@@ -492,50 +537,6 @@ return YES;
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/10/25/anti-alise-for-image-ios/">在iOS中让图片旋转时抗锯齿</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-10-25T11:36:00+08:00" pubdate data-updated="true">2012-10-25 11:36</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>在iOS界面开发时，经常会将某一个视图进行旋转，旋转时会发现图片边缘出现了很多锯齿。即使把layer的edgeAntialiasingMask属性设置了依然会有锯齿。如何才能消除锯齿呢？如果你仔细，你会发现那些边缘虚化(透明)的图片在旋转时并不会出现锯齿。那么如果我们把这些图片的边缘透明化，会不会解决这个问题呢？
-我取了一个图片，不进行任何处理，然后让它旋转0.1弧度：</p>
-
-<p><img src="/images/post/image-without-anti-alise.png" alt="image" /></p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2012/10/25/anti-alise-for-image-ios/">阅读更多 &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/3/">&larr; 以往文章</a>
@@ -575,6 +576,10 @@ return YES;
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2014/02/24/iphone-baseband-intro/">初识iPhone基带通讯</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/12/16/mists-of-the-sharp/">“#”的迷雾</a>
       </li>
     
@@ -588,10 +593,6 @@ return YES;
     
       <li class="post">
         <a href="/blog/2013/11/01/code-comment-and-doc-gen-tools-for-objc/">Objective-C代码注释和文档输出的工具和方法</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/10/28/operation-queue-intro/">并发编程之Operation Queue</a>
       </li>
     
   </ul>
@@ -621,7 +622,7 @@ return YES;
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2013 - 谌启亮 -
+  Copyright &copy; 2014 - 谌启亮 -
   <span class="credit">使用 <a href="http://octopress.org">Octopress</a></span>
 </p>
 

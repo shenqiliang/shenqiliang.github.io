@@ -9,9 +9,7 @@
   <meta name="author" content="谌启亮">
 
   
-  <meta name="description" content="对象的键－值机制是Cocoa的一部分。 键－值绑定（Key-value binding）
-键－值编码（Key-value coding）
-键－值监听（Key-value observing） ">
+  <meta name="description" content="在iPhone程序开发中有可能我们会需要将一个View的内容转换成图片。我自己对UIImage进行类扩展，写了一个方法： + (UIImage*)imageFromView:(UIView*)view{ UIGraphicsBeginImageContextWithOptions(view. &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +76,53 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/08/04/save-uiview-to-uiimage/">如何将一个UIView对象的内容保存为UIImage</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-08-04T22:48:00+08:00" pubdate data-updated="true">2011-08-04 22:48</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>在iPhone程序开发中有可能我们会需要将一个View的内容转换成图片。我自己对UIImage进行类扩展，写了一个方法：</p>
+
+<pre><code>+ (UIImage*)imageFromView:(UIView*)view{
+    UIGraphicsBeginImageContextWithOptions(view.bounds.size, YES, view.layer.contentsScale);
+    [view.layer renderInContext:UIGraphicsGetCurrentContext()];
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return image;
+}
+</code></pre>
+
+<p>注意：生成的图片的scale和view的scale一致，这样才可以保证图片的效果和view显示的完全一致，使用renderInContext方法可以让subviews的内容也显示的图片里。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -431,51 +476,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/03/10/an-utility-ibe-traveler/">另一个实用工具：Traveler</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-03-10T14:42:00+08:00" pubdate data-updated="true">2011-03-10 14:42</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>在完成了Star Invader之后，我就开始做了一个应用Traveler。这是一个方便国际旅行的实用工具。它提供这些功能：</p>
-
-<ul>
-<li>世界各地时区时间的快速查询。昼夜长短分析，帮助旅行者快速适应时差。</li>
-<li>各国重量、面积、体积等计量单位的快速转换。</li>
-<li>从网络上获取当前各国的货币汇率，快速进行货币兑换查询。</li>
-<li>世界各地区的衣服尺码比较和查询。</li>
-<li>各国区号、编码的查询。</li>
-</ul>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/7/">&larr; 以往文章</a>
@@ -515,6 +515,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2014/02/24/iphone-baseband-intro/">初识iPhone基带通讯</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/12/16/mists-of-the-sharp/">“#”的迷雾</a>
       </li>
     
@@ -528,10 +532,6 @@
     
       <li class="post">
         <a href="/blog/2013/11/01/code-comment-and-doc-gen-tools-for-objc/">Objective-C代码注释和文档输出的工具和方法</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/10/28/operation-queue-intro/">并发编程之Operation Queue</a>
       </li>
     
   </ul>
@@ -561,7 +561,7 @@
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2013 - 谌启亮 -
+  Copyright &copy; 2014 - 谌启亮 -
   <span class="credit">使用 <a href="http://octopress.org">Octopress</a></span>
 </p>
 

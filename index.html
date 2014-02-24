@@ -9,7 +9,7 @@
   <meta name="author" content="谌启亮">
 
   
-  <meta name="description" content="在代码中使用Autolayout时，大家都会使用NSDictionaryOfVariableBindings这个宏，这个宏可以生成一个变量名到变量值映射的Dictionary。比如NSDictionaryOfVariableBindings(button1, button2)将会生成一个{ @" &hellip;">
+  <meta name="description" content="基带（Baseband）是手机的通讯模块，它负责移动网络的调制与解调工作，它与手机核心通讯功能息息相关。iPhone中也有一个基带，越狱用户可能会经常听到这个名词，有锁的iPhone，如果基带不进行破解是没办法进行操作的。下面来介绍一下用iPhone基带进行通讯， &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -76,6 +76,47 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/02/24/iphone-baseband-intro/">初识iPhone基带通讯</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-02-24T18:01:00+08:00" pubdate data-updated="true">2014-02-24 18:01</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>基带（Baseband）是手机的通讯模块，它负责移动网络的调制与解调工作，它与手机核心通讯功能息息相关。iPhone中也有一个基带，越狱用户可能会经常听到这个名词，有锁的iPhone，如果基带不进行破解是没办法进行操作的。下面来介绍一下用iPhone基带进行通讯，本文需要手机越狱并具备足够的系统权限，建议在命令行下以root权限运行。未来会继续介绍利用基带进行SIM卡联系人和短信数据的导入导出，以及发短信等知识，敬请关注。</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2014/02/24/iphone-baseband-intro/">阅读更多 &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -458,47 +499,6 @@ id objc_getAssociatedObject(id object, const void *key);
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2013/07/30/no-keyboard-in-webview-of-ios5/">iOS5网页视图（UIWebView）中的输入框不能弹出键盘的问题</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-07-30T10:32:00+08:00" pubdate data-updated="true">2013-07-30 10:32</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>项目开发时，发现有时候在网页视图中的输入框获得焦点后，却不能弹出键盘。而且全部都是在iOS5的系统中出现了这个问题，iOS6中运行完全是正常的，而且即使是在iOS5中，其他的UITextView和UITextField仍然可以正常地弹出键盘。我仔细了看了一下代码，发现对UIWebView的一些操作和键盘弹出并没有什么关系。我看了一些UIWebView的一些资料，然后发现了这个问题：UIWebView要能弹出键盘，那么它所在的window必须是key window。</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2013/07/30/no-keyboard-in-webview-of-ios5/">阅读更多 &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; 以往文章</a>
@@ -536,6 +536,10 @@ id objc_getAssociatedObject(id object, const void *key);
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2014/02/24/iphone-baseband-intro/">初识iPhone基带通讯</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/12/16/mists-of-the-sharp/">“#”的迷雾</a>
       </li>
     
@@ -549,10 +553,6 @@ id objc_getAssociatedObject(id object, const void *key);
     
       <li class="post">
         <a href="/blog/2013/11/01/code-comment-and-doc-gen-tools-for-objc/">Objective-C代码注释和文档输出的工具和方法</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/10/28/operation-queue-intro/">并发编程之Operation Queue</a>
       </li>
     
   </ul>
@@ -582,7 +582,7 @@ id objc_getAssociatedObject(id object, const void *key);
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2013 - 谌启亮 -
+  Copyright &copy; 2014 - 谌启亮 -
   <span class="credit">使用 <a href="http://octopress.org">Octopress</a></span>
 </p>
 

@@ -9,7 +9,7 @@
   <meta name="author" content="谌启亮">
 
   
-  <meta name="description" content="逛开发论坛时经常发现一些同学说使用nib文件能提高性能，我对此保持怀疑态度，毕竟它是要读取并解析一个文件的。本着事实求是的精神，我实测了一下，对比使用nib和使用代码创建view的效率。 首先我创建了两个ViewController， &hellip;">
+  <meta name="description" content="我的MacBook是2008年末期的一款，当时手头不是很宽裕，但是看到这么顺眼的本本，再加上自己本身搞这一行，忍痛透支信用卡买了一个。它是最后一款铝合金外壳的MacBook了，后来铝合金的都是MacBook Pro了，160G硬盘，Core2 2G，2G内存。2年前感觉硬盘实在太小， &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -76,6 +76,47 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/03/30/old-macbook-upgrade-mem/">老MacBook升级内存记</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-30T00:31:00+08:00" pubdate data-updated="true">2012-03-30 00:31</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>我的MacBook是2008年末期的一款，当时手头不是很宽裕，但是看到这么顺眼的本本，再加上自己本身搞这一行，忍痛透支信用卡买了一个。它是最后一款铝合金外壳的MacBook了，后来铝合金的都是MacBook Pro了，160G硬盘，Core2 2G，2G内存。2年前感觉硬盘实在太小，换了一个320G的，撑到现在。</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/03/30/old-macbook-upgrade-mem/">阅读更多 &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -490,67 +531,6 @@ if (string1==string2) {
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/03/13/open-setting-use-url-schema/">通过URL Schema中打开iOS设置</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-03-13T22:34:00+08:00" pubdate data-updated="true">2012-03-13 22:34</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>iOS5.0中增加了通过URL Schema打开系统设置功能，并且可以具体打开到相关设置页。这样就很方便在我们提示用户修改系统设置时进行相关跳转。
-比如打开位置服务设置的URL是：</p>
-
-<pre><code>prefs:root=LOCATION_SERVICES
-</code></pre>
-
-<p>如果位置服务没有打开我们就可以用以下代码来跳转到位置服务设置，这样方便了很多。</p>
-
-<pre><code>[[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"prefs:root=LOCATION_SERVICES"]];
-</code></pre>
-
-<p>也可以打开你自己应用的设置</p>
-
-<pre><code>[[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"prefs:root=Apps&amp;amp;path=AppDisplayName"]];
-</code></pre>
-
-<p>还有其他一些很常用的URL：</p>
-
-<pre><code>prefs:root=TWITTER 设置Twitter
-prefs:root=General&amp;path=Bluetooth 设置蓝牙
-prefs:root=WIFI 设置WiFi
-prefs:root=General&amp;path=DATE_AND_TIME 设置日期／时间
-prefs:root=Wallpaper 设置壁纸
-</code></pre>
-
-<p><strong>注意：这种方式在iOS5.1和以上版本已经无效了。</strong></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/5/">&larr; 以往文章</a>
@@ -590,6 +570,10 @@ prefs:root=Wallpaper 设置壁纸
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2014/02/24/iphone-baseband-intro/">初识iPhone基带通讯</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/12/16/mists-of-the-sharp/">“#”的迷雾</a>
       </li>
     
@@ -603,10 +587,6 @@ prefs:root=Wallpaper 设置壁纸
     
       <li class="post">
         <a href="/blog/2013/11/01/code-comment-and-doc-gen-tools-for-objc/">Objective-C代码注释和文档输出的工具和方法</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/10/28/operation-queue-intro/">并发编程之Operation Queue</a>
       </li>
     
   </ul>
@@ -636,7 +616,7 @@ prefs:root=Wallpaper 设置壁纸
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2013 - 谌启亮 -
+  Copyright &copy; 2014 - 谌启亮 -
   <span class="credit">使用 <a href="http://octopress.org">Octopress</a></span>
 </p>
 
